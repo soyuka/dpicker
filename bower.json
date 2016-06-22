@@ -15,8 +15,11 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "test.js",
+    "!dist/dpicker.js",
+    "!dist/dpicker.min.js",
+    "screen.png",
+    "demo"
   ],
   "dependencies": {
     "moment": "^2.13.0",
