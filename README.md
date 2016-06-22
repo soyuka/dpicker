@@ -23,8 +23,8 @@ bower install dpicker --save
 DPicker depends on moment and maquette. Those can be included with your favorite module loader or through a CDN, for example:
 
 ```html
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
 ```
 
 To create a date picker, just init the DPicker module within a container:
@@ -36,14 +36,37 @@ var dp = new DPicker(document.getElementById('my-datepicker'))
 </script>
 ```
 
+You may want to add some css:
+
+```css
+td.dpicker-inactive {
+  color: grey;
+}
+
+button.dpicker-active {
+  background: red;
+}
+
+.dpicker-invisible {
+  display: none;
+}
+
+.dpicker-visible {
+  display: block;
+}
+```
+
 ## Options
 
 ```
+{boolean} options.display Display the date picker or not (default false)
 {Moment} options.model Your own model instance, defaults to moment()
 {Number} options.futureYear The latest year available in the date picker
 {Number} options.minYear The minimum year (default to 1986)
 {string} options.format The input format, a moment format, default to DD/MM/YYYY
 ```
+
+Every property is available through the `DPicker` instance.
 
 ## License
 
