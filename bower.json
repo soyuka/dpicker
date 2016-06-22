@@ -1,0 +1,25 @@
+{
+  "name": "dpicker",
+  "description": "Minimalist date picker",
+  "main": "dist/dpicker.js",
+  "authors": [
+    "soyuka"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "date",
+    "picker"
+  ],
+  "homepage": "https://github.com/soyuka/dpicker",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "moment": "^2.13.0",
+    "maquette": "^2.3.3"
+  }
+}
