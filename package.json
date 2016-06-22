@@ -1,0 +1,51 @@
+{
+  "name": "dpicker",
+  "version": "1.0.0",
+  "description": "Minimalist date picker",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soyuka/dpicker.git"
+  },
+  "keywords": [
+    "date",
+    "picker"
+  ],
+  "author": "soyuka",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/soyuka/dpicker/issues"
+  },
+  "homepage": "https://github.com/soyuka/dpicker#readme",
+  "dependencies": {
+    "maquette": "^2.3.3",
+    "moment": "^2.13.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.3",
+    "gulp-wrap": "^0.13.0",
+    "jsdom": "^9.2.1",
+    "maquette-query": "^0.7.5",
+    "mocha": "^2.5.3",
+    "mocha-jsdom": "^1.1.0",
+    "request-frame": "^1.4.1"
+  },
+  "testling": {
+    "harness": "mocha",
+    "files": "test.js",
+    "browsers": [
+      "ie/8..latest",
+      "chrome/latest",
+      "firefox/latest"
+    ]
+  }
+}

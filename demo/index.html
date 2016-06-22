@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>test</title>
+    <style type="text/css">
+      td.dpicker-inactive {
+        color: grey;
+      }
+      button.dpicker-active {
+        background: red;
+      }
+      .dpicker-invisible {
+        display: none;
+      }
+      .dpicker-visible {
+        display: block;
+      }
+    </style>
+  </head>
+<body>
+  <some-datepicker />
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
+	<script src="../dist/dpicker.js"></script>
+  <script>
+    angular.module('myModule', [])
+
+    angular.module('myModule')
+    .directive('someDatepicker', function() {
+      return {
+        link: function(scope, element, attrs) {
+          new DPicker(element[0])
+        }
+      }
+    })
+
+    angular.element(document).ready(function() {
+      angular.bootstrap(document, ['myModule'])
+    })
+  </script>
+</body>
+</html>
