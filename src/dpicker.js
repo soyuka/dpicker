@@ -5,9 +5,41 @@ const projector = maquette.createProjector()
 function noop() {}
 
 let container
-let model
-let format
-let display
+
+const now = moment()
+
+const _DPicker = {
+  model: now.clone(),
+  format: 'DD/MM/YYYY',
+  display: false,
+  futureYear: +now.format('YYYY') + 1,
+  pastYear: 1986
+}
+
+/**
+ * DPicker simple date picker
+ * @param {Element} element DOM element where you want the date picker
+ * @param {Object} options
+ * @param {Moment} options.model Your own model instance, defaults to moment()
+ * @param {Number} options.futureYear The latest year available (default to year + 1
+ * @param {Number} options.pastYear The minimum year (default to 1986)
+ * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
+ */
+function DPicker(element, options = {}) {
+  for (let i in options) {
+    if (i in _DPicker) {
+      _DPicker[i] = options[i]
+    }
+  }
+
+  // https://gist.github.com/jed/982883
+  container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+
+  document.addEventListener('click', hideContainer)
+  projector.append(element, this.render.bind(this))
+
+  return this
+}
 
 /**
  * Hides the container if user clicks not in the container
@@ -26,7 +58,7 @@ function hideContainer(evt) {
     parent = parent.parentNode
   }
 
-  display = false
+  _DPicker.display = false
   projector.scheduleRender()
 }
 
@@ -36,7 +68,7 @@ function hideContainer(evt) {
  * @see DPicker.render
  */
 function inputChange(evt) {
-  model = moment(evt.target.value, format)
+  _DPicker.model = moment(evt.target.value, format)
 }
 
 /**
@@ -45,7 +77,7 @@ function inputChange(evt) {
  * @see DPicker.render
  */
 function inputFocus(evt) {
-  display = true
+  _DPicker.display = true
 }
 
 /**
@@ -54,7 +86,7 @@ function inputFocus(evt) {
  * @see DPicker.renderYear
  */
 function yearChange(evt) {
-  model.year(evt.target.options[evt.target.selectedIndex].value)
+  _DPicker.model.year(evt.target.options[evt.target.selectedIndex].value)
 }
 
 /**
@@ -63,7 +95,7 @@ function yearChange(evt) {
  * @see DPicker.renderMonths
  */
 function monthChange(evt) {
-  model.month(evt.target.options[evt.target.selectedIndex].value)
+  _DPicker.model.month(evt.target.options[evt.target.selectedIndex].value)
 }
 
 /**
@@ -72,37 +104,31 @@ function monthChange(evt) {
  * @see DPicker.renderDays
  */
 function dayClick(evt) {
-  model.date(evt.target.value)
+  _DPicker.model.date(evt.target.value)
 }
 
 /**
- * DPicker simple date picker
- * @param {Element} element DOM element where you want the date picker
- * @param {Object} options
- * @param {Moment} options.model Your own model instance, defaults to moment()
- * @param {Number} options.futureYear The latest year available in the date picker
- * @param {Number} options.minYear The minimum year (default to 1986)
- * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
+ * Render a DPicker
+ * div.dpicker#uuid
+ *   input[type=text]
+ *   div.dpicker-[visible|invible]
+ * @see DPicker.renderYears
+ * @see DPicker.renderMonths
+ * @see DPicker.renderDays
  */
-function DPicker(element, options = {}) {
-  model = options.model || moment()
-  this.futureYear = options.futureYear || +moment().format('YYYY') + 2
-  this.minYear = options.minYear || 1986
-  format = this.format = options.format || 'DD/MM/YYYY'
-  display = false
-	// https://gist.github.com/jed/982883
-  this.container = container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
-
-  document.addEventListener('click', hideContainer)
-  projector.append(element, this.render.bind(this))
-
-  return this
-}
-
 DPicker.prototype.render = function() {
   return h('div.dpicker#'+container, [
-    h('input', {value: model.format(this.format), type: 'text', onchange: inputChange, onfocus: inputFocus, name: 'dpicker-input'}),
-    h('div', {classes: {'dpicker-visible': display, 'dpicker-invisible': !display}}, [
+    h('input', {
+      value: _DPicker.model.format(_DPicker.format),
+      type: 'text',
+      onchange: inputChange,
+      onfocus: inputFocus,
+      name: 'dpicker-input'}
+    ),
+    h('div', {
+      classes: {'dpicker-visible': _DPicker.display, 'dpicker-invisible': !_DPicker.display}
+    },
+    [
       this.renderYears(),
       this.renderMonths(),
       this.renderDays()
@@ -111,11 +137,11 @@ DPicker.prototype.render = function() {
 }
 
 DPicker.prototype.renderYears = function() {
-  let modelYear = +model.format('YYYY')
-  let futureYear = this.futureYear
+  let modelYear = +_DPicker.model.format('YYYY')
+  let futureYear = this.futureYear + 1
   let options = []
 
-  while(futureYear-- > this.minYear) {
+  while(--futureYear >= this.pastYear) {
     options.push(h('option', {value: futureYear, selected: futureYear === modelYear}, ''+futureYear))
   }
 
@@ -125,16 +151,24 @@ DPicker.prototype.renderYears = function() {
 }
 
 DPicker.prototype.renderMonths = function() {
-  let modelMonth = +model.format('MM')
+  let modelMonth = +_DPicker.model.format('MM')
 
-  return h('select', {onchange: monthChange, name: 'dpicker-month'}, moment.monthsShort().map((e, i) => h('option', {value: i, selected: i+1 === modelMonth}, e)))
+  return h('select', {
+      onchange: monthChange,
+      name: 'dpicker-month'
+    },
+    moment.monthsShort()
+    .map((e, i) => h('option', {
+      value: i, selected: i+1 === modelMonth
+    }, e))
+  )
 }
 
 DPicker.prototype.renderDays = function() {
-  let daysInMonth = model.daysInMonth()
-  let daysInPreviousMonth = model.clone().month(-1).daysInMonth()
-  let firstDay = +(model.clone().date(1).format('e')) - 1
-  let currentDay = model.date()
+  let daysInMonth = _DPicker.model.daysInMonth()
+  let daysInPreviousMonth = _DPicker.model.clone().month(-1).daysInMonth()
+  let firstDay = +(_DPicker.model.clone().date(1).format('e')) - 1
+  let currentDay = _DPicker.model.date()
 
   let rows = new Array(Math.ceil((firstDay + daysInMonth) / 7)).fill(0)
   let day
@@ -145,6 +179,7 @@ DPicker.prototype.renderDays = function() {
     h('tr', moment.weekdaysShort().map(e => h('th', e))),
     //rows
     rows.map((e, row) => {
+      //weeks filed with days
       return h('tr', {key: row}, new Array(7).fill(0).map((e, col) => {
 
         if (col <= firstDay && row == 0) {
@@ -162,14 +197,33 @@ DPicker.prototype.renderDays = function() {
           day++
         }
 
-        return h('td', {classes: {'dpicker-active': dayActive, 'dpicker-inactive': !dayActive}}, [
-          h(dayActive ? 'button' : 'span', {onclick: dayActive ? dayClick : noop, value: day, classes: {'dpicker-active': currentDay == day}}, day)
+        return h('td', {
+          classes: {'dpicker-active': dayActive, 'dpicker-inactive': !dayActive}
+        }, [
+          h(dayActive ? 'button' : 'span', {
+            onclick: dayActive ? dayClick : noop,
+            value: day,
+            classes: {'dpicker-active': currentDay == day}
+          }, day)
         ])
       }))
     })
   ])
 }
 
-DPicker.prototype.getModel = function() {
-  return model
+Object.defineProperty(DPicker.prototype, 'container', {
+  get: function() {
+    return container
+  }
+})
+
+for(let i in _DPicker) {
+  Object.defineProperty(DPicker.prototype, i, {
+      get: function() {
+        return _DPicker[i]
+      },
+      set: function(newValue) {
+        _DPicker[i] = newValue
+      }
+  })
 }

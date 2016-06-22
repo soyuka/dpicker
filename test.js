@@ -21,12 +21,20 @@ describe('dpicker', function() {
     })
   }
 
-  before(function() {
+  function createDatePicker(opts) {
+    if (container) {
+      document.body.removeChild(container)
+    }
+
     container = document.createElement('div')
     container.setAttribute('id', 'dpicker')
     document.body.appendChild(container)
-    dpicker = new DPicker(container)
+    dpicker = new DPicker(container, opts || {})
     projector = maquetteQuery.createTestProjector(dpicker.render.bind(dpicker))
+  }
+
+  before(function() {
+    createDatePicker()
   })
 
   it('should init a dpicker', function() {
@@ -49,8 +57,8 @@ describe('dpicker', function() {
 
     let input = getElementByName('dpicker-input')
 
-    expect(''+dpicker.getModel().year()).to.equal(options[selectedIndex].value)
-    expect(input.properties.value).to.equal(dpicker.getModel().format(dpicker.format))
+    expect(''+dpicker.model.year()).to.equal(options[selectedIndex].value)
+    expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
   })
 
   it('should change month', function() {
@@ -68,8 +76,8 @@ describe('dpicker', function() {
 
     let input = getElementByName('dpicker-input')
 
-    expect(''+dpicker.getModel().month()).to.equal(options[selectedIndex].value)
-    expect(input.properties.value).to.equal(dpicker.getModel().format(dpicker.format))
+    expect(''+dpicker.model.month()).to.equal(options[selectedIndex].value)
+    expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
   })
 
   it('should change day', function() {
@@ -78,6 +86,23 @@ describe('dpicker', function() {
     })
 
     button.simulate.click({value: button.properties.value})
-    expect(dpicker.getModel().date()).to.equal(button.properties.value)
+    expect(dpicker.model.date()).to.equal(button.properties.value)
+  })
+
+  it('should have customized date range', function() {
+    createDatePicker({futureYear: 2026, pastYear: 1900})
+
+    let options = document.querySelector('select[name="dpicker-year"]').options
+    expect(+options[0].value).to.equal(2026)
+    expect(options.length).to.equal(2027 - 1900)
+    expect(+options[options.length - 1].value).to.equal(1900)
+  })
+
+  it('should have customized format', function() {
+    dpicker.format = 'MM/DD/YYYY'
+
+    let input = getElementByName('dpicker-input')
+
+    expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
   })
 })
