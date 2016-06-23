@@ -19,7 +19,9 @@
     "!dist/dpicker.js",
     "!dist/dpicker.min.js",
     "screen.png",
-    "demo"
+    "gulpfile.js",
+    "demo",
+    "bump.sh"
   ],
   "dependencies": {
     "moment": "^2.13.0",
