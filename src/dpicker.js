@@ -112,7 +112,7 @@ function dayClick(evt) {
  * Render a DPicker
  * div.dpicker#uuid
  *   input[type=text]
- *   div.dpicker-[visible|invible]
+ *   div.dpicker-container.dpicker-[visible|invible]
  * @see DPicker.renderYears
  * @see DPicker.renderMonths
  * @see DPicker.renderDays
@@ -126,7 +126,7 @@ DPicker.prototype.render = function() {
       onfocus: inputFocus,
       name: 'dpicker-input'}
     ),
-    h('div', {
+    h('div.dpicker-container', {
       classes: {'dpicker-visible': _DPicker.display, 'dpicker-invisible': !_DPicker.display}
     },
     [
