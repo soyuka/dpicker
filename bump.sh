@@ -4,8 +4,7 @@
 
 gulp
 newver=$(npm --no-git-tag-version version $1)
-git add -f dist
-git add package.json
+git add -f dist package.json
 git commit -m $newver
 git tag $newver
 npm publish
