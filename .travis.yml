@@ -7,6 +7,10 @@ node_js:
    - "4"
    - "6"
 
+install:
+  - npm install
+  - npm run build
+
 matrix:
   fast_finish: true
 

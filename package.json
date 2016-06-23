@@ -4,8 +4,8 @@
   "description": "Minimalist date picker",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "build": "gulp"
+    "test": "./node_modules/.bin/_mocha",
+    "build": "./node_modules/.bin/gulp"
   },
   "repository": {
     "type": "git",
@@ -38,14 +38,5 @@
     "mocha": "^2.5.3",
     "mocha-jsdom": "^1.1.0",
     "request-frame": "^1.4.1"
-  },
-  "testling": {
-    "harness": "mocha",
-    "files": "test.js",
-    "browsers": [
-      "ie/8..latest",
-      "chrome/latest",
-      "firefox/latest"
-    ]
   }
 }
