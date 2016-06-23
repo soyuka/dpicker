@@ -14,3 +14,4 @@ newver=$(npm --no-git-tag-version version $1)
 git add package.json
 git commit -m $newver
 git push --tags
+git push
