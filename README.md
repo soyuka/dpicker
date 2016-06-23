@@ -1,5 +1,7 @@
 # DPicker
 
+[![Build Status](https://travis-ci.org/soyuka/dpicker.svg?branch=master)](https://travis-ci.org/soyuka/dpicker)
+
 Basic date picker
 
 ![screen](screen.png)

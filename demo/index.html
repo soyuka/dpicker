@@ -29,8 +29,21 @@
     angular.module('myModule')
     .directive('someDatepicker', function() {
       return {
+        template: '<button ng-click="toggle($event)">Toggle</button><button ng-click="tomorrow($event)">Tomorrow</button><button ng-click="today($event)">Today</button>',
         link: function(scope, element, attrs) {
-          new DPicker(element[0])
+          const dpicker = new DPicker(element[0])
+
+          scope.toggle = function(evt) {
+            dpicker.display = !dpicker.display
+          }
+
+          scope.tomorrow = function(evt) {
+            dpicker.model = moment().add(1, 'days')
+          }
+
+          scope.today = function(evt) {
+            dpicker.model = moment()
+          }
         }
       }
     })

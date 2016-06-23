@@ -35,19 +35,20 @@ function DPicker(element, options = {}) {
   // https://gist.github.com/jed/982883
   container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
 
-  document.addEventListener('click', hideContainer)
+  document.addEventListener('click', hide)
+  element.setAttribute('id', container)
   projector.append(element, this.render.bind(this))
 
   return this
 }
 
 /**
- * Hides the container if user clicks not in the container
+ * Hides the date picker if user does not click inside the container
  * @param {Event} DOMEvent
  * @see DPicker
  */
-function hideContainer(evt) {
-  let node = event.target
+function hide(evt) {
+  let node = evt.target
   let parent = node.parentNode
 
   while (parent != document) {
@@ -117,7 +118,7 @@ function dayClick(evt) {
  * @see DPicker.renderDays
  */
 DPicker.prototype.render = function() {
-  return h('div.dpicker#'+container, [
+  return h('div.dpicker', [
     h('input', {
       value: _DPicker.model.format(_DPicker.format),
       type: 'text',
@@ -166,11 +167,11 @@ DPicker.prototype.renderMonths = function() {
 
 DPicker.prototype.renderDays = function() {
   let daysInMonth = _DPicker.model.daysInMonth()
-  let daysInPreviousMonth = _DPicker.model.clone().month(-1).daysInMonth()
+  let daysInPreviousMonth = _DPicker.model.clone().subtract(1, 'months').daysInMonth()
   let firstDay = +(_DPicker.model.clone().date(1).format('e')) - 1
   let currentDay = _DPicker.model.date()
 
-  let rows = new Array(Math.ceil((firstDay + daysInMonth) / 7)).fill(0)
+  let rows = new Array(Math.ceil(.1+(firstDay + daysInMonth) / 7)).fill(0)
   let day
   let dayActive
 
@@ -224,6 +225,7 @@ for(let i in _DPicker) {
       },
       set: function(newValue) {
         _DPicker[i] = newValue
+        projector.scheduleRender()
       }
   })
 }
