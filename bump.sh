@@ -10,3 +10,4 @@ git commit -m $newver
 git tag $newver
 npm publish
 git reset --hard HEAD~1
+git push --tags
