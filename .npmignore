@@ -4,3 +4,5 @@ demo
 test.js
 gulpfile.js
 screen.png
+bower_components
+bump.sh
