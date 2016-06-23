@@ -6,6 +6,8 @@ Basic date picker
 
 ![screen](screen.png)
 
+[*Foundation style + french locales*](https://github.com/soyuka/dpicker#foundation-style-scss)
+
 ## Installation
 
 ### npm
@@ -60,7 +62,7 @@ button.dpicker-active {
 
 ## Options
 
-```
+```javascript
 {boolean} options.display Display the date picker or not (default false)
 {Moment} options.model Your own model instance, defaults to moment()
 {Number} options.futureYear The latest year available in the date picker
@@ -68,7 +70,61 @@ button.dpicker-active {
 {string} options.format The input format, a moment format, default to DD/MM/YYYY
 ```
 
-Every property is available through the `DPicker` instance.
+Every property is available through the `DPicker` instance and can be changed through the object lifecycle.
+
+Here is how to change the format for example:
+
+```javascript
+let dpicker = new DPicker(document.body);
+// ... do things
+dpicker.format = 'YYYY' //change the format
+```
+
+If you change locale moment, changes will automatically be taken into consideration. For example, set `moment.locale('fr')` to use french months.
+
+## Foundation style (SCSS)
+
+```scss
+.dpicker {
+    .dpicker-container {
+        width: 300px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 15px;
+        position: absolute;
+        background: $black;
+
+        &.dpicker-invisible { display: none; }
+        &.dpicker-visible { display: flex; }
+
+        > select {
+            flex: 0 0 49%;
+        }
+
+        > table {
+            color: $white;
+            text-align:center;
+
+            td {
+                border-collapse: collapse;
+                border: 1px solid $gray;
+            }
+
+            .dpicker-inactive { font-size: $small-font-size; color: scale-color($black, $lightness: 50%); }
+
+            .dpicker-active button {
+                @include button($expand: true)
+                margin: 0;
+                padding: 0.4em 0;
+
+                &.dpicker-active {
+                    background-color: scale-color($primary-color, $lightness: -20%);
+                }
+            }
+        }
+    }
+}
+```
 
 ## License
 
