@@ -2,7 +2,7 @@
   "name": "dpicker",
   "version": "1.0.8",
   "description": "Minimalist date picker",
-  "main": "index.js",
+  "main": "dist/dpicker.js",
   "scripts": {
     "test": "./node_modules/.bin/_mocha",
     "build": "./node_modules/.bin/gulp"
