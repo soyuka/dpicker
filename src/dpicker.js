@@ -130,20 +130,27 @@ DPicker.prototype.render = function() {
       classes: {'dpicker-visible': _DPicker.display, 'dpicker-invisible': !_DPicker.display}
     },
     [
-      this.renderYears(),
       this.renderMonths(),
+      this.renderYears(),
       this.renderDays()
     ])
   ])
 }
 
+/**
+ * Render Years
+ * select[name='dpicker-year']
+ */
 DPicker.prototype.renderYears = function() {
   let modelYear = +_DPicker.model.format('YYYY')
   let futureYear = this.futureYear + 1
   let options = []
 
   while(--futureYear >= this.pastYear) {
-    options.push(h('option', {value: futureYear, selected: futureYear === modelYear}, ''+futureYear))
+    options.push(h('option', {
+      value: futureYear,
+      selected: futureYear === modelYear
+    }, ''+futureYear))
   }
 
   return h('select', {onchange: yearChange, name: 'dpicker-year'}, [
@@ -151,6 +158,10 @@ DPicker.prototype.renderYears = function() {
   ])
 }
 
+/**
+ * Render Months
+ * select[name='dpicker-month']
+ */
 DPicker.prototype.renderMonths = function() {
   let modelMonth = +_DPicker.model.format('MM')
 
@@ -165,6 +176,14 @@ DPicker.prototype.renderMonths = function() {
   )
 }
 
+/**
+ * Render Days
+ * select[name='dpicker-month']
+ * table
+ *  tr
+ *    td
+ *      button|span
+ */
 DPicker.prototype.renderDays = function() {
   let daysInMonth = _DPicker.model.daysInMonth()
   let daysInPreviousMonth = _DPicker.model.clone().subtract(1, 'months').daysInMonth()
@@ -212,6 +231,9 @@ DPicker.prototype.renderDays = function() {
   ])
 }
 
+/**
+ * DPicker.container getter
+ */
 Object.defineProperty(DPicker.prototype, 'container', {
   get: function() {
     return container
