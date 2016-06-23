@@ -69,7 +69,7 @@ function hide(evt) {
  * @see DPicker.render
  */
 function inputChange(evt) {
-  _DPicker.model = moment(evt.target.value, format)
+  _DPicker.model = moment(evt.target.value, _DPicker.format)
 }
 
 /**

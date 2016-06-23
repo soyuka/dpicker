@@ -105,4 +105,34 @@ describe('dpicker', function() {
 
     expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
   })
+
+  it('should change dpicker according to input change', function() {
+
+    let input = getElementByName('dpicker-input')
+    dpicker.format = 'DD/MM/YYYY'
+    input.simulate.change({value: '24/06/1991'})
+
+		expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
+  })
+
+  it('should display dpicker on input focus', function() {
+
+    let input = getElementByName('dpicker-input')
+    input.simulate.focus()
+
+		expect(dpicker.display).to.be.true
+  })
+
+  it('should hide container on outside click', function() {
+    document.body.click()
+    expect(dpicker.display).to.be.false
+  })
+
+  it('should not hide container on inside click', function() {
+    let input = getElementByName('dpicker-input')
+    input.simulate.focus()
+    expect(dpicker.display).to.be.true
+    document.getElementById(dpicker.container).children[0].click()
+    expect(dpicker.display).to.be.true
+  })
 })
