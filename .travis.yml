@@ -1,0 +1,14 @@
+language: node_js
+branches:
+  only:
+    - master
+
+node_js:
+   - "4"
+   - "6"
+
+matrix:
+  fast_finish: true
+
+# container-base
+sudo: false
