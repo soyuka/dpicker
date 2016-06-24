@@ -16,6 +16,11 @@ function injector(fn) {
   }
 }
 
+// https://gist.github.com/jed/982883
+function uuid() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+}
+
 /**
  * DPicker simple date picker
  * @param {Element} element DOM element where you want the date picker
@@ -24,10 +29,10 @@ function injector(fn) {
  * @param {Number} options.futureYear The latest year available (default to year + 1
  * @param {Number} options.pastYear The minimum year (default to 1986)
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
+ * @param {string} options.inputId The input id, useful to add you own label
  */
 function DPicker(element, options = {}) {
-  // https://gist.github.com/jed/982883
-  this._container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+  this._container = uuid()
   this._projector = maquette.createProjector()
 
   const now = options.moment || moment()
@@ -37,7 +42,8 @@ function DPicker(element, options = {}) {
     format: options.format || 'DD/MM/YYYY',
     display: options.display || false,
     futureYear: options.futureYear || +now.format('YYYY') + 1,
-    pastYear: options.pastYear || 1986
+    pastYear: options.pastYear || 1986,
+    inputId: options.inputId || uuid()
   }
 
   this._events = {
@@ -132,7 +138,7 @@ function DPicker(element, options = {}) {
  */
 DPicker.prototype.render = injector(function render(events, data, toRender) {
   return h('div.dpicker', [
-    h('input', {
+    h('input#'+data.inputId, {
       value: data.model.format(data.format),
       type: 'text',
       onchange: events.inputChange,
@@ -252,6 +258,12 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
 Object.defineProperty(DPicker.prototype, 'container', {
   get: function() {
     return this._container
+  }
+})
+
+Object.defineProperty(DPicker.prototype, 'inputId', {
+  get: function() {
+    return this._data.inputId
   }
 })
 

@@ -30,7 +30,9 @@
 
   <h2>VanillaJS</h2>
   <div class="container">
+    <label for="dp-test-label-0">Label</label>
     <vanilla-datepicker></vanilla-datepicker>
+    <label for="dp-test-label-1">Label</label>
     <vanilla-datepicker></vanilla-datepicker>
   </div>
   <h2>Angular</h2>
@@ -43,7 +45,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
     <script src="../dist/dpicker.js"></script>
   <script>
-    ;[].slice.call(document.getElementsByTagName('vanilla-datepicker')).forEach(e => new DPicker(e))
+    ;[].slice.call(document.getElementsByTagName('vanilla-datepicker')).forEach((e, i) => new DPicker(e, {inputId: 'dp-test-label-'+i}))
 
     angular.module('myModule', [])
 

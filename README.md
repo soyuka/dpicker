@@ -58,6 +58,10 @@ button.dpicker-active {
 .dpicker-visible {
   display: block;
 }
+
+.dpicker-container {
+  position: absolute;
+}
 ```
 
 ## Options
@@ -68,6 +72,7 @@ button.dpicker-active {
 {Number} options.futureYear The latest year available in the date picker
 {Number} options.minYear The minimum year (default to 1986)
 {string} options.format The input format, a moment format, default to DD/MM/YYYY
+{string} options.inputId The input id, useful to add you own label
 ```
 
 Every property is available through the `DPicker` instance and can be changed through the object lifecycle.
