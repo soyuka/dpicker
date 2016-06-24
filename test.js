@@ -142,4 +142,15 @@ describe('dpicker', function() {
     document.getElementById(dpicker.container).children[0].click()
     expect(dpicker.display).to.be.true
   })
+
+  it('should intercept events', function(cb) {
+    createDatePicker({onChange: function() {
+      cb()
+    }})
+
+    let input = getElementByName('dpicker-input')
+
+    input.simulate.focus()
+
+  })
 })
