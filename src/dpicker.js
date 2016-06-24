@@ -31,7 +31,7 @@ function uuid() {
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
  * @param {string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
  * @param {string} options.inputId The input id, useful to add you own label (can only be set once)
- * @param {Function} options.onChange A function to call whenever the data gets updated
+ * @param {Function} options.onChange(data, array changedProperties) A function to call whenever the data gets updated
  */
 function DPicker(element, options = {}) {
   this._container = uuid()
@@ -70,7 +70,7 @@ function DPicker(element, options = {}) {
 
       this._data.display = false
       this._projector.scheduleRender()
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['display'])
     },
 
     /**
@@ -80,7 +80,7 @@ function DPicker(element, options = {}) {
      */
     inputChange: (evt) => {
       this._data.model = moment(evt.target.value, this._data.format)
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['model'])
     },
 
     /**
@@ -90,7 +90,7 @@ function DPicker(element, options = {}) {
      */
     inputFocus: (evt) => {
       this._data.display = true
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['display'])
     },
 
     /**
@@ -100,7 +100,7 @@ function DPicker(element, options = {}) {
      */
     yearChange: (evt) => {
       this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['model'])
     },
 
     /**
@@ -110,7 +110,7 @@ function DPicker(element, options = {}) {
      */
     monthChange: (evt) => {
       this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['model'])
     },
 
     /**
@@ -120,7 +120,7 @@ function DPicker(element, options = {}) {
      */
     dayClick: (evt) => {
       this._data.model.date(evt.target.value)
-      options.onChange && options.onChange(this._data)
+      options.onChange && options.onChange(this._data, ['model'])
     }
   }
 

@@ -144,7 +144,8 @@ describe('dpicker', function() {
   })
 
   it('should intercept events', function(cb) {
-    createDatePicker({onChange: function() {
+    createDatePicker({onChange: function(data, properties) {
+      expect(properties).to.contain('display')
       cb()
     }})
 

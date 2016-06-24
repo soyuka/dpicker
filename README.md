@@ -74,7 +74,7 @@ button.dpicker-active {
 {string} options.format The input format, a moment format, default to DD/MM/YYYY
 {string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
 {string} options.inputId The input id, useful to add you own label
-{Function} options.onChange A function to call whenever the model updates
+{Function} options.onChange(data, array changedProperties) A function to call whenever the data gets updated
 ```
 
 Every property is available through the `DPicker` instance and can be changed through the object lifecycle.
