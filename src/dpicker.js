@@ -1,19 +1,19 @@
 'use strict'
 const h = maquette.h
-const projector = maquette.createProjector()
 
 function noop() {}
 
-let container
-
-const now = moment()
-
-const _DPicker = {
-  model: now.clone(),
-  format: 'DD/MM/YYYY',
-  display: false,
-  futureYear: +now.format('YYYY') + 1,
-  pastYear: 1986
+/**
+ * This is usefull to keep data inside the instance, without the need to
+ * changing event function (see rule #1 of maquette.js http://maquettejs.org/docs/rules.html).
+ * Injector shortcut to avoid doing this on every function...
+ */
+function injector(fn) {
+  return function(events, data, toRender) {
+    return function() {
+      return fn(events, data, toRender)
+    }
+  }
 }
 
 /**
@@ -26,87 +26,100 @@ const _DPicker = {
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
  */
 function DPicker(element, options = {}) {
-  for (let i in options) {
-    if (i in _DPicker) {
-      _DPicker[i] = options[i]
+  // https://gist.github.com/jed/982883
+  this._container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+  this._projector = maquette.createProjector()
+
+  const now = options.moment || moment()
+
+  this._data = {
+    model: now.clone(),
+    format: options.format || 'DD/MM/YYYY',
+    display: options.display || false,
+    futureYear: options.futureYear || +now.format('YYYY') + 1,
+    pastYear: options.pastYear || 1986
+  }
+
+  this._events = {
+    /**
+     * Hides the date picker if user does not click inside the container
+     * @param {Event} DOMEvent
+     * @see DPicker
+     */
+    hide: (evt) => {
+      let node = evt.target
+      let parent = node.parentNode
+
+      while (parent != document) {
+        if (parent.getAttribute('id') == this._container) {
+          return
+        }
+
+        parent = parent.parentNode
+      }
+
+      this._data.display = false
+      this._projector.scheduleRender()
+    },
+
+    /**
+     * Change model on input change
+     * @param {Object} DOMEvent
+     * @see DPicker.render
+     */
+    inputChange: (evt) => {
+      this._data.model = moment(evt.target.value, this._data.format)
+    },
+
+    /**
+     * Show the container on input focus
+     * @param {Object} DOMEvent
+     * @see DPicker.render
+     */
+    inputFocus: (evt) => {
+      this._data.display = true
+    },
+
+    /**
+     * On year change, update the model value
+     * @param {Object} DOMEvent
+     * @see DPicker.renderYear
+     */
+    yearChange: (evt) => {
+      this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
+    },
+
+    /**
+     * On month change, update the model value
+     * @param {Object} DOMEvent
+     * @see DPicker.renderMonths
+     */
+    monthChange: (evt) => {
+      this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
+    },
+
+    /**
+     * On day click, update the model value
+     * @param {Object} DOMEvent
+     * @see DPicker.renderDays
+     */
+    dayClick: (evt) => {
+      this._data.model.date(evt.target.value)
     }
   }
 
-  // https://gist.github.com/jed/982883
-  container = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+  document.addEventListener('click', this._events.hide)
+  element.setAttribute('id', this._container)
 
-  document.addEventListener('click', hide)
-  element.setAttribute('id', container)
-  projector.append(element, this.render.bind(this))
+  this._projector.append(element, this.render(this._events, this._data, [
+    this.renderYears(this._events, this._data),
+    this.renderMonths(this._events, this._data),
+    this.renderDays(this._events, this._data),
+  ]))
 
   return this
 }
 
-/**
- * Hides the date picker if user does not click inside the container
- * @param {Event} DOMEvent
- * @see DPicker
- */
-function hide(evt) {
-  let node = evt.target
-  let parent = node.parentNode
-
-  while (parent != document) {
-    if (parent.getAttribute('id') == container) {
-      return
-    }
-
-    parent = parent.parentNode
-  }
-
-  _DPicker.display = false
-  projector.scheduleRender()
-}
-
-/**
- * Hides the container if user clicks not in the container
- * @param {Object} DOMEvent
- * @see DPicker.render
- */
-function inputChange(evt) {
-  _DPicker.model = moment(evt.target.value, _DPicker.format)
-}
-
-/**
- * Show the container on input focus
- * @param {Object} DOMEvent
- * @see DPicker.render
- */
-function inputFocus(evt) {
-  _DPicker.display = true
-}
-
-/**
- * On year change, update the model value
- * @param {Object} DOMEvent
- * @see DPicker.renderYear
- */
-function yearChange(evt) {
-  _DPicker.model.year(evt.target.options[evt.target.selectedIndex].value)
-}
-
-/**
- * On month change, update the model value
- * @param {Object} DOMEvent
- * @see DPicker.renderMonths
- */
-function monthChange(evt) {
-  _DPicker.model.month(evt.target.options[evt.target.selectedIndex].value)
-}
-
-/**
- * On day click, update the model value
- * @param {Object} DOMEvent
- * @see DPicker.renderDays
- */
-function dayClick(evt) {
-  _DPicker.model.date(evt.target.value)
-}
 
 /**
  * Render a DPicker
@@ -117,56 +130,55 @@ function dayClick(evt) {
  * @see DPicker.renderMonths
  * @see DPicker.renderDays
  */
-DPicker.prototype.render = function() {
+DPicker.prototype.render = injector(function render(events, data, toRender) {
   return h('div.dpicker', [
     h('input', {
-      value: _DPicker.model.format(_DPicker.format),
+      value: data.model.format(data.format),
       type: 'text',
-      onchange: inputChange,
-      onfocus: inputFocus,
+      onchange: events.inputChange,
+      onfocus: events.inputFocus,
       name: 'dpicker-input'}
     ),
     h('div.dpicker-container', {
-      classes: {'dpicker-visible': _DPicker.display, 'dpicker-invisible': !_DPicker.display}
+      classes: {
+        'dpicker-visible': data.display,
+        'dpicker-invisible': !data.display
+      }
     },
-    [
-      this.renderMonths(),
-      this.renderYears(),
-      this.renderDays()
-    ])
+    toRender.map(e => e()))
   ])
-}
+})
 
 /**
  * Render Years
  * select[name='dpicker-year']
  */
-DPicker.prototype.renderYears = function() {
-  let modelYear = +_DPicker.model.format('YYYY')
-  let futureYear = this.futureYear + 1
+DPicker.prototype.renderYears = injector(function renderYears(events, data, toRender) {
+  let modelYear = +data.model.format('YYYY')
+  let futureYear = data.futureYear + 1
   let options = []
 
-  while(--futureYear >= this.pastYear) {
+  while (--futureYear >= data.pastYear) {
     options.push(h('option', {
       value: futureYear,
       selected: futureYear === modelYear
     }, ''+futureYear))
   }
 
-  return h('select', {onchange: yearChange, name: 'dpicker-year'}, [
+  return h('select', {onchange: events.yearChange, name: 'dpicker-year'}, [
     options
   ])
-}
+})
 
 /**
  * Render Months
  * select[name='dpicker-month']
  */
-DPicker.prototype.renderMonths = function() {
-  let modelMonth = +_DPicker.model.format('MM')
+DPicker.prototype.renderMonths = injector(function renderMonths(events, data, toRender) {
+  let modelMonth = +data.model.format('MM')
 
   return h('select', {
-      onchange: monthChange,
+      onchange: events.monthChange,
       name: 'dpicker-month'
     },
     moment.monthsShort()
@@ -174,7 +186,7 @@ DPicker.prototype.renderMonths = function() {
       value: i, selected: i+1 === modelMonth
     }, e))
   )
-}
+})
 
 /**
  * Render Days
@@ -184,11 +196,11 @@ DPicker.prototype.renderMonths = function() {
  *    td
  *      button|span
  */
-DPicker.prototype.renderDays = function() {
-  let daysInMonth = _DPicker.model.daysInMonth()
-  let daysInPreviousMonth = _DPicker.model.clone().subtract(1, 'months').daysInMonth()
-  let firstDay = +(_DPicker.model.clone().date(1).format('e')) - 1
-  let currentDay = _DPicker.model.date()
+DPicker.prototype.renderDays = injector(function renderDays(events, data, toRender) {
+  let daysInMonth = data.model.daysInMonth()
+  let daysInPreviousMonth = data.model.clone().subtract(1, 'months').daysInMonth()
+  let firstDay = +(data.model.clone().date(1).format('e')) - 1
+  let currentDay = data.model.date()
 
   let rows = new Array(Math.ceil(.1+(firstDay + daysInMonth) / 7)).fill(0)
   let day
@@ -218,10 +230,13 @@ DPicker.prototype.renderDays = function() {
         }
 
         return h('td', {
-          classes: {'dpicker-active': dayActive, 'dpicker-inactive': !dayActive}
+          classes: {
+            'dpicker-active': dayActive,
+            'dpicker-inactive': !dayActive
+          }
         }, [
           h(dayActive ? 'button' : 'span', {
-            onclick: dayActive ? dayClick : noop,
+            onclick: dayActive ? events.dayClick : noop,
             value: day,
             classes: {'dpicker-active': currentDay == day}
           }, day)
@@ -229,25 +244,25 @@ DPicker.prototype.renderDays = function() {
       }))
     })
   ])
-}
+})
 
 /**
  * DPicker.container getter
  */
 Object.defineProperty(DPicker.prototype, 'container', {
   get: function() {
-    return container
+    return this._container
   }
 })
 
-for(let i in _DPicker) {
-  Object.defineProperty(DPicker.prototype, i, {
-      get: function() {
-        return _DPicker[i]
-      },
-      set: function(newValue) {
-        _DPicker[i] = newValue
-        projector.scheduleRender()
-      }
+;['model', 'format', 'display', 'futureYear', 'pastYear'].forEach(e => {
+ Object.defineProperty(DPicker.prototype, e, {
+    get: function() {
+      return this._data[e]
+    },
+    set: function(newValue) {
+      this._data[e] = newValue
+      this._projector.scheduleRender()
+    }
   })
-}
+})

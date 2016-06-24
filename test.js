@@ -26,11 +26,20 @@ describe('dpicker', function() {
       document.body.removeChild(container)
     }
 
+    if (!opts) { opts = {} }
+
     container = document.createElement('div')
     container.setAttribute('id', 'dpicker')
     document.body.appendChild(container)
     dpicker = new DPicker(container, opts || {})
-    projector = maquetteQuery.createTestProjector(dpicker.render.bind(dpicker))
+
+    projector = maquetteQuery.createTestProjector(
+      dpicker.render(dpicker._events, dpicker._data, [
+        dpicker.renderYears(dpicker._events, dpicker._data),
+        dpicker.renderMonths(dpicker._events, dpicker._data),
+        dpicker.renderDays(dpicker._events, dpicker._data),
+      ])
+    )
   }
 
   before(function() {
@@ -45,7 +54,6 @@ describe('dpicker', function() {
   it('should change year', function() {
     let selectedIndex = 4
     let select = getElementByName('dpicker-year')
-
     let options = document.querySelector('select[name="dpicker-year"]').options
 
     select.simulate.change({
@@ -99,28 +107,26 @@ describe('dpicker', function() {
   })
 
   it('should have customized format', function() {
-    dpicker.format = 'MM/DD/YYYY'
-
     let input = getElementByName('dpicker-input')
+    dpicker.format = 'MM/DD/YYYY'
 
     expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
   })
 
   it('should change dpicker according to input change', function() {
-
     let input = getElementByName('dpicker-input')
+
     dpicker.format = 'DD/MM/YYYY'
     input.simulate.change({value: '24/06/1991'})
 
-		expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
+    expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
   })
 
   it('should display dpicker on input focus', function() {
-
     let input = getElementByName('dpicker-input')
-    input.simulate.focus()
 
-		expect(dpicker.display).to.be.true
+    input.simulate.focus()
+    expect(dpicker.display).to.be.true
   })
 
   it('should hide container on outside click', function() {
@@ -130,6 +136,7 @@ describe('dpicker', function() {
 
   it('should not hide container on inside click', function() {
     let input = getElementByName('dpicker-input')
+
     input.simulate.focus()
     expect(dpicker.display).to.be.true
     document.getElementById(dpicker.container).children[0].click()
