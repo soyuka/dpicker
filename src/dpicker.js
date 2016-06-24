@@ -29,7 +29,8 @@ function uuid() {
  * @param {Number} options.futureYear The latest year available (default to year + 1
  * @param {Number} options.pastYear The minimum year (default to 1986)
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
- * @param {string} options.inputId The input id, useful to add you own label
+ * @param {string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
+ * @param {string} options.inputId The input id, useful to add you own label (can only be set once)
  */
 function DPicker(element, options = {}) {
   this._container = uuid()
@@ -43,7 +44,8 @@ function DPicker(element, options = {}) {
     display: options.display || false,
     futureYear: options.futureYear || +now.format('YYYY') + 1,
     pastYear: options.pastYear || 1986,
-    inputId: options.inputId || uuid()
+    months: options.months || moment.months()
+    inputId: options.inputId || uuid(),
   }
 
   this._events = {
@@ -187,7 +189,7 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
       onchange: events.monthChange,
       name: 'dpicker-month'
     },
-    moment.monthsShort()
+    data.months
     .map((e, i) => h('option', {
       value: i, selected: i+1 === modelMonth
     }, e))
@@ -267,7 +269,7 @@ Object.defineProperty(DPicker.prototype, 'inputId', {
   }
 })
 
-;['model', 'format', 'display', 'futureYear', 'pastYear'].forEach(e => {
+;['model', 'format', 'display', 'futureYear', 'pastYear', 'months'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]
