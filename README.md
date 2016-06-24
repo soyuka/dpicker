@@ -72,6 +72,7 @@ button.dpicker-active {
 {Number} options.futureYear The latest year available in the date picker
 {Number} options.minYear The minimum year (default to 1986)
 {string} options.format The input format, a moment format, default to DD/MM/YYYY
+{string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
 {string} options.inputId The input id, useful to add you own label
 ```
 
