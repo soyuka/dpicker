@@ -31,12 +31,13 @@ function uuid() {
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
  * @param {string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
  * @param {string} options.inputId The input id, useful to add you own label (can only be set once)
+ * @param {string} options.inputName The input name
  * @param {Function} options.onChange(data, array changedProperties) A function to call whenever the data gets updated
  */
 function DPicker(element, options = {}) {
   this._container = uuid()
 
-  const now = options.moment || moment()
+  const now = options.model || moment()
 
   this._data = {
     model: now.clone(),
@@ -45,7 +46,8 @@ function DPicker(element, options = {}) {
     futureYear: options.futureYear || +now.format('YYYY') + 1,
     pastYear: options.pastYear || 1986,
     months: options.months || moment.months(),
-    inputId: options.inputId || uuid()
+    inputId: options.inputId || uuid(),
+    inputName: options.name || 'dpicker-input'
   }
 
   this._projector = maquette.createProjector()
@@ -79,7 +81,13 @@ function DPicker(element, options = {}) {
      * @see DPicker.render
      */
     inputChange: (evt) => {
-      this._data.model = moment(evt.target.value, this._data.format)
+      if(!evt.target.value) {
+        this._data.isEmpty = true
+      } else {
+        this._data.isEmpty = false
+        this._data.model = moment(evt.target.value, this._data.format)
+      }
+
       options.onChange && options.onChange(this._data, ['model'])
     },
 
@@ -99,6 +107,7 @@ function DPicker(element, options = {}) {
      * @see DPicker.renderYear
      */
     yearChange: (evt) => {
+      this._data.isEmpty = false
       this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
       options.onChange && options.onChange(this._data, ['model'])
     },
@@ -109,6 +118,7 @@ function DPicker(element, options = {}) {
      * @see DPicker.renderMonths
      */
     monthChange: (evt) => {
+      this._data.isEmpty = false
       this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
       options.onChange && options.onChange(this._data, ['model'])
     },
@@ -119,6 +129,7 @@ function DPicker(element, options = {}) {
      * @see DPicker.renderDays
      */
     dayClick: (evt) => {
+      this._data.isEmpty = false
       this._data.model.date(evt.target.value)
       options.onChange && options.onChange(this._data, ['model'])
     }
@@ -149,12 +160,12 @@ function DPicker(element, options = {}) {
 DPicker.prototype.render = injector(function render(events, data, toRender) {
   return h('div.dpicker', [
     h('input#'+data.inputId, {
-      value: data.model.format(data.format),
+      value: data.isEmpty ? '' : data.model.format(data.format),
       type: 'text',
       onchange: events.inputChange,
       onfocus: events.inputFocus,
-      name: 'dpicker-input'}
-    ),
+      name: data.inputName
+    }),
     h('div.dpicker-container', {
       classes: {
         'dpicker-visible': data.display,
@@ -181,9 +192,10 @@ DPicker.prototype.renderYears = injector(function renderYears(events, data, toRe
     }, ''+futureYear))
   }
 
-  return h('select', {onchange: events.yearChange, name: 'dpicker-year'}, [
-    options
-  ])
+  return h('select', {
+    onchange: events.yearChange,
+    name: 'dpicker-year'
+  }, options)
 })
 
 /**
@@ -283,7 +295,12 @@ Object.defineProperty(DPicker.prototype, 'inputId', {
       return this._data[e]
     },
     set: function(newValue) {
-      this._data[e] = newValue
+      if (e === 'model' && !newValue) {
+        this._data.isEmpty = true
+      } else {
+        this._data[e] = newValue
+      }
+
       this._projector.scheduleRender()
     }
   })
