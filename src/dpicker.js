@@ -59,10 +59,14 @@ function DPicker(element, options = {}) {
      * @see DPicker
      */
     hide: (evt) => {
+      if (this._data.display == false) {
+        return
+      }
+
       let node = evt.target
       let parent = node.parentNode
 
-      while (parent != document) {
+      while (parent && parent != document) {
         if (parent.getAttribute('id') == this._container) {
           return
         }
