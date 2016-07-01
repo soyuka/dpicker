@@ -31,3 +31,7 @@ gulp.task('default', function() {
   .pipe(rename('dpicker.min.js'))
   .pipe(gulp.dest('dist'))
 })
+
+gulp.task('watch', ['default'], function() {
+  gulp.watch('src/*.js', ['default'])
+})

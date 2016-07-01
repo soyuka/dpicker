@@ -34,7 +34,8 @@ describe('dpicker', function() {
     dpicker = new DPicker(container, opts || {})
 
     projector = maquetteQuery.createTestProjector(
-      dpicker.render(dpicker._events, dpicker._data, [
+      dpicker.renderContainer(dpicker._events, dpicker._data, [
+        dpicker.renderInput(dpicker._events, dpicker._data),
         dpicker.renderYears(dpicker._events, dpicker._data),
         dpicker.renderMonths(dpicker._events, dpicker._data),
         dpicker.renderDays(dpicker._events, dpicker._data),

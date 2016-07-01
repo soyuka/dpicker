@@ -40,6 +40,19 @@ var dp = new DPicker(document.getElementById('my-datepicker'))
 </script>
 ```
 
+If you have an input already, you can init the datepicker with it, the date picker container will be the input parent node:
+
+```html
+<label for="my-dpicker">
+  Pick a date:
+  <input type="text" dpicker id="my-dpicker" />
+</label>
+<script>
+var dp = new DPicker(document.querySelectorAll('[dpicker]')[0])
+</script>
+
+```
+
 You may want to add some css:
 
 ```css

@@ -23,16 +23,16 @@ function uuid() {
 
 /**
  * DPicker simple date picker
- * @param {Element} element DOM element where you want the date picker
+ * @param {Element} element DOM element where you want the date picker or an input
  * @param {Object} options
  * @param {Moment} options.model Your own model instance, defaults to moment()
  * @param {Number} options.futureYear The latest year available (default to year + 1
  * @param {Number} options.pastYear The minimum year (default to 1986)
  * @param {string} options.format The input format, a moment format, default to DD/MM/YYYY
  * @param {string} options.months Months array, defaults to moment.months(), see also moment.monthsShort()
+ * @param {Function} options.onChange(data, array changedProperties) A function to call whenever the data gets updated
  * @param {string} options.inputId The input id, useful to add you own label (can only be set once)
  * @param {string} options.inputName The input name
- * @param {Function} options.onChange(data, array changedProperties) A function to call whenever the data gets updated
  */
 function DPicker(element, options = {}) {
   this._container = uuid()
@@ -136,21 +136,56 @@ function DPicker(element, options = {}) {
       this._data.isEmpty = false
       this._data.model.date(evt.target.value)
       options.onChange && options.onChange(this._data, ['model'])
-    }
+    },
   }
 
   document.addEventListener('click', this._events.hide)
-  element.setAttribute('id', this._container)
 
-  this._projector.append(element, this.render(this._events, this._data, [
+  let render = this.render(this._events, this._data, [
     this.renderYears(this._events, this._data),
     this.renderMonths(this._events, this._data),
     this.renderDays(this._events, this._data),
+  ])
+
+  if (element.tagName == 'INPUT') {
+    this._projector.merge(element, this.renderInput(this._events, this._data))
+    element.parentNode.setAttribute('id', this._container)
+    element.parentNode.classList.add('dpicker')
+    this._projector.append(element.parentNode, render)
+    return this
+  }
+
+  this._projector.append(element, this.renderContainer(this._events, this._data, [
+    this.renderInput(this._events, this._data),
+    render
   ]))
+
+  element.setAttribute('id', this._container)
 
   return this
 }
 
+/**
+ * Render input
+ */
+DPicker.prototype.renderInput = injector(function renderInput(events, data, toRender) {
+  return h('input#'+data.inputId, {
+    value: data.isEmpty ? '' : data.model.format(data.format),
+    type: 'text',
+    onchange: events.inputChange,
+    onfocus: events.inputFocus,
+    name: data.inputName
+  })
+})
+
+/**
+ * Dpicker container if no input is provided
+ * if an input is given, it's parentNode will be the container
+ * div.dpicker
+ */
+DPicker.prototype.renderContainer = injector(function renderInput(events, data, toRender) {
+  return h('div.dpicker', toRender.map(e => e()))
+})
 
 /**
  * Render a DPicker
@@ -162,22 +197,13 @@ function DPicker(element, options = {}) {
  * @see DPicker.renderDays
  */
 DPicker.prototype.render = injector(function render(events, data, toRender) {
-  return h('div.dpicker', [
-    h('input#'+data.inputId, {
-      value: data.isEmpty ? '' : data.model.format(data.format),
-      type: 'text',
-      onchange: events.inputChange,
-      onfocus: events.inputFocus,
-      name: data.inputName
-    }),
-    h('div.dpicker-container', {
-      classes: {
-        'dpicker-visible': data.display,
-        'dpicker-invisible': !data.display
-      }
-    },
-    toRender.map(e => e()))
-  ])
+  return h('div.dpicker-container', {
+    classes: {
+      'dpicker-visible': data.display,
+      'dpicker-invisible': !data.display
+    }
+  },
+  toRender.map(e => e()))
 })
 
 /**
