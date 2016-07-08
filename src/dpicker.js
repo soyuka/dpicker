@@ -85,11 +85,16 @@ function DPicker(element, options = {}) {
      * @see DPicker.render
      */
     inputChange: (evt) => {
-      if(!evt.target.value) {
+      if (!evt.target.value) {
         this._data.isEmpty = true
       } else {
         this._data.isEmpty = false
         this._data.model = moment(evt.target.value, this._data.format)
+
+        if (!this._data.model.isValid()) {
+          this._data.isEmpty = true
+          this._data.model = moment()
+        }
       }
 
       options.onChange && options.onChange(this._data, ['model'])
@@ -136,6 +141,7 @@ function DPicker(element, options = {}) {
       this._data.isEmpty = false
       this._data.model.date(evt.target.value)
       options.onChange && options.onChange(this._data, ['model'])
+      this._data.display = false
     },
   }
 
@@ -296,6 +302,7 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
           h(dayActive ? 'button' : 'span', {
             onclick: dayActive ? events.dayClick : noop,
             value: day,
+            type: 'button',
             classes: {'dpicker-active': currentDay == day}
           }, day)
         ])
