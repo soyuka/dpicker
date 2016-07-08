@@ -96,6 +96,7 @@ describe('dpicker', function() {
 
     button.simulate.click({value: button.properties.value})
     expect(dpicker.model.date()).to.equal(button.properties.value)
+    expect(dpicker.display).to.equal(false)
   })
 
   it('should have customized date range', function() {
@@ -120,6 +121,15 @@ describe('dpicker', function() {
     dpicker.format = 'DD/MM/YYYY'
     input.simulate.change({value: '24/06/1991'})
 
+    expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
+  })
+
+  it('should not fail on invalid input change', function() {
+    let input = getElementByName('dpicker-input')
+
+    dpicker.format = 'DD/MM/YYYY'
+    input.simulate.change({value: '24/06/1991'})
+    input.simulate.change({value: 'test'})
     expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
   })
 

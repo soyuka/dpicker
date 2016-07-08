@@ -88,13 +88,13 @@ function DPicker(element, options = {}) {
       if (!evt.target.value) {
         this._data.isEmpty = true
       } else {
-        this._data.isEmpty = false
-        this._data.model = moment(evt.target.value, this._data.format)
+        let newModel = moment(evt.target.value, this._data.format)
 
-        if (!this._data.model.isValid()) {
-          this._data.isEmpty = true
-          this._data.model = moment()
+        if (newModel.isValid()) {
+          this._data.model = newModel
         }
+
+        this._data.isEmpty = false
       }
 
       options.onChange && options.onChange(this._data, ['model'])
