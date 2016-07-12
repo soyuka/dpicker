@@ -21,6 +21,10 @@ function uuid() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
 }
 
+function positionInParent(element) {
+  return [].findIndex.call(element.parentNode.children, (c) => c == element)
+}
+
 /**
  * DPicker simple date picker
  * @param {Element} element DOM element where you want the date picker or an input
@@ -138,11 +142,112 @@ function DPicker(element, options = {}) {
      * @see DPicker.renderDays
      */
     dayClick: (evt) => {
+      evt.preventDefault()
       this._data.isEmpty = false
       this._data.model.date(evt.target.value)
       options.onChange && options.onChange(this._data, ['model'])
       this._data.display = false
     },
+
+    dayKeyDown: (evt) => {
+      if (evt.which > 40 || evt.which < 37) {
+        return
+      }
+
+      switch (evt.which) {
+        //left
+        case 37: {
+          let previous = evt.target.parentNode.previousElementSibling
+          if (previous && previous.querySelector('button')) {
+            return previous.querySelector('button').focus()
+          }
+
+          //previous row, last button
+          previous = evt.target.parentNode.parentNode.previousElementSibling.querySelector('td:last-child button')
+          if (previous) {
+            return previous.focus()
+          }
+
+          let last = evt.target.parentNode.parentNode.parentNode.querySelector('tr:last-child').querySelectorAll('td.dpicker-active')
+
+          return last[last.length - 1].querySelector('button').focus()
+          break;
+        }
+        //up
+        case 38: {
+          let td = evt.target.parentNode
+          let position = positionInParent(td)
+          let previous = evt.target.parentNode.parentNode.previousElementSibling
+
+          while(previous) {
+
+            if (previous.children[position].classList.contains('dpicker-active')) {
+
+              return previous.children[position].querySelector('button').focus()
+            }
+
+            previous = previous.previousElementSibling
+          }
+
+          let last = evt.target.parentNode.parentNode.parentNode.querySelector('tr:last-child')
+
+          while(last) {
+            if (last.children[position].classList.contains('dpicker-active')) {
+              return last.children[position].querySelector('button').focus()
+            }
+
+            last = last.previousElementSibling
+          }
+
+          break;
+        }
+        //right
+        case 39: {
+          let next = evt.target.parentNode.nextElementSibling
+
+          if (next && next.querySelector('button')) {
+            return next.querySelector('button').focus()
+          }
+
+          next = evt.target.parentNode.parentNode.nextElementSibling
+
+          if (next && next.querySelector('td:first-child button')) {
+            return next.querySelector('td:first-child button').focus()
+          }
+
+          return evt.target.parentNode.parentNode.parentNode.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
+          break;
+        }
+        //down
+        case 40: {
+          let td = evt.target.parentNode
+          let position = positionInParent(td)
+          let next = evt.target.parentNode.parentNode.nextElementSibling
+
+          while(next) {
+
+            if (next.children[position].classList.contains('dpicker-active')) {
+
+              return next.children[position].querySelector('button').focus()
+            }
+
+            next = next.nextElementSibling
+          }
+
+          let first = evt.target.parentNode.parentNode.parentNode.querySelector('tr:first-child')
+
+          while(first) {
+            if (first.children[position].classList.contains('dpicker-active')) {
+              return first.children[position].querySelector('button').focus()
+            }
+
+            first = first.nextElementSibling
+          }
+
+          break;
+        }
+      }
+    }
   }
 
   document.addEventListener('click', this._events.hide)
@@ -303,6 +408,7 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
             onclick: dayActive ? events.dayClick : noop,
             value: day,
             type: 'button',
+            onkeydown: events.dayKeyDown,
             classes: {'dpicker-active': currentDay == day}
           }, day)
         ])
