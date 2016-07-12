@@ -21,8 +21,8 @@ function uuid() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
 }
 
-function positionInParent(element) {
-  return [].findIndex.call(element.parentNode.children, (c) => c == element)
+function positionInParent(children) {
+  return [].findIndex.call(children.parentNode.children, (c) => c == children)
 }
 
 /**
@@ -154,43 +154,65 @@ function DPicker(element, options = {}) {
         return
       }
 
+      let td = evt.target.parentNode
+      let table = td.parentNode.parentNode
+
       switch (evt.which) {
         //left
         case 37: {
-          let previous = evt.target.parentNode.previousElementSibling
+          //previous td
+          let previous = td.previousElementSibling
+
           if (previous && previous.querySelector('button')) {
             return previous.querySelector('button').focus()
           }
 
           //previous row, last button
-          previous = evt.target.parentNode.parentNode.previousElementSibling.querySelector('td:last-child button')
+          previous = td.parentNode.previousElementSibling
+          previous = previous ? previous.querySelector('td:last-child button') : null
+
           if (previous) {
             return previous.focus()
           }
 
-          let last = evt.target.parentNode.parentNode.parentNode.querySelector('tr:last-child').querySelectorAll('td.dpicker-active')
-
+          //last tr first td
+          let last = table.querySelector('tr:last-child').querySelectorAll('td.dpicker-active')
           return last[last.length - 1].querySelector('button').focus()
+          break;
+        }
+        //right
+        case 39: {
+          let next = td.nextElementSibling
+
+          if (next && next.querySelector('button')) {
+            return next.querySelector('button').focus()
+          }
+
+          next = td.parentNode.nextElementSibling
+          next = next ? next.querySelector('td:first-child button') : null
+
+          if (next) {
+            return next.focus()
+          }
+
+          return table.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
           break;
         }
         //up
         case 38: {
-          let td = evt.target.parentNode
           let position = positionInParent(td)
-          let previous = evt.target.parentNode.parentNode.previousElementSibling
+          //previous line (tr), element (td) at the same position
+          let previous = td.parentNode.previousElementSibling
+          previous = previous ? previous.children[position] : null
 
-          while(previous) {
-
-            if (previous.children[position].classList.contains('dpicker-active')) {
-
-              return previous.children[position].querySelector('button').focus()
-            }
-
-            previous = previous.previousElementSibling
+          if (previous && previous.classList.contains('dpicker-active')) {
+            return previous.querySelector('button').focus()
           }
 
-          let last = evt.target.parentNode.parentNode.parentNode.querySelector('tr:last-child')
+          //last line
+          let last = table.querySelector('tr:last-child')
 
+          //find the last available position with a button beggining by the bottom
           while(last) {
             if (last.children[position].classList.contains('dpicker-active')) {
               return last.children[position].querySelector('button').focus()
@@ -201,41 +223,21 @@ function DPicker(element, options = {}) {
 
           break;
         }
-        //right
-        case 39: {
-          let next = evt.target.parentNode.nextElementSibling
-
-          if (next && next.querySelector('button')) {
-            return next.querySelector('button').focus()
-          }
-
-          next = evt.target.parentNode.parentNode.nextElementSibling
-
-          if (next && next.querySelector('td:first-child button')) {
-            return next.querySelector('td:first-child button').focus()
-          }
-
-          return evt.target.parentNode.parentNode.parentNode.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
-          break;
-        }
         //down
         case 40: {
-          let td = evt.target.parentNode
           let position = positionInParent(td)
-          let next = evt.target.parentNode.parentNode.nextElementSibling
+          //next line (tr), element (td) at the same position
+          let next = td.parentNode.nextElementSibling
+          next = next ? next.children[position] : null
 
-          while(next) {
-
-            if (next.children[position].classList.contains('dpicker-active')) {
-
-              return next.children[position].querySelector('button').focus()
-            }
-
-            next = next.nextElementSibling
+          if (next && next.classList.contains('dpicker-active')) {
+              return next.querySelector('button').focus()
           }
 
-          let first = evt.target.parentNode.parentNode.parentNode.querySelector('tr:first-child')
+          //first line
+          let first = table.querySelector('tr:first-child')
 
+          //find the first available position with a button beggining by the top
           while(first) {
             if (first.children[position].classList.contains('dpicker-active')) {
               return first.children[position].querySelector('button').focus()
