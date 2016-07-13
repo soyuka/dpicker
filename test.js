@@ -1,5 +1,5 @@
 'use strict'
-const jsdom = require('mocha-jsdom')
+require('jsdom-global')()
 const expect = require('chai').expect
 const DPicker = require('./dist/dpicker.js')
 const requestFrame = require('request-frame')
@@ -7,8 +7,6 @@ const maquetteQuery = require('maquette-query')
 const moment = require('moment')
 
 describe('dpicker', function() {
-  jsdom()
-
   global.screen = {}
   global.requestAnimationFrame = requestFrame('request')
 
