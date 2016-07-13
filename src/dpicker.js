@@ -39,6 +39,11 @@ function positionInParent(children) {
  * @param {string} options.inputName The input name
  */
 function DPicker(element, options = {}) {
+
+  if (!(this instanceof DPicker)) {
+    return new DPicker(element, options)
+  }
+
   this._container = uuid()
 
   const now = options.model || moment()
@@ -51,7 +56,9 @@ function DPicker(element, options = {}) {
     pastYear: options.pastYear || 1986,
     months: options.months || moment.months(),
     inputId: options.inputId || uuid(),
-    inputName: options.name || 'dpicker-input'
+    inputName: options.name || 'dpicker-input',
+    isEmpty: options.model !== undefined && !options.model ? true : false,
+    onChange: options.onChange
   }
 
   this._projector = maquette.createProjector()
@@ -80,7 +87,7 @@ function DPicker(element, options = {}) {
 
       this._data.display = false
       this._projector.scheduleRender()
-      options.onChange && options.onChange(this._data, ['display'])
+      this._data.onChange && this._data.onChange(this._data, ['display'])
     },
 
     /**
@@ -101,7 +108,7 @@ function DPicker(element, options = {}) {
         this._data.isEmpty = false
       }
 
-      options.onChange && options.onChange(this._data, ['model'])
+      this._data.onChange && this._data.onChange(this._data, ['model'])
     },
 
     /**
@@ -111,7 +118,7 @@ function DPicker(element, options = {}) {
      */
     inputFocus: (evt) => {
       this._data.display = true
-      options.onChange && options.onChange(this._data, ['display'])
+      this._data.onChange && this._data.onChange(this._data, ['display'])
     },
 
     /**
@@ -122,7 +129,7 @@ function DPicker(element, options = {}) {
     yearChange: (evt) => {
       this._data.isEmpty = false
       this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
-      options.onChange && options.onChange(this._data, ['model'])
+      this._data.onChange && this._data.onChange(this._data, ['model'])
     },
 
     /**
@@ -133,7 +140,7 @@ function DPicker(element, options = {}) {
     monthChange: (evt) => {
       this._data.isEmpty = false
       this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
-      options.onChange && options.onChange(this._data, ['model'])
+      this._data.onChange && this._data.onChange(this._data, ['model'])
     },
 
     /**
@@ -143,21 +150,21 @@ function DPicker(element, options = {}) {
      */
     dayClick: (evt) => {
       evt.preventDefault()
-      this._data.isEmpty = false
       this._data.model.date(evt.target.value)
-      options.onChange && options.onChange(this._data, ['model'])
-      this._data.display = false
+      this._data.isEmpty = false
+      this._data.onChange && this._data.onChange(this._data, ['model'])
     },
 
     dayKeyDown: (evt) => {
-      if (evt.which > 40 || evt.which < 37) {
+      let key = evt.which || evt.keyCode
+      if (key > 40 || key < 37) {
         return
       }
 
       let td = evt.target.parentNode
       let table = td.parentNode.parentNode
 
-      switch (evt.which) {
+      switch (key) {
         //left
         case 37: {
           //previous td
@@ -178,7 +185,6 @@ function DPicker(element, options = {}) {
           //last tr first td
           let last = table.querySelector('tr:last-child').querySelectorAll('td.dpicker-active')
           return last[last.length - 1].querySelector('button').focus()
-          break;
         }
         //right
         case 39: {
@@ -196,7 +202,6 @@ function DPicker(element, options = {}) {
           }
 
           return table.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
-          break;
         }
         //up
         case 38: {
@@ -220,8 +225,6 @@ function DPicker(element, options = {}) {
 
             last = last.previousElementSibling
           }
-
-          break;
         }
         //down
         case 40: {
@@ -245,8 +248,6 @@ function DPicker(element, options = {}) {
 
             first = first.nextElementSibling
           }
-
-          break;
         }
       }
     }
@@ -261,6 +262,10 @@ function DPicker(element, options = {}) {
   ])
 
   if (element.tagName == 'INPUT') {
+    if (!element.parentNode) {
+      throw new ReferenceError('Can not init DPicker on an input without parent node')
+    }
+
     this._projector.merge(element, this.renderInput(this._events, this._data))
     element.parentNode.setAttribute('id', this._container)
     element.parentNode.classList.add('dpicker')
@@ -428,25 +433,31 @@ Object.defineProperty(DPicker.prototype, 'container', {
   }
 })
 
+/**
+ * DPicker.inputId getter
+ */
 Object.defineProperty(DPicker.prototype, 'inputId', {
   get: function() {
     return this._data.inputId
   }
 })
 
-;['model', 'format', 'display', 'futureYear', 'pastYear', 'months'].forEach(e => {
+;['model', 'format', 'display', 'futureYear', 'pastYear', 'months', 'onChange'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]
     },
     set: function(newValue) {
-      if (e === 'model' && !newValue) {
-        this._data.isEmpty = true
+      if (e === 'model') {
+        this._data.isEmpty = !!!newValue
+        this._data[e] = newValue ? newValue : this._data[e]
       } else {
         this._data[e] = newValue
       }
 
-      this._projector.scheduleRender()
+      if (e != 'onChange') {
+        this._projector.scheduleRender()
+      }
     }
   })
 })
