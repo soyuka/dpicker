@@ -1,7 +1,11 @@
 {
   "name": "dpicker",
   "description": "Minimalist date picker",
-  "main": "dist/dpicker.js",
+  "main": [
+    "dist/dpicker.js",
+    "dist/dpicker.arrow-navigation.js",
+    "dist/dpicker.modifiers.js"
+  ],
   "authors": [
     "soyuka"
   ],
@@ -16,12 +20,14 @@
     "node_modules",
     "bower_components",
     "test.js",
-    "!dist/dpicker.js",
-    "!dist/dpicker.min.js",
+    "src/*.spec.js",
+    "!dist/*.js",
     "screen.png",
     "gulpfile.js",
     "demo",
-    "bump.sh"
+    "bump.sh",
+    "doc",
+    "coverage"
   ],
   "dependencies": {
     "moment": "^2.13.0",

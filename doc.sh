@@ -1,0 +1,12 @@
+#!/bin/bash
+git checkout gh-pages
+git reset --hard origin/master
+gulp
+npm run coverage
+./node_modules/.bin/jsdoc -c jsdoc.conf.json -R README.md -d . src/*.js
+git add .
+git add -f coverage
+git add -f dist
+git commit -m 'bump doc'
+git push -fu origin gh-pages
+git checkout master

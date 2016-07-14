@@ -6,9 +6,11 @@
       td.dpicker-inactive {
         color: grey;
       }
+
       button.dpicker-active {
-        background: red;
+        background: coral;
       }
+
       .dpicker-invisible {
         display: none;
       }
@@ -46,6 +48,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
     <script src="../dist/dpicker.js"></script>
+    <script src="../dist/dpicker.arrow-navigation.js"></script>
+    <script src="../dist/dpicker.modifiers.js"></script>
   <script>
     ;[].slice.call(document.querySelectorAll('[vanilla-datepicker]')).forEach((e, i) => new DPicker(e))
 
