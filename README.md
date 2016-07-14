@@ -6,6 +6,8 @@
 
 [Demo and full documentation](https://soyuka.github.io/dpicker/DPicker.html#demo)
 
+A framework-agnostic minimal date picker.
+
 ## Installation
 
 ### npm
@@ -82,6 +84,8 @@ The [modifiers](https://soyuka.github.io/dpicker/DPicker.modules.module_modifier
 To know more about modules check out the [documentation](https://soyuka.github.io/dpicker/DPicker.html).
 
 DPicker depends on [maquettejs](http://maquettejs.org/) (~3.4Kb gz) for virtual dom and [momentjs](http://momentjs.com/) (~15.3Kb gz) for date manipulation.
+
+A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L56)
 
 ## License
 
