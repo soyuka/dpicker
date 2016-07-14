@@ -15,7 +15,7 @@ if (!DPicker) {
  * - `-` gives the previous date
  * - `-10` gives the previous date - 10 days
  * @param {Event} DOMEvent
- * @listens DPicker#dayKeyDown
+ * @listens DPicker#inputChange
  */
 function InputChange(evt) {
 
