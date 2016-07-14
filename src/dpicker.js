@@ -102,7 +102,7 @@ function isElementInContainer(parent, containerId) {
  * @param {Function} [options.modifier] A function that can modify the data when a model change occurs
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
- * @fires DPicker#hide
+ * @listens DPicker#hide
  */
 function DPicker(element, options = {}) {
 
@@ -346,9 +346,9 @@ DPicker.prototype._loadEvents = function loadEvents() {
 /**
  * Render input
  * @method
- * @fires DPicker#inputChange
- * @fires DPicker#inputBlur
- * @fires DPicker#inputFocus
+ * @listens DPicker#inputChange
+ * @listens DPicker#inputBlur
+ * @listens DPicker#inputFocus
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderInput = injector(function renderInput(events, data, toRender) {
@@ -406,7 +406,7 @@ DPicker.prototype.render = injector(function render(events, data, toRender) {
  * select[name='dpicker-year']
  * ```
  * @method
- * @fires DPicker#yearChange
+ * @listens DPicker#yearChange
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderYears = injector(function renderYears(events, data, toRender) {
@@ -433,7 +433,7 @@ DPicker.prototype.renderYears = injector(function renderYears(events, data, toRe
  * select[name='dpicker-month']
  * ```
  * @method
- * @fires DPicker#monthChange
+ * @listens DPicker#monthChange
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderMonths = injector(function renderMonths(events, data, toRender) {
@@ -459,8 +459,8 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
  *      button|span
  * ```
  * @method
- * @fires DPicker#dayClick
- * @fires DPicker#dayKeyDown
+ * @listens DPicker#dayClick
+ * @listens DPicker#dayKeyDown
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderDays = injector(function renderDays(events, data, toRender) {
