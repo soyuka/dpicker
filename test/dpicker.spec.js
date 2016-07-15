@@ -92,6 +92,13 @@ describe('dpicker', function() {
     expect(+options[options.length - 1].value).to.equal(1900)
   })
 
+  it('should change number of displayed months on min date', function() {
+    const dpicker = createDatePicker({min: moment('1900-06-01'), model: moment('1900-05-01'), format: 'YYYY-MM-DD'})
+
+    let options = document.querySelector('select[name="dpicker-month"]').options
+    expect(options.length).to.equal(7)
+  })
+
   it('should bind to an input[type="date"]', function() {
     let input = document.createElement('input')
     let label = document.createElement('label')
