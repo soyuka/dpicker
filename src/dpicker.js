@@ -157,6 +157,10 @@ function DPicker(element, options = {}) {
     this._data.inputId = element.getAttribute('id') || this._data.inputId
     this._data.inputName = element.getAttribute('name') || this._data.inputName
 
+    if (element.getAttribute('type') == 'date') {
+      element.setAttribute('type', 'text')
+    }
+
     //bind input attributes to data
     ;[['format', 'format'], ['min', 'min'], ['max', 'max'], ['value', 'model']].map((e, i) => {
       let dataKey = e[1]
@@ -174,6 +178,7 @@ function DPicker(element, options = {}) {
     })
 
     this._projector.merge(element, this.renderInput(this._events, this._data))
+
     elementContainer = element.parentNode
     elementContainer.classList.add('dpicker')
     renderContainer = render
