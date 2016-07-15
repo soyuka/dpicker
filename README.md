@@ -45,10 +45,10 @@ If you have an input already, you can init the datepicker with it, the date pick
 ```html
 <label for="my-dpicker">
   Pick a date:
-  <input type="text" dpicker id="my-dpicker" />
+  <input type="date" id="my-dpicker" format="YYYY-MM-DD" min="1999-01-01" max="2026-01-01" value="2000-01-01" />
 </label>
 <script>
-var dp = new DPicker(document.querySelectorAll('[dpicker]')[0])
+var dp = new DPicker(document.querySelector('input[type="date"]'))
 </script>
 ```
 

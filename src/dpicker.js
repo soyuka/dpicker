@@ -90,10 +90,10 @@ function isElementInContainer(parent, containerId) {
  * @class
  * @param {Element} element DOM element where you want the date picker or an input
  * @param {Object} [options={}]
- * @param {Moment} [options.model=moment()] Your own model instance, defaults to moment()
- * @param {Number} [options.futureYear=currentYear+1] The latest year available
- * @param {Number} [options.pastYear=1986] The minimum year
- * @param {string} [options.format='DD/MM/YYYY'] The input format, a moment format
+ * @param {Moment} [options.model=moment()] Your own model instance, defaults to moment() (can be set by the `value` attribute on an input, transformed to moment according to the given format)
+ * @param {Moment} [options.min=1986-01-01] The minimum date (can be set by the `min` attribute on an input)
+ * @param {Moment} [options.max=today+1 year] The maximum date (can be set by the `max` attribute on an input)
+ * @param {string} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input)
  * @param {string} [options.months=moment.months()] Months array, see also moment.monthsShort()
  * @param {boolean} [options.display=true]
  * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
@@ -120,8 +120,8 @@ function DPicker(element, options = {}) {
     display: options.display !== undefined ? options.display : false,
     hideOnDayClick: options.hideOnDayClick !== undefined ? options.hideOnDayClick : true,
     hideOnEnter: options.hideOnEnter !== undefined ? options.hideOnEnter : true,
-    futureYear: options.futureYear || +now.format('YYYY') + 1,
-    pastYear: options.pastYear || 1986,
+    min: options.min || moment('1986-01-01'),
+    max: options.max || moment().add(1, 'year').month(11),
     months: options.months || moment.months(),
     inputId: options.inputId || uuid(),
     inputName: options.name || 'dpicker-input',
@@ -156,6 +156,23 @@ function DPicker(element, options = {}) {
 
     this._data.inputId = element.getAttribute('id') || this._data.inputId
     this._data.inputName = element.getAttribute('name') || this._data.inputName
+
+    //bind input attributes to data
+    ;[['format', 'format'], ['min', 'min'], ['max', 'max'], ['value', 'model']].map((e, i) => {
+      let dataKey = e[1]
+      e = e[0]
+
+      let attr = element.getAttribute(e)
+
+      if (!attr) { return }
+
+      if (dataKey !== 'format') {
+        this._data[dataKey] = moment(attr, this._data.format)
+      } else {
+        this._data[dataKey] = attr
+      }
+    })
+
     this._projector.merge(element, this.renderInput(this._events, this._data))
     elementContainer = element.parentNode
     elementContainer.classList.add('dpicker')
@@ -355,6 +372,9 @@ DPicker.prototype.renderInput = injector(function renderInput(events, data, toRe
   return h('input#'+data.inputId, {
     value: data.isEmpty ? '' : data.model.format(data.format),
     type: 'text',
+    min: data.min.format(data.format),
+    max: data.max.format(data.format),
+    format: data.format,
     onchange: events.inputChange,
     onblur: events.inputBlur,
     onfocus: events.inputFocus,
@@ -410,14 +430,16 @@ DPicker.prototype.render = injector(function render(events, data, toRender) {
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderYears = injector(function renderYears(events, data, toRender) {
-  let modelYear = +data.model.format('YYYY')
-  let futureYear = data.futureYear + 1
+  let modelYear = data.model.year()
+  let futureYear = data.max.year() + 1
+  let pastYear = data.min.year()
   let options = []
 
-  while (--futureYear >= data.pastYear) {
+  while (--futureYear >= pastYear) {
     options.push(h('option', {
       value: futureYear,
-      selected: futureYear === modelYear
+      selected: futureYear === modelYear,
+      key: futureYear
     }, ''+futureYear))
   }
 
@@ -437,15 +459,26 @@ DPicker.prototype.renderYears = injector(function renderYears(events, data, toRe
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderMonths = injector(function renderMonths(events, data, toRender) {
-  let modelMonth = +data.model.format('MM')
+  let modelMonth = data.model.month()
+  let currentYear = data.model.year()
+  let months = data.months
+
+  if (data.max.year() == currentYear) {
+    let maxMonth = data.max.month()
+    months = months.filter((e, i) => i <= maxMonth)
+  } else if (data.min.year() == currentYear) {
+    let minMonth = data.min.month()
+    months = months.filter((e, i) => i >= minMonth)
+  }
 
   return h('select', {
       onchange: events.monthChange,
       name: 'dpicker-month'
     },
-    data.months
+    months
     .map((e, i) => h('option', {
-      value: i, selected: i+1 === modelMonth
+      value: i, selected: i === modelMonth,
+      key: i
     }, e))
   )
 })
@@ -595,12 +628,12 @@ Object.defineProperties(DPicker.prototype, {
  * @description Get/Set display, hides or shows the date picker
  */
 /**
- * @var {Number} DPicker#futureYear
- * @description Get/Set futureYear
+ * @var {Moment} DPicker#min
+ * @description Get/Set min date
  */
 /**
- * @var {Number} DPicker#pastYear
- * @description Get/Set pastYear
+ * @var {Moment} DPicker#max
+ * @description Get/Set max date
  */
 /**
  * @var {Array.<string>} DPicker#months
@@ -610,7 +643,7 @@ Object.defineProperties(DPicker.prototype, {
  * @var {Array.<string>} DPicker#inputName
  * @description Get/Set input name
  */
-;['model', 'format', 'display', 'futureYear', 'pastYear', 'months', 'inputName'].forEach(e => {
+;['model', 'format', 'display', 'months', 'inputName', 'min', 'max'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]

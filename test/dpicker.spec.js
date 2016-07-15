@@ -84,12 +84,44 @@ describe('dpicker', function() {
   })
 
   it('should have customized date range', function() {
-    const dpicker = createDatePicker({futureYear: 2026, pastYear: 1900})
+    const dpicker = createDatePicker({max: moment('2026-01-12'), min: moment('1900-01-01')})
 
     let options = document.querySelector('select[name="dpicker-year"]').options
     expect(+options[0].value).to.equal(2026)
     expect(options.length).to.equal(2027 - 1900)
     expect(+options[options.length - 1].value).to.equal(1900)
+  })
+
+  it('should bind to an input[type="date"]', function() {
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'date')
+    input.setAttribute('id', 't')
+    input.setAttribute('format', 'YYYY-MM-DD')
+    input.setAttribute('min', '1991-06-24')
+    input.setAttribute('max', '1992-11-21')
+    input.setAttribute('value', '1992-10-10')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    expect(dpicker.inputId).to.equal('t')
+    expect(dpicker.format).to.equal('YYYY-MM-DD')
+    expect(dpicker.min.format('YYYY-MM-DD')).to.equal('1991-06-24')
+    expect(dpicker.max.format('YYYY-MM-DD')).to.equal('1992-11-21')
+    expect(input.getAttribute('type')).to.equal('text')
+
+    let options = document.querySelector('select[name="dpicker-year"]').options
+    expect(+options[0].value).to.equal(1992)
+    expect(options.length).to.equal(2)
+    expect(+options[options.length - 1].value).to.equal(1991)
+
+    options = document.querySelector('select[name="dpicker-month"]').options
+    expect(+options[0].value).to.equal(0)
+    expect(+options[options.length - 1].value).to.equal(10)
   })
 
   it('should have customized format', function() {
