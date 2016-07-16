@@ -95,6 +95,7 @@ function isElementInContainer(parent, containerId) {
  * @param {Moment} [options.max=today+1 year] The maximum date (can be set by the `max` attribute on an input)
  * @param {string} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input)
  * @param {string} [options.months=moment.months()] Months array, see also moment.monthsShort()
+ * @param {string} [options.days=moment.weekdaysShort()] Days array, see also moment.weekdaysMin()
  * @param {boolean} [options.display=true]
  * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
  * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
@@ -123,9 +124,10 @@ function DPicker(element, options = {}) {
     min: options.min || moment('1986-01-01'),
     max: options.max || moment().add(1, 'year').month(11),
     months: options.months || moment.months(),
+    days: options.days || moment.weekdaysShort(),
     inputId: options.inputId || uuid(),
     inputName: options.name || 'dpicker-input',
-    isEmpty: options.model !== undefined && !options.model ? true : false
+    isEmpty: options.model !== undefined && !options.model ? true : false,
   }
 
   this.onChange = options.onChange
@@ -513,7 +515,7 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
 
   return h('table', [
     //headers
-    h('tr', moment.weekdaysShort().map(e => h('th', e))),
+    h('tr', data.days.map(e => h('th', e))),
     //rows
     rows.map((e, row) => {
       //weeks filed with days
@@ -645,10 +647,14 @@ Object.defineProperties(DPicker.prototype, {
  * @description Get/Set months an array of strings representing months, defaults to moment.months()
  */
 /**
+ * @var {Array.<string>} DPicker#days
+ * @description Get/Set days an array of strings representing days, defaults to moment.weekdaysShort()
+ */
+/**
  * @var {Array.<string>} DPicker#inputName
  * @description Get/Set input name
  */
-;['model', 'format', 'display', 'months', 'inputName', 'min', 'max'].forEach(e => {
+;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]
