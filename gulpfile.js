@@ -5,6 +5,10 @@ const uglify = require('gulp-uglify')
 const path = require('path')
 const traceur = require('gulp-traceur')
 const Transform = require('stream').Transform
+const jhaml = require('@soyuka/jhaml')
+const zlib = require('zlib')
+const fs = require('fs')
+const sass = require('node-sass')
 
 const uml = (name, contents, inject) => {
   return `
@@ -63,11 +67,9 @@ gulp.task('default', function() {
 
 // stolen from https://github.com/AFASSoftware/maquette/blob/master/gulpfile.js#L136
 gulp.task('check-size', ['default'], function(callback) {
-  var zlib = require('zlib')
-  var fs = require('fs')
-  var input = fs.createReadStream('./dist/dpicker.min.js')
-  var stream = input.pipe(zlib.createGzip())
-  var length = 0
+  const input = fs.createReadStream('./dist/dpicker.min.js')
+  const stream = input.pipe(zlib.createGzip())
+  const length = 0
   stream.on('data', function(chunk) {
     length += chunk.length
   });
@@ -78,6 +80,31 @@ gulp.task('check-size', ['default'], function(callback) {
     }
     callback()
   })
+})
+
+gulp.task('build-styles', ['default'], function() {
+  const styles = {}
+
+  fs.readdirSync('./demo/styles').map(e => {
+    let css = fs.readFileSync(`./demo/styles/${e}`)
+    let style = sass.renderSync({data: `#${path.basename(e, '.css')} { ${css.toString()} }`})
+
+    styles[path.basename(e, '.css')] =  {
+      css: style.css.toString(),
+      code: css.toString()
+    }
+  })
+
+  const scope = {
+    styles: styles
+  }
+
+  let output = fs.createWriteStream('./demo/styles.html')
+
+  fs.createReadStream('./demo/styles.haml')
+  .pipe(jhaml(scope))
+  .pipe(output)
+
 })
 
 gulp.task('watch', ['default'], function() {

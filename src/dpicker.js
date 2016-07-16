@@ -57,6 +57,7 @@ function isElementInContainer(parent, containerId) {
  * If you change locale moment, changes will automatically be taken into consideration. For example, set `moment.locale('fr')` to use french months.
  *
  * You can find coverage <a href="/dpicker/coverage/lcov-report/dist">here</a>
+ * Some alternate stylesheets are available <a href="/dpicker/demo/styles.html">here</a>
  *
  * <h2 id="demo">Demo</h2>
  *

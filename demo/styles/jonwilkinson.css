@@ -1,0 +1,29 @@
+.dpicker-container table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 3px;
+    -webkit-box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+    box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+}
+
+.dpicker-container button,
+.dpicker-container td,
+.dpicker-container th {
+    font-size: 1em;  /* overall calendar size */
+    height: 2em; /* tweak to add vertical spacing to calendar */
+    min-width: 1em; /* tweak to add horizontal spacing to calendar */
+    text-align: center;
+}
+
+.dpicker-inactive { color: rgba(0,0,0,.2); }
+select[name="dpicker-year"], select[name="dpicker-month"] { margin: 1em 2em 1em 0em; }
+.dpicker-active button.dpicker-active { background-color: #FFFBCC; font-weight:bold; }
+.dpicker-container, .dpicker-container button {  font-size: 100%; font: inherit; vertical-align: baseline; }
+.dpicker-container { margin:.5em; }
+.dpicker-active, .dpicker-inactive {border: 1px solid rgba(0,0,0,.05); }
+.dpicker-active button { border:none; width: 100%; background: none; }
+.dpicker-active button:hover { background: rgba(0,0,0,.05); cursor: pointer; }
+.dpicker-invisible { display: none; }
+.dpicker-visible { display: block; }

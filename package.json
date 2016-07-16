@@ -28,6 +28,7 @@
     "moment": "^2.13.0"
   },
   "devDependencies": {
+    "@soyuka/jhaml": "^1.0.8",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
@@ -40,6 +41,7 @@
     "jsdom-global": "^2.0.0",
     "maquette-query": "^0.7.5",
     "mocha": "^2.5.3",
+    "node-sass": "^3.8.0",
     "request-frame": "^1.4.1"
   }
 }

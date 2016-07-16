@@ -73,6 +73,8 @@ button.dpicker-active {
 }
 ```
 
+[You can find alternatives stylesheets here.](https://soyuka.github.io/dpicker/demo/styles.html)
+
 ## Modules
 
 To keep DPicker small (2.1Kb gz), external modules are available:
