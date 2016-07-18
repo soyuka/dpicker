@@ -2,9 +2,7 @@
   "name": "dpicker",
   "description": "Minimalist date picker",
   "main": [
-    "dist/dpicker.js",
-    "dist/dpicker.arrow-navigation.js",
-    "dist/dpicker.modifiers.js"
+    "dist/dpicker.js"
   ],
   "authors": [
     "soyuka"
