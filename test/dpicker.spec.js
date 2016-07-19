@@ -28,7 +28,7 @@ describe('dpicker', function() {
 
         let input = getElementByName('dpicker-input')
         expect(''+dpicker.model.year()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
+        expect(input.properties.value).to.equal(dpicker.input)
         cb()
       }
     })
@@ -51,7 +51,7 @@ describe('dpicker', function() {
 
         let input = getElementByName('dpicker-input')
         expect(''+dpicker.model.month()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
+        expect(input.properties.value).to.equal(dpicker.input)
         cb()
       }
     })
@@ -131,19 +131,36 @@ describe('dpicker', function() {
     expect(+options[options.length - 1].value).to.equal(10)
   })
 
+  it('should bind to an input[type="date"] with an empty value', function() {
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'date')
+    input.setAttribute('id', 't')
+    input.setAttribute('value', '')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    expect(dpicker.input).to.equal('')
+    expect(input.value).to.equal('')
+  })
+
   it('should have customized format', function() {
     const dpicker = createDatePicker()
 
     let input = getElementByName('dpicker-input')
     dpicker.format = 'MM/DD/YYYY'
 
-    expect(input.properties.value).to.equal(dpicker.model.format(dpicker.format))
+    expect(input.properties.value).to.equal(dpicker.input)
   })
 
   it('should change dpicker according to input change', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
+        expect(dpicker.input).to.equal('24/06/1991')
         cb()
       }
     })
@@ -161,7 +178,7 @@ describe('dpicker', function() {
     dpicker.format = 'DD/MM/YYYY'
     input.simulate.change({value: '24/06/1991'})
     input.simulate.change({value: 'test'})
-    expect(dpicker.model.format(dpicker.format)).to.equal('24/06/1991')
+    expect(dpicker.input).to.equal('24/06/1991')
   })
 
   it('should display dpicker on input focus', function() {

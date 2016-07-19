@@ -128,7 +128,7 @@ function DPicker(element, options = {}) {
     days: options.days || moment.weekdaysShort(),
     inputId: options.inputId || uuid(),
     inputName: options.name || 'dpicker-input',
-    isEmpty: options.model !== undefined && !options.model ? true : false,
+    isEmpty: options.model !== undefined && !options.model ? true : false
   }
 
   this.onChange = options.onChange
@@ -165,18 +165,32 @@ function DPicker(element, options = {}) {
     }
 
     //bind input attributes to data
-    ;[['format', 'format'], ['min', 'min'], ['max', 'max'], ['value', 'model']].map((e, i) => {
-      let dataKey = e[1]
-      e = e[0]
-
+    ;['format', 'min', 'max', 'value'].map((e, i) => {
       let attr = element.getAttribute(e)
 
-      if (!attr) { return }
+      if (typeof attr !== 'string') {
+        return
+      }
 
-      if (dataKey !== 'format') {
-        this._data[dataKey] = moment(attr, this._data.format)
-      } else {
-        this._data[dataKey] = attr
+      if (!attr) {
+        if (e === 'value' && attr.trim() === '') {
+          this._data.isEmpty = true
+        }
+
+        return
+      }
+
+      if (e === 'format') {
+        this._data.format = attr
+
+        return
+      }
+
+      let m = moment(attr, this._data.format)
+
+      if (m.isValid()) {
+        if (e === 'value') { e = 'model' }
+        this._data[e] = m
       }
     })
 
@@ -254,8 +268,6 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     inputChange: (evt) => {
-      this._data.input = evt.target.value
-
       if (!evt.target.value) {
         this._data.isEmpty = true
       } else {
@@ -581,7 +593,11 @@ Object.defineProperties(DPicker.prototype, {
    */
   'input': {
     get: function() {
-      return this._data.input
+      if (this._data.isEmpty) {
+        return ''
+      }
+
+      return this._data.model.format(this._data.format)
     }
   },
   /**
