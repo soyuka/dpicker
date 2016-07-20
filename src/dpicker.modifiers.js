@@ -32,6 +32,8 @@ function InputChange(evt) {
   }
 
   this.model = moment().add(x, 'days')
+
+  this.onChange()
 }
 
 const modifiers = DPicker.modules.modifiers = {

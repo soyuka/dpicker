@@ -29,4 +29,16 @@ describe('dpicker.modifiers', function() {
     input.simulate.change({value: '-10'})
     expect(dpicker.model.format('YYYYMMDD')).to.equal(now.clone().subtract(10, 'days').format('YYYYMMDD'))
   })
+
+  it('should call onChange twice', function(cb) {
+    let i = 0
+    const dpicker = createDatePicker({onChange: function() {
+      if (++i === 2) {
+        cb()
+      }
+    }})
+
+    let input = getElementByName('dpicker-input')
+    input.simulate.change({value: '+'})
+  })
 })
