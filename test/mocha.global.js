@@ -50,6 +50,7 @@ global.createDatePicker = function createDatePicker(opts) {
       dpicker.renderInput(dpicker._events, dpicker._data),
       dpicker.renderYears(dpicker._events, dpicker._data),
       dpicker.renderMonths(dpicker._events, dpicker._data),
+      dpicker.renderTime(dpicker._events, dpicker._data),
       dpicker.renderDays(dpicker._events, dpicker._data),
     ])
   )

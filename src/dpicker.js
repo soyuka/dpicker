@@ -41,6 +41,10 @@ function isElementInContainer(parent, containerId) {
   return false
 }
 
+const MINUTES = new Array(60).fill(0)
+const HOURS24 = new Array(24).fill(0).map((e, i) => i)
+const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
+
 /**
  * *DPicker a simple date picker*
  *
@@ -102,6 +106,8 @@ function isElementInContainer(parent, containerId) {
  * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
  * @param {Function} [options.modifier] A function that can modify the data when a model change occurs
+ * @param {boolean} [options.time=false] Wether to add time or not, true if input type is `datetime`
+ * @param {boolean} [options.meridiem=false] 12 vs 24 time format where 24 is the default, this can be set through the `time-format` attribute (eg: 12 or 24)
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
  * @listens DPicker#hide
@@ -128,7 +134,9 @@ function DPicker(element, options = {}) {
     days: options.days || moment.weekdaysShort(),
     inputId: options.inputId || uuid(),
     inputName: options.name || 'dpicker-input',
-    isEmpty: options.model !== undefined && !options.model ? true : false
+    isEmpty: options.model !== undefined && !options.model ? true : false,
+    time: options.time !== undefined ? options.time : false,
+    meridiem: options.meridiem !== undefined ? options.meridiem : false
   }
 
   this.onChange = options.onChange
@@ -137,15 +145,14 @@ function DPicker(element, options = {}) {
 
   this._events = this._loadEvents()
 
-  if (DPicker.modules) {
-    this._loadModules()
-  }
+  this._loadModules()
 
   document.addEventListener('click', this._events.hide)
 
   let render = this.render(this._events, this._data, [
     this.renderYears(this._events, this._data),
     this.renderMonths(this._events, this._data),
+    this.renderTime(this._events, this._data),
     this.renderDays(this._events, this._data)
   ])
 
@@ -160,39 +167,7 @@ function DPicker(element, options = {}) {
     this._data.inputId = element.getAttribute('id') || this._data.inputId
     this._data.inputName = element.getAttribute('name') || this._data.inputName
 
-    if (element.getAttribute('type') == 'date') {
-      element.setAttribute('type', 'text')
-    }
-
-    //bind input attributes to data
-    ;['format', 'min', 'max', 'value'].map((e, i) => {
-      let attr = element.getAttribute(e)
-
-      if (typeof attr !== 'string') {
-        return
-      }
-
-      if (!attr) {
-        if (e === 'value' && attr.trim() === '') {
-          this._data.isEmpty = true
-        }
-
-        return
-      }
-
-      if (e === 'format') {
-        this._data.format = attr
-
-        return
-      }
-
-      let m = moment(attr, this._data.format)
-
-      if (m.isValid()) {
-        if (e === 'value') { e = 'model' }
-        this._data[e] = m
-      }
-    })
+    this._parseInputAttributes(element)
 
     this._projector.merge(element, this.renderInput(this._events, this._data))
 
@@ -214,6 +189,61 @@ function DPicker(element, options = {}) {
   elementContainer.addEventListener('keydown', this._events.keyDown)
 
   return this
+}
+
+/**
+ * Parse input attributes and fill dpicker data container on initialization
+ * Parsed attributes are:
+ * - type (date or datetime)
+ * - format (moment format)
+ * - min (min date, a string matching the given format)
+ * - max (max date, a string matching the given format)
+ * - value (model initial value, a string matching the given format)
+ * @param {Element} element - an input
+ */
+DPicker.prototype._parseInputAttributes = function(element) {
+  let type = element.getAttribute('type')
+  if (type == 'date' || type == 'datetime') {
+    element.setAttribute('type', 'text')
+  }
+
+  if (type == 'datetime') {
+    this._data.time = true
+  }
+
+  //bind input attributes to data
+  ;['format', 'min', 'max', 'value', 'time-format'].map((e, i) => {
+    let attr = element.getAttribute(e)
+
+    if (typeof attr !== 'string') {
+      return
+    }
+
+    if (!attr) {
+      if (e === 'value' && attr.trim() === '') {
+        this._data.isEmpty = true
+      }
+
+      return
+    }
+
+    if (e === 'format') {
+      this._data.format = attr
+      return
+    }
+
+    if (e === 'time-format') {
+      this._data.meridiem = attr.match(12) ? true : false
+      return
+    }
+
+    let m = moment(attr, this._data.format, true)
+
+    if (m.isValid()) {
+      if (e === 'value') { e = 'model' }
+      this._data[e] = m
+    }
+  })
 }
 
 DPicker.prototype._loadModules = function loadModules() {
@@ -376,7 +406,58 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       document.getElementById(this.inputId).blur()
       this._data.display = false
-    }
+    },
+
+    /**
+     * On hours change
+     * @Event DPicker#hoursChange
+     * @param {Event} DOMEvent
+     */
+    hoursChange: (evt) => {
+      this._data.isEmpty = false
+
+      let val = parseInt(evt.target.options[evt.target.selectedIndex].value)
+
+      if (this._data.meridiem && this._data.model.format('A') === 'PM') {
+        val = val === 12 ? 12 : val + 12
+      } else if(val === 12) {
+        val = 0
+      }
+
+      this._data.model.hours(val)
+      this.onChange()
+    },
+
+    /**
+     * On minutes change
+     * @Event DPicker#minutesChange
+     * @param {Event} DOMEvent
+     */
+    minutesChange: (evt) => {
+      this._data.isEmpty = false
+      this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
+      this.onChange()
+    },
+
+    /**
+     * On meridiem change
+     * @Event DPicker#meridiemChange
+     * @param {Event} DOMEvent
+     */
+    meridiemChange: (evt) => {
+      this._data.isEmpty = false
+      let val = evt.target.options[evt.target.selectedIndex].value
+      let hours = this._data.model.hours()
+
+      if (val === 'AM') {
+        hours = hours === 12 ? 0 : hours - 12
+      } else {
+        hours = hours === 12 ? 12 : hours + 12
+      }
+
+      this._data.model.hours(hours)
+      this.onChange()
+    },
   }
 }
 
@@ -501,6 +582,64 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
       key: i
     }, e))
   )
+})
+
+/**
+ * Render Time
+ * ```
+ * select[name='dpicker-hour']
+ * select[name='dpicker-minutes']
+ * ```
+ * @method
+ * @listens DPicker#hourChange
+ * @listens DPicker#minutesChange
+ * @return {H} the rendered virtual dom hierarchy
+ */
+DPicker.prototype.renderTime = injector(function renderTime(events, data, toRender) {
+  if (!data.time) { return }
+
+  let modelHours = data.model.hours()
+  if (data.meridiem) {
+    modelHours = modelHours > 12 ? modelHours - 12 : modelHours
+  }
+
+  let modelMinutes = data.model.minutes()
+
+  let hours = data.meridiem ? HOURS12 : HOURS24
+
+  let selects = [
+    h('select', {
+      onchange: events.hoursChange,
+      name: 'dpicker-hours'
+    }, hours
+      .map((e, i) => h('option', {
+        value: e,
+        selected: e === modelHours,
+        key: e
+      }, e < 10 ? '0'+e : e))
+    ),
+    h('select', {
+      onchange: events.minutesChange,
+      name: 'dpicker-minutes'
+    }, MINUTES
+      .map((e, i) => h('option', {
+        value: i,
+        selected: i === modelMinutes,
+        key: i
+      }, i < 10 ? '0'+i : ''+i))
+    )
+  ]
+
+  if (data.meridiem) {
+    let modelMeridiem = data.model.format('A')
+    selects.push(h('select', {
+      onchange: events.meridiemChange,
+      name: 'dpicker-meridiem'
+    }, ['AM', 'PM'].map(e => h('option', {value: e, selected: modelMeridiem === e}, e))
+    ))
+  }
+
+  return h('span.dpicker-time', selects)
 })
 
 /**
@@ -668,10 +807,18 @@ Object.defineProperties(DPicker.prototype, {
  * @description Get/Set days an array of strings representing days, defaults to moment.weekdaysShort()
  */
 /**
- * @var {Array.<string>} DPicker#inputName
+ * @var {String} DPicker#inputName
  * @description Get/Set input name
  */
-;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max'].forEach(e => {
+/**
+ * @var {Boolean} DPicker#meridiem
+ * @description Get/Set meridiem (12 vs 24 hours format)
+ */
+/**
+ * @var {Boolean} DPicker#time
+ * @description Get/Set time wether to add time
+ */
+;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max', 'time', 'meridiem'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]

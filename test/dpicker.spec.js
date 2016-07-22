@@ -351,4 +351,163 @@ describe('dpicker', function() {
     label.querySelectorAll('button')[0].focus()
     expect(dpicker.display).to.be.true
   })
+
+  it('should change hours (24h format)', function(cb) {
+    const dpicker = createDatePicker({
+      onChange: (data) => {
+        expect(select.children[selectedIndex].properties.selected).to.be.true
+
+        let input = getElementByName('dpicker-input')
+        expect(''+dpicker.model.hours()).to.equal(options[selectedIndex].value)
+        expect(input.properties.value).to.equal(dpicker.input)
+        cb()
+      },
+      time: true
+    })
+
+    let selectedIndex = 4
+    let select = getElementByName('dpicker-hours')
+    let options = document.querySelector('select[name="dpicker-hours"]').options
+
+    select.simulate.change({
+      options: options,
+      selectedIndex: selectedIndex
+    })
+
+  })
+
+  it('should change minutes (24h format)', function(cb) {
+    const dpicker = createDatePicker({
+      onChange: (data) => {
+        expect(select.children[selectedIndex].properties.selected).to.be.true
+
+        let input = getElementByName('dpicker-input')
+        expect(''+dpicker.model.minutes()).to.equal(options[selectedIndex].value)
+        expect(input.properties.value).to.equal(dpicker.input)
+        cb()
+      },
+      time: true
+    })
+
+    let selectedIndex = 4
+    let select = getElementByName('dpicker-minutes')
+    let options = document.querySelector('select[name="dpicker-minutes"]').options
+
+    select.simulate.change({
+      options: options,
+      selectedIndex: selectedIndex
+    })
+  })
+
+  it('should change hours AM (12h format)', function(cb) {
+    const dpicker = createDatePicker({
+      time: true,
+      meridiem: true
+    })
+
+    let meridiem = getElementByName('dpicker-meridiem')
+    let moptions = document.querySelector('select[name="dpicker-meridiem"]').options
+
+    meridiem.simulate.change({
+      options: moptions,
+      selectedIndex: 0 //AM
+    })
+
+    let select = getElementByName('dpicker-hours')
+    let options = document.querySelector('select[name="dpicker-hours"]').options
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(0)
+    }
+
+    select.simulate.change({
+      options: options,
+      selectedIndex: 0 //12
+    })
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(12)
+    }
+
+    meridiem.simulate.change({
+      options: moptions,
+      selectedIndex: 1 //PM
+    })
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(23)
+    }
+
+    select.simulate.change({
+      options: options,
+      selectedIndex: 11 //11
+    })
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(12)
+    }
+
+    select.simulate.change({
+      options: options,
+      selectedIndex: 0 //12
+    })
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(0)
+    }
+
+    meridiem.simulate.change({
+      options: moptions,
+      selectedIndex: 0 //AM
+    })
+
+    dpicker.onChange = (data) => {
+      expect(dpicker.model.hours()).to.equal(12)
+      cb()
+    }
+
+    meridiem.simulate.change({
+      options: moptions,
+      selectedIndex: 1 //PM
+    })
+  })
+
+  it('should bind to an input[type="datetime"]', function() {
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'datetime')
+    input.setAttribute('id', 't')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    expect(dpicker.time).to.equal(true)
+    expect(input.getAttribute('type')).to.equal('text')
+
+    let options = document.querySelector('select[name="dpicker-hours"]').options
+    expect(options).to.have.length.of(24)
+  })
+
+  it('should bind to an input[type="datetime"] with meridiem', function() {
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'datetime')
+    input.setAttribute('time-format', '12h')
+    input.setAttribute('id', 't')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    expect(dpicker.time).to.equal(true)
+    expect(input.getAttribute('type')).to.equal('text')
+
+    let options = document.querySelector('select[name="dpicker-hours"]').options
+    expect(options).to.have.length.of(12)
+  })
 })
