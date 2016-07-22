@@ -38,20 +38,33 @@
     <label for="dp-test-label-1">Label
       <input id="dp-test-label-1" type="date" />
     </label>
+    <label for="dp-test-label-2">Datetime
+      <input id="dp-test-label-2" type="datetime" format="DD/MM/YYYY hh:mm A" time-format="12"/>
+    </label>
+    <label for="dp-test-label-3">Datetime
+      <input id="dp-test-label-3" type="datetime" format="DD/MM/YYYY HH:MM" />
+    </label>
   </div>
   <h2>Angular</h2>
   <div class="container">
     <angular-datepicker></angular-datepicker/>
     <angular-datepicker></angular-datepicker/>
   </div>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
-    <script src="../dist/dpicker.js"></script>
-    <script src="../dist/dpicker.arrow-navigation.js"></script>
-    <script src="../dist/dpicker.modifiers.js"></script>
+  <h2>Angular second example</h2>
+  <div ng-controller="MyCtrl as my">
+    Choosen date (ng-model): {{my.someDate.format('DD/MM/YYYY')}}
+    <label for="mydp">Choose a date
+      <input type="text" ng-dpicker ng-model="my.someDate" />
+    </label>
+  </div>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
+  <script src="../dist/dpicker.js"></script>
+  <script src="../dist/dpicker.arrow-navigation.js"></script>
+  <script src="../dist/dpicker.modifiers.js"></script>
   <script>
-    ;[].slice.call(document.querySelectorAll('input[type="date"]')).forEach((e, i) => new DPicker(e))
+		;[].slice.call(document.querySelectorAll('input[type="date"]')).concat([].slice.call(document.querySelectorAll('input[type="datetime"]'))).forEach(e => new DPicker(e));
 
     angular.module('myModule', [])
 
@@ -75,6 +88,54 @@
           scope.today = function(evt) {
             dpicker.model = moment()
           }
+        }
+      }
+    })
+    .controller('MyCtrl', function() {
+      this.someDate = moment('24/06/1991', 'DD/MM/YYYY')
+    })
+    //This one uses ngModelCtrl
+    .directive('ngDpicker', function() {
+      return {
+        restrict: 'A',
+        scope: {
+          ngModel: '='
+        },
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelCtrl) {
+          scope.dpicker = new DPicker(element[0])
+
+          scope.dpicker.onChange = function() {
+            ngModelCtrl.$setViewValue(scope.dpicker.model)
+          }
+
+          if (scope.ngModel) {
+            let model = moment(scope.ngModel, scope.dpicker.format, true)
+            if (model.isValid()) {
+              scope.dpicker.model = model
+            }
+          }
+
+          ngModelCtrl.$setViewValue(!scope.dpicker.input ? null : scope.dpicker.model)
+
+          //Move ng-class to input
+          if (attrs.ngClass) {
+            element[0].removeAttribute('ng-class')
+            let e
+
+            if (element[0].tagName == 'INPUT') {
+              e = element[0]
+            } else {
+              e = element.find('input')[0]
+            }
+            e.setAttribute('ng-class', attrs.ngClass)
+          }
+
+          attrs.$observe('ngModel', function(value) {
+            if (value instanceof Date) {
+              scope.dpicker.model = moment(value)
+            }
+          })
         }
       }
     })

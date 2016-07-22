@@ -69,14 +69,14 @@ gulp.task('default', function() {
 gulp.task('check-size', ['default'], function(callback) {
   const input = fs.createReadStream('./dist/dpicker.min.js')
   const stream = input.pipe(zlib.createGzip())
-  const length = 0
+  let length = 0
   stream.on('data', function(chunk) {
     length += chunk.length
   });
   stream.on('end', function() {
     console.log('gzipped size in kB:', length/1024)
-    if (length >= 2.5 * 1024) {
-      return callback(new Error('Claim that dpicker is only 2.5 kB gzipped no longer holds'))
+    if (length >= 3 * 1024) {
+      return callback(new Error('Claim that dpicker is only 3 kB gzipped no longer holds'))
     }
     callback()
   })
