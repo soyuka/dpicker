@@ -88,11 +88,11 @@ Or with every available options:
 
 Note that every specified attribute have to be strings, and if it's a date it should be in the given format.
 
-Now with time:
+Now with time (24h format):
 
 ```html
 <label for="dp-ex">Choose date and time
-  <input id="dp-ex" type="datetime" format="DD/MM/YYYY HH:MM" />
+  <input id="dp-ex" type="datetime" format="DD/MM/YYYY HH:mm" />
 </label>
 ```
 
