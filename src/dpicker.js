@@ -41,7 +41,7 @@ function isElementInContainer(parent, containerId) {
   return false
 }
 
-const MINUTES = new Array(60).fill(0)
+const MINUTES = new Array(60).fill(0).map((e, i) => i)
 const HOURS24 = new Array(24).fill(0).map((e, i) => i)
 const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
 
@@ -108,6 +108,7 @@ const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
  * @param {Function} [options.modifier] A function that can modify the data when a model change occurs
  * @param {boolean} [options.time=false] Wether to add time or not, true if input type is `datetime`
  * @param {boolean} [options.meridiem=false] 12 vs 24 time format where 24 is the default, this can be set through the `time-format` attribute (eg: 12 or 24)
+ * @param {Number} [options.step=1] Minutes step
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
  * @listens DPicker#hide
@@ -136,7 +137,8 @@ function DPicker(element, options = {}) {
     inputName: options.name || 'dpicker-input',
     isEmpty: options.model !== undefined && !options.model ? true : false,
     time: options.time !== undefined ? options.time : false,
-    meridiem: options.meridiem !== undefined ? options.meridiem : false
+    meridiem: options.meridiem !== undefined ? options.meridiem : false,
+    step: options.step || 1
   }
 
   this.onChange = options.onChange
@@ -199,6 +201,7 @@ function DPicker(element, options = {}) {
  * - min (min date, a string matching the given format)
  * - max (max date, a string matching the given format)
  * - value (model initial value, a string matching the given format)
+ * - step (model initial value, a string matching the given format)
  * @param {Element} element - an input
  */
 DPicker.prototype._parseInputAttributes = function(element) {
@@ -212,7 +215,7 @@ DPicker.prototype._parseInputAttributes = function(element) {
   }
 
   //bind input attributes to data
-  ;['format', 'min', 'max', 'value', 'time-format'].map((e, i) => {
+  ;['format', 'min', 'max', 'value', 'time-format', 'step'].map((e, i) => {
     let attr = element.getAttribute(e)
 
     if (typeof attr !== 'string') {
@@ -229,6 +232,11 @@ DPicker.prototype._parseInputAttributes = function(element) {
 
     if (e === 'format') {
       this._data.format = attr
+      return
+    }
+
+    if (e === 'step') {
+      this._data.step = attr
       return
     }
 
@@ -622,11 +630,12 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
       onchange: events.minutesChange,
       name: 'dpicker-minutes'
     }, MINUTES
-      .map((e, i) => h('option', {
-        value: i,
-        selected: i === modelMinutes,
-        key: i
-      }, i < 10 ? '0'+i : ''+i))
+      .filter(e => e % data.step === 0)
+      .map(e => h('option', {
+        value: e,
+        selected: e === modelMinutes,
+        key: e
+      }, e < 10 ? '0'+e : ''+e))
     )
   ]
 
@@ -818,7 +827,11 @@ Object.defineProperties(DPicker.prototype, {
  * @var {Boolean} DPicker#time
  * @description Get/Set time wether to add time
  */
-;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max', 'time', 'meridiem'].forEach(e => {
+/**
+ * @var {Number} DPicker#step
+ * @description Get/Set minutes step
+ */
+;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max', 'time', 'meridiem', 'step'].forEach(e => {
  Object.defineProperty(DPicker.prototype, e, {
     get: function() {
       return this._data[e]

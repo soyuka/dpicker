@@ -510,4 +510,15 @@ describe('dpicker', function() {
     let options = document.querySelector('select[name="dpicker-hours"]').options
     expect(options).to.have.length.of(12)
   })
+
+  it('should have minutes step of 5', function() {
+    const dpicker = createDatePicker({
+      time: true,
+      step: 5
+    })
+
+    let options = document.querySelector('select[name="dpicker-minutes"]').options
+
+    expect(options).to.have.length.of(12)
+  })
 })
