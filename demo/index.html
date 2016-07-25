@@ -64,7 +64,7 @@
   <script src="../dist/dpicker.arrow-navigation.js"></script>
   <script src="../dist/dpicker.modifiers.js"></script>
   <script>
-		;[].slice.call(document.querySelectorAll('input[type="date"]')).concat([].slice.call(document.querySelectorAll('input[type="datetime"]'))).forEach(e => new DPicker(e));
+		;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
 
     angular.module('myModule', [])
 

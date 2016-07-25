@@ -59,7 +59,7 @@ var dp = new DPicker(document.querySelector('input[type="date"]'))
 Let's initialize every `date` and `datetime` inputs with DPicker by using this ugly one-liner:
 
 ```javascript
-;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]'))).forEach(e => new DPicker(e));
+;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
 ```
 
 HTML can now take multiple formats, the simplest would be:
