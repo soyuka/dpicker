@@ -585,6 +585,8 @@ describe('dpicker', function() {
     let hours = document.querySelector('select[name="dpicker-hours"]').options
     expect(hours).to.have.length.of(14)
 
+    dpicker.model = moment('1991/06/24 09:10', format)
+    expect(dpicker.valid).to.be.false
     dpicker.model = moment('1991/06/24 11:10', format)
 
     setTimeout(function() {
@@ -594,7 +596,7 @@ describe('dpicker', function() {
     }, 100)
   })
 
-  it('should keep available hours - max', function(cb) {
+  it('should keep available hours/minutes - max', function(cb) {
     let format = 'YYYY/MM/DD HH:mm';
     const dpicker = createDatePicker({
       time: true,
@@ -612,11 +614,37 @@ describe('dpicker', function() {
     expect(dpicker.valid).to.be.false
     dpicker.model = moment('1991/06/24 09:10', format)
 
+    //wait for render
     setTimeout(function() {
       hours = document.querySelector('select[name="dpicker-hours"]').options
       expect(hours).to.have.length.of(11)
       expect(dpicker.valid).to.be.true
       cb()
     }, 100)
+  })
+
+  it('should find first value if minutes step (#8)', function() {
+    let format = 'YYYY/MM/DD HH:mm';
+    const dpicker = createDatePicker({
+      time: true,
+      format: format,
+      step: 15,
+      model: moment('1991/06/24 10:33', format),
+    })
+
+
+    ;[
+      {time: '11:44', expect: 45},
+      {time: '11:07', expect: 0},
+      {time: '11:08', expect: 15},
+      {time: '11:00', expect: 0},
+      {time: '11:58', expect: 0},
+      {time: '11:17', expect: 15},
+      {time: '11:30', expect: 30},
+      {time: '11:34', expect: 30},
+    ].map((e) => {
+      dpicker.model = moment('1991/06/24 '+e.time, format)
+      expect(dpicker.model.minutes()).to.equal(e.expect);
+    })
   })
 })

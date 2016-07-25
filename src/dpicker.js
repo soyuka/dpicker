@@ -231,13 +231,8 @@ DPicker.prototype._parseInputAttributes = function(element) {
       return
     }
 
-    if (e === 'format') {
-      this._data.format = attr
-      return
-    }
-
-    if (e === 'step') {
-      this._data.step = attr
+    if (~['format', 'step'].indexOf(e)) {
+      this._data[e] = attr
       return
     }
 
@@ -252,7 +247,10 @@ DPicker.prototype._parseInputAttributes = function(element) {
       if (e === 'value') { e = 'model' }
       this._data[e] = m
     }
+
   })
+
+  this._minutesStep()
 }
 
 DPicker.prototype._loadModules = function loadModules() {
@@ -319,6 +317,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this._data.empty = false
       }
 
+      this._minutesStep()
       this.onChange()
     },
 
@@ -426,7 +425,6 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this._data.empty = false
 
       let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
-
       if (this._data.meridiem && this._data.model.format('A') === 'PM') {
         val = val === 12 ? 12 : val + 12
       } else if(val === 12) {
@@ -781,6 +779,24 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
   ])
 })
 
+
+DPicker.prototype._minutesStep = function() {
+  if (this._data.step <= 1) {
+    return
+  }
+
+  let minutes = MINUTES.filter(e => e % this._data.step === 0)
+  let modelMinutes = this._data.model.minutes()
+
+  minutes[minutes.length] = 60
+  modelMinutes = minutes.reduce(function (prev, curr) {
+    return (Math.abs(curr - modelMinutes) < Math.abs(prev - modelMinutes) ? curr : prev)
+  });
+  minutes.length--
+
+  this._data.model.minutes(modelMinutes)
+}
+
 Object.defineProperties(DPicker.prototype, {
   /**
    * @var {String} DPicker#container
@@ -913,6 +929,7 @@ Object.defineProperties(DPicker.prototype, {
 
         if (this.isValid(newValue)) {
           this._data.model = newValue
+          this._minutesStep()
         }
       } else {
         this._data[e] = newValue
