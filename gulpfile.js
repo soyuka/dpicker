@@ -87,7 +87,7 @@ gulp.task('build-styles', ['default'], function() {
 
   fs.readdirSync('./demo/styles').map(e => {
     let css = fs.readFileSync(`./demo/styles/${e}`)
-    let style = sass.renderSync({data: `#${path.basename(e, '.css')} { ${css.toString()} }`})
+    let style = sass.renderSync({data: `#${path.basename(e, '.css')} { ${css.toString()} }`, includePaths: ['./bower_components/foundation-sites/scss']})
 
     styles[path.basename(e, '.css')] =  {
       css: style.css.toString(),
