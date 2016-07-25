@@ -417,7 +417,7 @@ describe('dpicker', function() {
     let options = document.querySelector('select[name="dpicker-hours"]').options
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(0)
+      expect(data.model.hours()).to.equal(0)
     }
 
     select.simulate.change({
@@ -426,7 +426,7 @@ describe('dpicker', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(12)
+      expect(data.model.hours()).to.equal(12)
     }
 
     meridiem.simulate.change({
@@ -435,7 +435,7 @@ describe('dpicker', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(23)
+      expect(data.model.hours()).to.equal(23)
     }
 
     select.simulate.change({
@@ -444,7 +444,7 @@ describe('dpicker', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(12)
+      expect(data.model.hours()).to.equal(12)
     }
 
     select.simulate.change({
@@ -453,7 +453,7 @@ describe('dpicker', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(0)
+      expect(data.model.hours()).to.equal(0)
     }
 
     meridiem.simulate.change({
@@ -462,7 +462,7 @@ describe('dpicker', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(dpicker.model.hours()).to.equal(12)
+      expect(data.model.hours()).to.equal(12)
       cb()
     }
 
