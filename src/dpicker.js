@@ -206,11 +206,11 @@ function DPicker(element, options = {}) {
  */
 DPicker.prototype._parseInputAttributes = function(element) {
   let type = element.getAttribute('type')
-  if (type == 'date' || type == 'datetime') {
+  if (type === 'date' || type === 'datetime') {
     element.setAttribute('type', 'text')
   }
 
-  if (type == 'datetime') {
+  if (type === 'datetime') {
     this._data.time = true
   }
 
@@ -424,7 +424,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
     hoursChange: (evt) => {
       this._data.isEmpty = false
 
-      let val = parseInt(evt.target.options[evt.target.selectedIndex].value)
+      let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
 
       if (this._data.meridiem && this._data.model.format('A') === 'PM') {
         val = val === 12 ? 12 : val + 12
@@ -465,7 +465,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       this._data.model.hours(hours)
       this.onChange()
-    },
+    }
   }
 }
 
@@ -572,10 +572,10 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
   let currentYear = data.model.year()
   let months = data.months
 
-  if (data.max.year() == currentYear) {
+  if (data.max.year() === currentYear) {
     let maxMonth = data.max.month()
     months = months.filter((e, i) => i <= maxMonth)
-  } else if (data.min.year() == currentYear) {
+  } else if (data.min.year() === currentYear) {
     let minMonth = data.min.month()
     months = months.filter((e, i) => i >= minMonth)
   }
