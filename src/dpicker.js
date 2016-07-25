@@ -60,7 +60,7 @@ const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
  *
  * If you change locale moment, changes will automatically be taken into consideration. For example, set `moment.locale('fr')` to use french months.
  *
- * You can find coverage <a href="/dpicker/coverage/lcov-report/dist">here</a>
+ * <a href="/dpicker/demo/index.html">Full demo here</a>
  * Some alternate stylesheets are available <a href="/dpicker/demo/styles.html">here</a>
  *
  * <h2 id="demo">Demo</h2>

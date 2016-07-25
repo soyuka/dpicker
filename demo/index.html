@@ -2,63 +2,140 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation-flex.min.css" type="text/css" media="all" />
     <style type="text/css">
-      td.dpicker-inactive {
-        color: grey;
-      }
+  label.dpicker .dpicker-container {
+    top: inherit; }
+  .dpicker {
+    position: relative; }
+    .dpicker .dpicker-container {
+      width: 300px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 15px;
+      position: absolute;
+      left: 0;
+      top: 2.4375rem;
+      background: #fefefe;
+      border: #0a0a0a;
+      z-index: 2; }
+      .dpicker .dpicker-container.dpicker-invisible {
+        display: none; }
+      .dpicker .dpicker-container.dpicker-visible {
+        display: flex; }
+      .dpicker .dpicker-container select {
+        flex: 0 0 49%; }
 
-      button.dpicker-active {
-        background: coral;
-      }
+      .dpicker .dpicker-container .dpicker-time { display: flex; }
+      .dpicker .dpicker-container .dpicker-time select {
+        flex: 0 0 55%; }
 
-      .dpicker-invisible {
-        display: none;
-      }
-      .dpicker-visible {
-        display: block;
-      }
+      .dpicker .dpicker-container table {
+        color: #0a0a0a;
+        text-align: center; }
+        .dpicker .dpicker-container table td {
+          border-collapse: collapse;
+          border: 1px solid #0a0a0a;
+          width: 40px;
+          height: 40px; }
+        .dpicker .dpicker-container table .dpicker-inactive {
+          font-size: 80%;
+          color: #858585; }
+        .dpicker .dpicker-container table .dpicker-active button {
+          display: inline-block;
+          text-align: center;
+          line-height: 1;
+          cursor: pointer;
+          -webkit-appearance: none;
+          transition: background-color 0.25s ease-out, color 0.25s ease-out;
+          vertical-align: middle;
+          border: 1px solid transparent;
+          border-radius: 0;
+          padding: 0.85em 1em;
+          margin: 0 0 1rem 0;
+          font-size: 0.9rem;
+          background-color: #f0f0f0;
+          color: #fefefe;
+          display: block;
+          width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          margin: 0;
+          padding: 0;
+          color: inherit;
+          height: 100%;
+          border: 0; }
+          [data-whatinput='mouse'] .dpicker .dpicker-container table .dpicker-active button {
+            outline: 0; }
+          .dpicker .dpicker-container table .dpicker-active button:hover, .dpicker .dpicker-container table .dpicker-active button:focus {
+            background-color: silver;
+            color: #fefefe; }
+          .dpicker .dpicker-container table .dpicker-active button.dpicker-active {
+            background-color: silver; }
 
-      .container {
-        margin: 10 auto;
-        width: 100%;
-      }
 
-      .container > * {
-        display: inline-block;
-      }
+      .fieldset:not(:last-child) { border-right: 0; }
     </style>
   </head>
 <body>
 
-  <h2>VanillaJS</h2>
-  <div class="container">
-    <label for="dp-test-label-0">Min + Max
-      <input id="dp-test-label-0" type="date" min="24/06/1991" max="20/08/2000" value="24/06/1991" format="DD/MM/YYYY" />
-    </label>
-    <label for="dp-test-label-1">Label
-      <input id="dp-test-label-1" type="date" />
-    </label>
-    <label for="dp-test-label-2">Datetime
-      <input id="dp-test-label-2" type="datetime" format="DD/MM/YYYY hh:mm A" time-format="12"/>
-    </label>
-    <label for="dp-test-label-3">Datetime
-      <input id="dp-test-label-3" type="datetime" format="DD/MM/YYYY HH:mm"  min="24/06/1991 15:10" value="24/06/1991 15:10"/>
-    </label>
-    <label for="dp-test-label-3">Issue 11
-      <input id="dp-issue-11" type="text" format="DD/MM/YYYY HH:mm" />
-    </label>
+  <div class="row">
+    <ul class="menu">
+      <li><a href="../">Documentation</a></li>
+      <li><a href="styles.html">Styles</a></li>
+      <li><a href="../coverage/lcov-report/index.html" target="_blank">Coverage</a></li>
+    </ul>
+
+    <h2 class="columns small-12">VanillaJS</h2>
+
+    <fieldset class="fieldset columns small-1 medium-6">
+      <legend>Default</legend>
+      <label for="dp-test-label-1">Label
+        <input id="dp-test-label-1" type="date" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset columns small-1 medium-6">
+      <legend>Min + Max</legend>
+      <label for="dp-test-label-0">Pick:
+        <input id="dp-test-label-0" type="date" min="24/06/1991" max="20/08/2000" value="24/06/1991" format="DD/MM/YYYY" />
+      </label>
+    </fieldset>
   </div>
-  <h2>Angular</h2>
-  <div class="container">
-    <angular-datepicker></angular-datepicker/>
-    <angular-datepicker></angular-datepicker/>
+
+  <div class="row">
+    <fieldset class="fieldset columns small-1 medium-6">
+      <legend>Datetime (12h format, 15 step)</legend>
+      <label for="dp-test-label-2">Pick:
+        <input id="dp-test-label-2" type="datetime" format="DD/MM/YYYY hh:mm A" time-format="12" step="15"/>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset columns small-1 medium-6">
+      <legend>Datetime + min</legend>
+      <label for="dp-test-label-3">Pick:
+        <input id="dp-test-label-3" type="datetime" format="DD/MM/YYYY HH:mm"  min="24/06/1991 15:10" value="24/06/1991 15:10"/>
+      </label>
+    </fieldset>
   </div>
-  <h2>Angular second example</h2>
-  <div ng-controller="MyCtrl as my">
-    Choosen date (ng-model): {{my.someDate.format('DD/MM/YYYY')}}
-    <label for="mydp">Choose a date
-      <input type="text" ng-dpicker ng-model="my.someDate" />
-    </label>
+
+  <div class="row">
+    <h2 class="columns small-12">Angular</h2>
+
+    <fieldset class="fieldset columns small-2 medium-6" ng-controller="MyCtrl as my">
+      <legend>Directive + ngModel + ngController</legend>
+      <label for="mydp">Choose a date
+        <input type="text" dp-dpicker ng-model="my.someDate" />
+      </label>
+      Choosen date (ng-model): {{my.someDate.format('DD/MM/YYYY')}}
+    </fieldset>
+
+    <fieldset class="fieldset columns small-2 medium-6">
+      <legend>Directive that handles dynamic setters</legend>
+      <angular-datepicker></angular-datepicker/>
+    </fieldset>
+  </div>
+
   </div>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
@@ -69,17 +146,13 @@
   <script>
 		;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
 
-    let dp11 = new DPicker(document.getElementById('dp-issue-11'))
-    dp11.time = true
-    dp11.min = moment()
-
     angular.module('myModule', [])
 
     angular.module('myModule')
     .directive('angularDatepicker', function() {
       return {
         restrict: 'E',
-        template: '<button ng-click="toggle($event)">Toggle</button><button ng-click="tomorrow($event)">Tomorrow</button><button ng-click="today($event)">Today</button>',
+        template: '<button class="button" ng-click="toggle($event)">Toggle</button><button class="button" ng-click="tomorrow($event)">Tomorrow</button><button class="button" ng-click="today($event)">Today</button>',
         scope: true,
         link: function(scope, element, attrs) {
           let dpicker = new DPicker(element[0])
@@ -102,7 +175,7 @@
       this.someDate = moment('24/06/1991', 'DD/MM/YYYY')
     })
     //This one uses ngModelCtrl
-    .directive('ngDpicker', function() {
+    .directive('dpDpicker', function() {
       return {
         restrict: 'A',
         scope: {

@@ -1,0 +1,68 @@
+@import 'foundation';
+
+$black: #2F3439 !default;
+$white: #fefefe !default;
+$alt-white: #f0f0f0 !default;
+
+label.dpicker .dpicker-container { top: inherit; }
+.dpicker {
+    position: relative;
+
+    .dpicker-container {
+        width: 300px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 15px;
+        position: absolute;
+        left: 0;
+        top: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+        background: $white;
+        border: $black;
+        z-index: 2;
+
+        &.dpicker-invisible { display: none; }
+        &.dpicker-visible { display: flex; }
+
+        select {
+            flex: 0 0 49%;
+        }
+
+        .dpicker-time {
+          display: flex;
+          select {
+              flex: 0 0 30%;
+          }
+        }
+
+        table {
+            color: $black;
+            text-align:center;
+
+            td {
+                border-collapse: collapse;
+                border: 1px solid $black;
+                width: 40px;
+                height: 40px;
+            }
+
+            .dpicker-inactive { font-size: $small-font-size; color: scale-color($black, $lightness: 50%); }
+
+            $dpicker-hover: scale-color($alt-white, $lightness: -20%);
+
+            .dpicker-active button {
+
+                @include button($expand: true, $background: $alt-white, $background-hover: $dpicker-hover)
+
+                margin: 0;
+                padding: 0;
+                color: inherit;
+                height: 100%;
+                border: 0;
+
+                &.dpicker-active {
+                    background-color: $dpicker-hover;
+                }
+            }
+        }
+    }
+}

@@ -75,7 +75,7 @@ gulp.task('check-size', ['default'], function(callback) {
   });
   stream.on('end', function() {
     console.log('gzipped size in kB:', length/1024)
-    if (length >= 3 * 1024) {
+    if (length >= 3.5 * 1024) {
       return callback(new Error('Claim that dpicker is only 3 kB gzipped no longer holds'))
     }
     callback()
@@ -87,9 +87,11 @@ gulp.task('build-styles', ['default'], function() {
 
   fs.readdirSync('./demo/styles').map(e => {
     let css = fs.readFileSync(`./demo/styles/${e}`)
-    let style = sass.renderSync({data: `#${path.basename(e, '.css')} { ${css.toString()} }`})
+    let style = sass.renderSync({data: `#${path.basename(e, '.css')} { ${css.toString()} }`, includePaths: ['./bower_components/foundation-sites/scss']})
 
-    styles[path.basename(e, '.css')] =  {
+    let basename = path.basename(e, '.css')
+
+    styles[basename] =  {
       css: style.css.toString(),
       code: css.toString()
     }

@@ -4,7 +4,9 @@
 [![Code Climate](https://codeclimate.com/github/soyuka/dpicker/badges/gpa.svg)](https://codeclimate.com/github/soyuka/dpicker)
 [![Test Coverage](https://codeclimate.com/github/soyuka/dpicker/badges/coverage.svg)](https://codeclimate.com/github/soyuka/dpicker/coverage)
 
-[Demo and full documentation](https://soyuka.github.io/dpicker/DPicker.html#demo)
+[Demo](https://soyuka.github.io/dpicker/demo/index.html)
+[Styles](https://soyuka.github.io/dpicker/demo/styles.html)
+[Documentation](https://soyuka.github.io/dpicker/DPicker.html)
 
 A framework-agnostic minimal date picker.
 
@@ -177,7 +179,7 @@ button.dpicker-active {
 
 ## Modules
 
-To keep DPicker small (2.7Kb gz), external modules are available:
+To keep DPicker small (3.1Kb gz), external modules are available:
 
 For example [arrowNavigation](https://soyuka.github.io/dpicker/DPicker.modules.module_arrowNavigation.html) allows the use of arrows on days to switch from one to another.
 
@@ -196,7 +198,7 @@ If you know one that does have less than 1000 SLOC, please let me know.
 
 This date picker:
 
-- is light and easy to use, especially easy to maintain (~500 sloc) and to extend or add functionalities (see `onChange` and `modifier` methods).
+- is light and easy to use, especially easy to maintain (~600 sloc) and to extend or add functionalities (see `onChange` and `modifier` methods).
 - is framework agnostic, and no default css so that it fits well with foundation/bootstrap and angular/react
 - has HTML attributes compatibility with `input[type="date"]` (adds a `format` attribute) and `input[type="datetime"]` (adds a `time-format` attribute on top of the `format` one if you need 12 hours time range)
 - works with momentjs so that locale changes are a breeze

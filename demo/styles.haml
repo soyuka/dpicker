@@ -24,6 +24,7 @@
     - for(let i in styles)
       %style{type: 'text/css'}= styles[i].css
   %body
+    %a{href: 'index.html'} Back to demo
     %h1 DPicker styles
     - for(let i in styles)
       %div.style
@@ -37,5 +38,5 @@
     %script{type: "text/javascript", src: "https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"}
     %script{type: 'text/javascript', src: "../dist/dpicker.js"}
     %script
-      ;[].slice.call(document.getElementsByTagName('dpicker')).forEach((e, i) => new DPicker(e))
+      ;[].slice.call(document.getElementsByTagName('dpicker')).forEach((e, i) => new DPicker(e, {time: true, meridiem: true, format: 'DD/MM/YYYY hh:mm'}))
 
