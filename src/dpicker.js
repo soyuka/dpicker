@@ -614,6 +614,14 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
   let modelMinutes = data.model.minutes()
 
   let hours = data.meridiem ? HOURS12 : HOURS24
+  let minutes = MINUTES.filter(e => e % data.step === 0)
+
+  if(data.model.isSame(data.min, 'day')) {
+    let minMinutes = data.min.minutes()
+    minutes = minutes.filter(e => e >= minMinutes)
+    let minHours = + data.meridiem ? data.min.format('h') : data.model.hours()
+    hours = hours.filter(e => e >= minHours)
+  }
 
   let selects = [
     h('select', {
@@ -629,8 +637,8 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
     h('select', {
       onchange: events.minutesChange,
       name: 'dpicker-minutes'
-    }, MINUTES
-      .filter(e => e % data.step === 0)
+    },
+      minutes
       .map(e => h('option', {
         value: e,
         selected: e === modelMinutes,

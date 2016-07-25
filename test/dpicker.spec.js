@@ -521,4 +521,41 @@ describe('dpicker', function() {
 
     expect(options).to.have.length.of(12)
   })
+
+  it('should not allow lower hour/min than minDate ones (24)', function() {
+    let format = 'YYYY/MM/DD HH:mm';
+    const dpicker = createDatePicker({
+      time: true,
+      format: format,
+      model: moment('1991/06/24 15:10', format),
+      min: moment('1991/06/24 15:10', format),
+    })
+
+    let minutes = document.querySelector('select[name="dpicker-minutes"]').options
+
+    expect(minutes).to.have.length.of(50)
+
+    let hours = document.querySelector('select[name="dpicker-hours"]').options
+
+    expect(hours).to.have.length.of(9)
+  })
+
+  it('should not allow lower hour/min than minDate ones (12)', function() {
+    let format = 'YYYY/MM/DD hh:mm A';
+    const dpicker = createDatePicker({
+      time: true,
+      meridiem: true,
+      format: format,
+      model: moment('1991/06/24 10:10 AM', format),
+      min: moment('1991/06/24 10:10 AM', format),
+    })
+
+    let minutes = document.querySelector('select[name="dpicker-minutes"]').options
+
+    expect(minutes).to.have.length.of(50)
+
+    let hours = document.querySelector('select[name="dpicker-hours"]').options
+
+    expect(hours).to.have.length.of(3)
+  })
 })
