@@ -654,6 +654,13 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
     hours = hours.filter(e => e >= minHours)
   }
 
+  if(data.model.isSame(data.max, 'day')) {
+    let maxMinutes = data.max.minutes()
+    minutes = minutes.filter(e => e <= maxMinutes)
+    let maxHours = + data.meridiem ? data.max.format('h') : data.max.hours()
+    hours = hours.filter(e => e <= maxHours)
+  }
+
   let selects = [
     h('select', {
       onchange: events.hoursChange,

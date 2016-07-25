@@ -573,7 +573,7 @@ describe('dpicker', function() {
     expect(hours).to.have.length.of(3)
   })
 
-  it('should keep available hours (#11)', function(cb) {
+  it('should keep available hours - min (#11)', function(cb) {
     let format = 'YYYY/MM/DD HH:mm';
     const dpicker = createDatePicker({
       time: true,
@@ -590,6 +590,32 @@ describe('dpicker', function() {
     setTimeout(function() {
       hours = document.querySelector('select[name="dpicker-hours"]').options
       expect(hours).to.have.length.of(14)
+      cb()
+    }, 100)
+  })
+
+  it('should keep available hours - max', function(cb) {
+    let format = 'YYYY/MM/DD HH:mm';
+    const dpicker = createDatePicker({
+      time: true,
+      format: format,
+      model: moment('1991/06/24 10:10', format),
+      max: moment('1991/06/24 10:10', format),
+    })
+
+    let hours = document.querySelector('select[name="dpicker-hours"]').options
+    expect(hours).to.have.length.of(11)
+    let minutes = document.querySelector('select[name="dpicker-minutes"]').options
+    expect(minutes).to.have.length.of(11)
+
+    dpicker.model = moment('1991/06/24 11:10', format)
+    expect(dpicker.valid).to.be.false
+    dpicker.model = moment('1991/06/24 09:10', format)
+
+    setTimeout(function() {
+      hours = document.querySelector('select[name="dpicker-hours"]').options
+      expect(hours).to.have.length.of(11)
+      expect(dpicker.valid).to.be.true
       cb()
     }, 100)
   })
