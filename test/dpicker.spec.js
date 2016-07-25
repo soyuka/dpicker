@@ -572,4 +572,25 @@ describe('dpicker', function() {
 
     expect(hours).to.have.length.of(3)
   })
+
+  it('should keep available hours (#11)', function(cb) {
+    let format = 'YYYY/MM/DD HH:mm';
+    const dpicker = createDatePicker({
+      time: true,
+      format: format,
+      model: moment('1991/06/24 10:10', format),
+      min: moment('1991/06/24 10:10', format),
+    })
+
+    let hours = document.querySelector('select[name="dpicker-hours"]').options
+    expect(hours).to.have.length.of(14)
+
+    dpicker.model = moment('1991/06/24 11:10', format)
+
+    setTimeout(function() {
+      hours = document.querySelector('select[name="dpicker-hours"]').options
+      expect(hours).to.have.length.of(14)
+      cb()
+    }, 100)
+  })
 })

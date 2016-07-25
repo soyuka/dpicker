@@ -650,7 +650,7 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
   if(data.model.isSame(data.min, 'day')) {
     let minMinutes = data.min.minutes()
     minutes = minutes.filter(e => e >= minMinutes)
-    let minHours = + data.meridiem ? data.min.format('h') : data.model.hours()
+    let minHours = + data.meridiem ? data.min.format('h') : data.min.hours()
     hours = hours.filter(e => e >= minHours)
   }
 

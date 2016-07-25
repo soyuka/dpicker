@@ -44,6 +44,9 @@
     <label for="dp-test-label-3">Datetime
       <input id="dp-test-label-3" type="datetime" format="DD/MM/YYYY HH:mm"  min="24/06/1991 15:10" value="24/06/1991 15:10"/>
     </label>
+    <label for="dp-test-label-3">Issue 11
+      <input id="dp-issue-11" type="text" format="DD/MM/YYYY HH:mm" />
+    </label>
   </div>
   <h2>Angular</h2>
   <div class="container">
@@ -65,6 +68,10 @@
   <script src="../dist/dpicker.modifiers.js"></script>
   <script>
 		;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
+
+    let dp11 = new DPicker(document.getElementById('dp-issue-11'))
+    dp11.time = true
+    dp11.min = moment()
 
     angular.module('myModule', [])
 
