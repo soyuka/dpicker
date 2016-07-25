@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0
+
+`isEmpty` renamed `empty`
+
 ## 1.3.0
 
 Drop `previousYear` and `futureYear`. Those are replaced by `min` and `max`:

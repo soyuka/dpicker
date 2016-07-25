@@ -135,10 +135,11 @@ function DPicker(element, options = {}) {
     days: options.days || moment.weekdaysShort(),
     inputId: options.inputId || uuid(),
     inputName: options.name || 'dpicker-input',
-    isEmpty: options.model !== undefined && !options.model ? true : false,
+    empty: options.model !== undefined && !options.model ? true : false,
     time: options.time !== undefined ? options.time : false,
     meridiem: options.meridiem !== undefined ? options.meridiem : false,
-    step: options.step || 1
+    step: options.step || 1,
+    valid: true
   }
 
   this.onChange = options.onChange
@@ -224,7 +225,7 @@ DPicker.prototype._parseInputAttributes = function(element) {
 
     if (!attr) {
       if (e === 'value' && attr.trim() === '') {
-        this._data.isEmpty = true
+        this._data.empty = true
       }
 
       return
@@ -247,7 +248,7 @@ DPicker.prototype._parseInputAttributes = function(element) {
 
     let m = moment(attr, this._data.format, true)
 
-    if (m.isValid()) {
+    if (this.isValid(m)) {
       if (e === 'value') { e = 'model' }
       this._data[e] = m
     }
@@ -307,15 +308,15 @@ DPicker.prototype._loadEvents = function loadEvents() {
      */
     inputChange: (evt) => {
       if (!evt.target.value) {
-        this._data.isEmpty = true
+        this._data.empty = true
       } else {
         let newModel = moment(evt.target.value, this._data.format)
 
-        if (newModel.isValid()) {
+        if (this.isValid(newModel)) {
           this._data.model = newModel
         }
 
-        this._data.isEmpty = false
+        this._data.empty = false
       }
 
       this.onChange()
@@ -358,7 +359,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     yearChange: (evt) => {
-      this._data.isEmpty = false
+      this._data.empty = false
       this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
       this.onChange()
     },
@@ -369,7 +370,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     monthChange: (evt) => {
-      this._data.isEmpty = false
+      this._data.empty = false
       this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
       this.onChange()
     },
@@ -382,7 +383,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
     dayClick: (evt) => {
       evt.preventDefault()
       this._data.model.date(evt.target.value)
-      this._data.isEmpty = false
+      this._data.empty = false
       this.onChange()
 
       if (this._data.hideOnDayClick) {
@@ -422,7 +423,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     hoursChange: (evt) => {
-      this._data.isEmpty = false
+      this._data.empty = false
 
       let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
 
@@ -442,7 +443,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     minutesChange: (evt) => {
-      this._data.isEmpty = false
+      this._data.empty = false
       this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
       this.onChange()
     },
@@ -453,7 +454,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     meridiemChange: (evt) => {
-      this._data.isEmpty = false
+      this._data.empty = false
       let val = evt.target.options[evt.target.selectedIndex].value
       let hours = this._data.model.hours()
 
@@ -469,6 +470,32 @@ DPicker.prototype._loadEvents = function loadEvents() {
   }
 }
 
+DPicker.prototype.isValid = function isValid(model) {
+  if (!(model instanceof moment)) {
+    return false
+  }
+
+  if (!model.isValid()) {
+    return false
+  }
+
+  if (model < this._data.min) {
+    this._data.valid = false
+    this._data.model = this._data.min
+    return false
+  }
+
+  if (model > this._data.max) {
+    this._data.valid = false
+    this._data.model = this._data.min
+    return false
+  }
+
+  this._data.valid = true
+
+  return true
+}
+
 /**
  * Render input
  * @method
@@ -479,7 +506,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
  */
 DPicker.prototype.renderInput = injector(function renderInput(events, data, toRender) {
   return h('input#'+data.inputId, {
-    value: data.isEmpty ? '' : data.model.format(data.format),
+    value: data.empty ? '' : data.model.format(data.format),
     type: 'text',
     min: data.min.format(data.format),
     max: data.max.format(data.format),
@@ -571,24 +598,28 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
   let modelMonth = data.model.month()
   let currentYear = data.model.year()
   let months = data.months
+  let showMonths = data.months.map((e, i) => i)
 
   if (data.max.year() === currentYear) {
     let maxMonth = data.max.month()
-    months = months.filter((e, i) => i <= maxMonth)
-  } else if (data.min.year() === currentYear) {
+    showMonths = showMonths.filter(e => e <= maxMonth)
+  }
+
+  if (data.min.year() === currentYear) {
     let minMonth = data.min.month()
-    months = months.filter((e, i) => i >= minMonth)
+    showMonths = showMonths.filter(e => e >= minMonth)
   }
 
   return h('select', {
       onchange: events.monthChange,
       name: 'dpicker-month'
     },
-    months
+    showMonths
     .map((e, i) => h('option', {
-      value: i, selected: i === modelMonth,
-      key: i
-    }, e))
+      value: e,
+      selected: e === modelMonth,
+      key: e
+    }, months[e]))
   )
 })
 
@@ -678,9 +709,21 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
   let firstDay = +(data.model.clone().date(1).format('e')) - 1
   let currentDay = data.model.date()
 
+  let minDay
+  let maxDay
+
+  if(data.model.isSame(data.min, 'month')) {
+    minDay = data.min.date()
+  }
+
+  if(data.model.isSame(data.max, 'month')) {
+    maxDay = data.max.date()
+  }
+
   let rows = new Array(Math.ceil(.1+(firstDay + daysInMonth) / 7)).fill(0)
   let day
   let dayActive
+  let loopend = true
 
   return h('table', [
     //headers
@@ -689,6 +732,7 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
     rows.map((e, row) => {
       //weeks filed with days
       return h('tr', {key: row}, new Array(7).fill(0).map((e, col) => {
+        dayActive = loopend
 
         if (col <= firstDay && row === 0) {
           day = daysInPreviousMonth - (firstDay - col)
@@ -700,9 +744,15 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
           if (day === daysInMonth) {
             day = 0
             dayActive = false
+            loopend = false
           }
 
           day++
+        }
+
+        if (dayActive === true) {
+          dayActive = typeof minDay !== 'undefined' ? day >= minDay : dayActive
+          dayActive = typeof maxDay !== 'undefined' ? day <= maxDay : dayActive
         }
 
         return h('td', {
@@ -749,7 +799,7 @@ Object.defineProperties(DPicker.prototype, {
    */
   'input': {
     get: function() {
-      if (this._data.isEmpty) {
+      if (this._data.empty) {
         return ''
       }
 
@@ -791,6 +841,12 @@ Object.defineProperties(DPicker.prototype, {
     },
     get: function() {
       return this._modifier
+    }
+  },
+
+  'valid': {
+    get: function() {
+      return this._data.valid
     }
   }
 })
@@ -846,8 +902,11 @@ Object.defineProperties(DPicker.prototype, {
     },
     set: function(newValue) {
       if (e === 'model') {
-        this._data.isEmpty = !newValue
-        this._data[e] = newValue ? newValue : this._data[e]
+        this._data.empty = !newValue
+
+        if (this.isValid(newValue)) {
+          this._data.model = newValue
+        }
       } else {
         this._data[e] = newValue
       }

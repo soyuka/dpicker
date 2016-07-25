@@ -93,10 +93,24 @@ describe('dpicker', function() {
   })
 
   it('should change number of displayed months on min date', function() {
-    const dpicker = createDatePicker({min: moment('1900-06-01'), model: moment('1900-05-01'), format: 'YYYY-MM-DD'})
+    const dpicker = createDatePicker({min: moment('1900-06-01'), model: moment('1900-06-01'), format: 'YYYY-MM-DD'})
 
     let options = document.querySelector('select[name="dpicker-month"]').options
     expect(options.length).to.equal(7)
+  })
+
+  it('should change days active on min date', function() {
+    const dpicker = createDatePicker({min: moment('1991-06-24'), model: moment('1991-06-24'), format: 'YYYY-MM-DD'})
+
+    let days = document.querySelectorAll('button')
+    expect(days).to.have.length.of(7)
+  })
+
+  it('should change days active on max date', function() {
+    const dpicker = createDatePicker({max: moment('1991-06-24'), model: moment('1991-06-24'), format: 'YYYY-MM-DD'})
+
+    let days = document.querySelectorAll('button')
+    expect(days).to.have.length.of(24)
   })
 
   it('should bind to an input[type="date"]', function() {
@@ -210,9 +224,9 @@ describe('dpicker', function() {
     let input = getElementByName('dpicker-input')
 
     input.simulate.change({value: '24/06/1991'})
-    expect(dpicker._data.isEmpty).to.be.false
+    expect(dpicker._data.empty).to.be.false
     input.simulate.change({value: ''})
-    expect(dpicker._data.isEmpty).to.be.true
+    expect(dpicker._data.empty).to.be.true
   })
 
   it('should init dpicker on a container', function() {
@@ -243,9 +257,9 @@ describe('dpicker', function() {
     expect(dpicker.inputId).to.equal('t')
 
     dpicker.model = moment('24/06/1991', 'DD/MM/YYYY')
-    expect(dpicker._data.isEmpty).to.be.false
+    expect(dpicker._data.empty).to.be.false
     dpicker.model = ''
-    expect(dpicker._data.isEmpty).to.be.true
+    expect(dpicker._data.empty).to.be.true
   })
 
   it('should add a modifier', function() {
