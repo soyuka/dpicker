@@ -105,7 +105,6 @@ const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
  * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
  * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
- * @param {Function} [options.modifier] A function that can modify the data when a model change occurs
  * @param {boolean} [options.time=false] Wether to add time or not, true if input type is `datetime`
  * @param {boolean} [options.meridiem=false] 12 vs 24 time format where 24 is the default, this can be set through the `time-format` attribute (eg: 12 or 24)
  * @param {Number} [options.step=1] Minutes step
@@ -143,7 +142,6 @@ function DPicker(element, options = {}) {
   }
 
   this.onChange = options.onChange
-  this.modifier = options.modifier
   this._projector = maquette.createProjector()
 
   this._events = this._loadEvents()
@@ -844,34 +842,11 @@ Object.defineProperties(DPicker.prototype, {
   'onChange': {
     set: function(onChange) {
       this._onChange = () => {
-        if (this.modifier) {
-          this.modifier()
-        }
-
         return !onChange ? false : onChange(this._data)
       }
     },
     get: function() {
       return this._onChange
-    }
-  },
-  /**
-   * @var {Function} DPicker#modifier
-   * @description Set modifier method
-   */
-  'modifier': {
-    set: function(modifier) {
-      if (!modifier) {
-        this._modifier = null
-        return
-      }
-
-      this._modifier = () => {
-        modifier.bind(this)()
-      }
-    },
-    get: function() {
-      return this._modifier
     }
   },
 

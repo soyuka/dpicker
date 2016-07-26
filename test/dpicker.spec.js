@@ -263,6 +263,7 @@ describe('dpicker', function() {
   })
 
   it('should add a modifier', function() {
+    this.skip('feature removed')
     const now = moment()
     const dpicker = createDatePicker({
       model: moment('24/06/1991', 'DD/MM/YYYY'),
@@ -431,6 +432,7 @@ describe('dpicker', function() {
     let options = document.querySelector('select[name="dpicker-hours"]').options
 
     dpicker.onChange = (data) => {
+      //@TODO if model == 00:03 bug expected 12 to equal 0
       expect(data.model.hours()).to.equal(0)
     }
 
