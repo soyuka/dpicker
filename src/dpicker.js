@@ -511,7 +511,9 @@ DPicker.prototype.renderInput = injector(function renderInput(events, data, toRe
     onchange: events.inputChange,
     onblur: events.inputBlur,
     onfocus: events.inputFocus,
-    name: data.inputName
+    name: data.inputName,
+    'aria-invalid': data.valid,
+    'aria-haspopup': true
   })
 })
 
@@ -547,6 +549,7 @@ DPicker.prototype.render = injector(function render(events, data, toRender) {
   return h('div.dpicker-container', {
     classes: {
       'dpicker-visible': data.display,
+      'aria-hidden': data.display,
       'dpicker-invisible': !data.display
     }
   },
@@ -578,7 +581,8 @@ DPicker.prototype.renderYears = injector(function renderYears(events, data, toRe
 
   return h('select', {
     onchange: events.yearChange,
-    name: 'dpicker-year'
+    name: 'dpicker-year',
+    'aria-label': 'Year'
   }, options)
 })
 
@@ -609,7 +613,8 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
 
   return h('select', {
       onchange: events.monthChange,
-      name: 'dpicker-month'
+      name: 'dpicker-month',
+    'aria-label': 'Month'
     },
     showMonths
     .map((e, i) => h('option', {
@@ -661,7 +666,8 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
   let selects = [
     h('select', {
       onchange: events.hoursChange,
-      name: 'dpicker-hours'
+      name: 'dpicker-hours',
+      'aria-label': 'Hours'
     }, hours
       .map((e, i) => h('option', {
         value: e,
@@ -671,7 +677,8 @@ DPicker.prototype.renderTime = injector(function renderTime(events, data, toRend
     ),
     h('select', {
       onchange: events.minutesChange,
-      name: 'dpicker-minutes'
+      name: 'dpicker-minutes',
+      'aria-label': 'Minutes'
     },
       minutes
       .map(e => h('option', {
@@ -767,6 +774,8 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
         }, [
           h(dayActive ? 'button' : 'span', {
             value: day,
+            'aria-label': dayActive ? 'Day ' + day : false,
+            'aria-disabled': dayActive ? false : true,
             onclick: dayActive ? events.dayClick : noop,
             type: dayActive ? 'button' : null,
             onkeydown: dayActive ? events.dayKeyDown || noop : noop,
