@@ -129,8 +129,8 @@ function DPicker(element, options = {}) {
     display: options.display !== undefined ? options.display : false,
     hideOnDayClick: options.hideOnDayClick !== undefined ? options.hideOnDayClick : true,
     hideOnEnter: options.hideOnEnter !== undefined ? options.hideOnEnter : true,
-    min: options.min || moment('1986-01-01'),
-    max: options.max || moment().add(1, 'year').month(11),
+    min: options.min instanceof moment ? options.min.clone() : moment('1986-01-01'),
+    max: options.max instanceof moment ? options.max.clone() : moment().add(1, 'year').month(11),
     months: options.months || moment.months(),
     days: options.days || moment.weekdaysShort(),
     inputId: options.inputId || uuid(),
@@ -138,7 +138,7 @@ function DPicker(element, options = {}) {
     empty: options.model !== undefined && !options.model ? true : false,
     time: options.time !== undefined ? options.time : false,
     meridiem: options.meridiem !== undefined ? options.meridiem : false,
-    step: options.step || 1,
+    step: options.step !== undefined ? parseInt(options.step, 10) : 1,
     valid: true
   }
 
@@ -247,7 +247,6 @@ DPicker.prototype._parseInputAttributes = function(element) {
       if (e === 'value') { e = 'model' }
       this._data[e] = m
     }
-
   })
 
   this._minutesStep()
@@ -308,7 +307,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       if (!evt.target.value) {
         this._data.empty = true
       } else {
-        let newModel = moment(evt.target.value, this._data.format)
+        let newModel = moment(evt.target.value, this._data.format, true)
 
         if (this.isValid(newModel)) {
           this._data.model = newModel
@@ -479,13 +478,13 @@ DPicker.prototype.isValid = function isValid(model) {
 
   if (model < this._data.min) {
     this._data.valid = false
-    this._data.model = this._data.min
+    this._data.model = this._data.min.clone()
     return false
   }
 
   if (model > this._data.max) {
     this._data.valid = false
-    this._data.model = this._data.min
+    this._data.model = this._data.max.clone()
     return false
   }
 
