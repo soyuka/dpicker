@@ -1,6 +1,8 @@
 'use strict'
 const h = maquette.h
 
+DPicker.h = h
+
 function noop() {}
 
 /**
@@ -15,6 +17,8 @@ function injector(fn) {
     }
   }
 }
+
+DPicker.injector = injector
 
 /**
  * uuid generator
@@ -40,10 +44,6 @@ function isElementInContainer(parent, containerId) {
 
   return false
 }
-
-const MINUTES = new Array(60).fill(0).map((e, i) => i)
-const HOURS24 = new Array(24).fill(0).map((e, i) => i)
-const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
 
 /**
  * *DPicker a simple date picker*
@@ -105,9 +105,6 @@ const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
  * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
  * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
- * @param {boolean} [options.time=false] Wether to add time or not, true if input type is `datetime`
- * @param {boolean} [options.meridiem=false] 12 vs 24 time format where 24 is the default, this can be set through the `time-format` attribute (eg: 12 or 24)
- * @param {Number} [options.step=1] Minutes step
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
  * @listens DPicker#hide
@@ -120,160 +117,220 @@ function DPicker(element, options = {}) {
 
   this._container = uuid()
 
-  const now = options.model || moment()
-
-  this._data = {
-    model: now.clone(),
-    format: options.format || 'DD/MM/YYYY',
-    display: options.display !== undefined ? options.display : false,
-    hideOnDayClick: options.hideOnDayClick !== undefined ? options.hideOnDayClick : true,
-    hideOnEnter: options.hideOnEnter !== undefined ? options.hideOnEnter : true,
-    min: options.min instanceof moment ? options.min.clone() : moment('1986-01-01'),
-    max: options.max instanceof moment ? options.max.clone() : moment().add(1, 'year').month(11),
-    months: options.months || moment.months(),
-    days: options.days || moment.weekdaysShort(),
-    inputId: options.inputId || uuid(),
-    inputName: options.name || 'dpicker-input',
-    empty: options.model !== undefined && !options.model ? true : false,
-    time: options.time !== undefined ? options.time : false,
-    meridiem: options.meridiem !== undefined ? options.meridiem : false,
-    step: options.step !== undefined ? parseInt(options.step, 10) : 1,
-    valid: true
+  if (!DPicker.hasOwnProperty('properties')) {
+    DPicker.prototype.properties = {
+      format: { default: 'DD/MM/YYYY', attribute: 'format', getset: true },
+      model: { default: moment(), moment: true, attribute: 'value' },
+      display: { default: false, getset: true },
+      hideOnDayClick: { default: true },
+      hideOnEnter: { default: true },
+      min: { default: moment('1986-01-01'), moment: true, attribute: 'min', getset: true },
+      max: { default: moment().add(1, 'year').month(11), moment: true, attribute: 'max', getset: true },
+      months: { default: moment.months(), getset: true },
+      days: { default: moment.weekdaysShort(), getset: true },
+      inputName: { default: 'dpicker-input', attribute: 'name' },
+      inputId: { default: uuid(), attribute: 'id' },
+      empty: { default: false },
+      valid: { default: true }
+    }
   }
 
   this.onChange = options.onChange
-  this._projector = maquette.createProjector()
 
-  this._events = this._loadEvents()
-
+  this._data = {}
   this._loadModules()
+  this._initData(options)
 
   document.addEventListener('click', this._events.hide)
-
-  let render = this.render(this._events, this._data, [
-    this.renderYears(this._events, this._data),
-    this.renderMonths(this._events, this._data),
-    this.renderTime(this._events, this._data),
-    this.renderDays(this._events, this._data)
-  ])
-
-  let elementContainer
-  let renderContainer
 
   if (element.tagName === 'INPUT') {
     if (!element.parentNode) {
       throw new ReferenceError('Can not init DPicker on an input without parent node')
     }
 
-    this._data.inputId = element.getAttribute('id') || this._data.inputId
-    this._data.inputName = element.getAttribute('name') || this._data.inputName
+    this._parseInputAttributes([].slice.call(element.attributes))
 
-    this._parseInputAttributes(element)
-
-    this._projector.merge(element, this.renderInput(this._events, this._data))
-
-    elementContainer = element.parentNode
-    elementContainer.classList.add('dpicker')
-    renderContainer = render
-  } else {
-    renderContainer = this.renderContainer(this._events, this._data, [
-      this.renderInput(this._events, this._data),
-      render
-    ])
-
-    elementContainer = element
+    let parentNode = element.parentNode
+    element.parentNode.removeChild(element)
+    element = parentNode
+    element.classList.add('dpicker')
   }
 
-  this._projector.append(elementContainer, renderContainer)
+  this._initialize()
 
-  elementContainer.setAttribute('id', this._container)
-  elementContainer.addEventListener('keydown', this._events.keyDown)
+  let childs = [
+    this.renderYears(this._events, this._data),
+    this.renderMonths(this._events, this._data),
+  ]
+
+  //add module render functions
+  childs.push.apply(childs, this._modulesRender.map(e => e(this._events, this._data)))
+  childs.push(this.renderDays(this._events, this._data))
+
+  this._projector = maquette.createProjector()
+  this._projector.append(element, this.renderContainer(this._events, this._data, [
+    this.renderInput(this._events, this._data),
+    this.render(this._events, this._data, childs)
+  ]))
+
+  element.setAttribute('id', this._container)
+  element.addEventListener('keydown', this._events.keyDown)
 
   return this
 }
 
 /**
- * Parse input attributes and fill dpicker data container on initialization
- * Parsed attributes are:
- * - type (date or datetime)
- * - format (moment format)
- * - min (min date, a string matching the given format)
- * - max (max date, a string matching the given format)
- * - value (model initial value, a string matching the given format)
- * - step (model initial value, a string matching the given format)
- * @param {Element} element - an input
+ * Called after parseInputAttributes but before render
+ * Use it with modules to change things on initialization
  */
-DPicker.prototype._parseInputAttributes = function(element) {
-  let type = element.getAttribute('type')
-  if (type === 'date' || type === 'datetime') {
-    element.setAttribute('type', 'text')
-  }
-
-  if (type === 'datetime') {
-    this._data.time = true
-  }
-
-  //bind input attributes to data
-  ;['format', 'min', 'max', 'value', 'time-format', 'step'].map((e, i) => {
-    let attr = element.getAttribute(e)
-
-    if (typeof attr !== 'string') {
-      return
-    }
-
-    if (!attr) {
-      if (e === 'value' && attr.trim() === '') {
-        this._data.empty = true
-      }
-
-      return
-    }
-
-    if (~['format', 'step'].indexOf(e)) {
-      this._data[e] = attr
-      return
-    }
-
-    if (e === 'time-format') {
-      this._data.meridiem = attr.match(12) ? true : false
-      return
-    }
-
-    let m = moment(attr, this._data.format, true)
-
-    if (this.isValid(m)) {
-      if (e === 'value') { e = 'model' }
-      this._data[e] = m
-    }
-  })
-
-  this._minutesStep()
+DPicker.prototype._initialize = function() {
+  this.isValid(this._data.model)
 }
 
-DPicker.prototype._loadModules = function loadModules() {
-  for(let module in DPicker.modules) {
-    if (!DPicker.modules.hasOwnProperty(module)) {
+/**
+ * Initializes the _data property, creates appropriate getters and setters
+ * Called after _loadModules
+ * @internal
+ * @param {Object} options - DPicker creation options
+ */
+DPicker.prototype._initData = function(options) {
+  for (let i in this.properties) {
+    let e = this.properties[i]
+
+    if (e.getset && !(i in DPicker.prototype)) {
+      Object.defineProperty(DPicker.prototype, i, {
+        get: function() {
+          return this._data[i]
+        },
+        set: function(newValue) {
+          this._data[i] = newValue
+          this._projector.scheduleRender()
+        }
+      })
+    }
+
+    this._data[i] = e.default
+
+    if (options[i] === undefined) {
       continue
     }
 
-    for(let event in DPicker.modules[module]) {
-      if (!DPicker.modules[module].hasOwnProperty(event)) {
+    if (i === 'model' && !options[i]) {
+      this._data.empty = true
+      continue
+    }
+
+    this._data[i] = options[i]
+  }
+
+}
+
+/**
+ * Parse input attributes and fill dpicker data container on initialization
+ * @param {Element} element - an input
+ */
+DPicker.prototype._parseInputAttributes = function(attributes) {
+
+  for (let i in this.properties) {
+    let e = this.properties[i]
+
+    if (e.attribute === undefined) {
+      continue
+    }
+
+    if (typeof e.attribute === 'function') {
+      this._data[i] = e.attribute(attributes)
+      continue
+    }
+
+    let attribute = attributes.find(a => a.name === e.attribute)
+
+    if (!attribute) {
+      continue
+    }
+
+    let v = attribute.value
+
+    if (!v) {
+      if (i === 'model') {
+        this._data.empty = true
         continue
       }
 
-      let internal = event+'-internal'
-      this._events[internal] = this._events[event]
-      this._events[event] = (evt) => {
-        if (this._events[internal]) {
-          this._events[internal](evt)
-        }
+      continue
+    }
 
-        DPicker.modules[module][event].bind(this)(evt)
+    if (e.moment === true) {
+      v = moment(attribute.value, this._data.format, true)
+
+      if (v.isValid() === false) {
+        continue
+      }
+    }
+
+    this._data[i] = v
+  }
+}
+
+/**
+ * Load modules
+ * @internal
+ */
+DPicker.prototype._loadModules = function loadModules() {
+  this._events = this._loadEvents()
+  this._modulesRender = []
+
+  for (let moduleName in DPicker.modules) {
+    let module = DPicker.modules[moduleName]
+
+    for (let event in module.events) {
+      if (!this._events[event]) {
+        this._events[event] = module.events[event].bind(this)
+        continue
+      }
+
+      if (!this._events[event+'-internal']) {
+        this._events[event+'-internal'] = [this._events[event]]
+        this._events[event] = (evt) => {
+          this._events[event+'-internal'].map(e => e.bind(this)(evt))
+        }
+      }
+
+      this._events[event+'-internal'].push(module.events[event])
+    }
+
+    for (let call in module.calls) {
+      if (!DPicker.prototype.hasOwnProperty(call) || typeof module.calls[call] !== 'function') {
+        continue
+      }
+
+      if (!this[call+'-internal']) {
+        this[call+'-internal'] = [DPicker.prototype[call]]
+        this[call] = (...args) => {
+          this[call+'-internal'].map(e => e.apply(this, args))
+        }
+      }
+
+      this[call+'-internal'].push(module.calls[call])
+    }
+
+    if (module.render) {
+      this._modulesRender = this._modulesRender.concat(module.render)
+    }
+
+    if (module.properties) {
+      for (let i in module.properties) {
+        if (!this.properties[i]) {
+          this.properties[i] = module.properties[i]
+        }
       }
     }
   }
 }
 
+/**
+ * Load _event object
+ */
 DPicker.prototype._loadEvents = function loadEvents() {
   return {
     /**
@@ -306,15 +363,11 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this._data.empty = true
       } else {
         let newModel = moment(evt.target.value, this._data.format, true)
-
-        if (this.isValid(newModel)) {
-          this._data.model = newModel
-        }
+        this._data.model = this.isValid(newModel)
 
         this._data.empty = false
       }
 
-      this._minutesStep()
       this.onChange()
     },
 
@@ -412,83 +465,38 @@ DPicker.prototype._loadEvents = function loadEvents() {
       document.getElementById(this.inputId).blur()
       this._data.display = false
     },
-
-    /**
-     * On hours change
-     * @Event DPicker#hoursChange
-     * @param {Event} DOMEvent
-     */
-    hoursChange: (evt) => {
-      this._data.empty = false
-
-      let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
-      if (this._data.meridiem && this._data.model.format('A') === 'PM') {
-        val = val === 12 ? 12 : val + 12
-      } else if(val === 12) {
-        val = 0
-      }
-
-      this._data.model.hours(val)
-      this.onChange()
-    },
-
-    /**
-     * On minutes change
-     * @Event DPicker#minutesChange
-     * @param {Event} DOMEvent
-     */
-    minutesChange: (evt) => {
-      this._data.empty = false
-      this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
-      this.onChange()
-    },
-
-    /**
-     * On meridiem change
-     * @Event DPicker#meridiemChange
-     * @param {Event} DOMEvent
-     */
-    meridiemChange: (evt) => {
-      this._data.empty = false
-      let val = evt.target.options[evt.target.selectedIndex].value
-      let hours = this._data.model.hours()
-
-      if (val === 'AM') {
-        hours = hours === 12 ? 0 : hours - 12
-      } else {
-        hours = hours === 12 ? 12 : hours + 12
-      }
-
-      this._data.model.hours(hours)
-      this.onChange()
-    }
   }
 }
 
+/**
+ * Returns the valid moment object according to the given (new) model by comparing
+ * to min and max
+ * This sets the property `valid` to either `true` or `false`
+ * @param {Moment} model
+ * @return {Moment}
+ */
 DPicker.prototype.isValid = function isValid(model) {
   if (!(model instanceof moment)) {
-    return false
+    throw new TypeError('isValid(Moment model), model is not a moment instance')
   }
 
   if (!model.isValid()) {
-    return false
+    this._data.valid = false
+    return this._data.model
   }
 
   if (model < this._data.min) {
     this._data.valid = false
-    this._data.model = this._data.min.clone()
-    return false
+    return this._data.min.clone()
   }
 
   if (model > this._data.max) {
     this._data.valid = false
-    this._data.model = this._data.max.clone()
-    return false
+    return this._data.max.clone()
   }
 
   this._data.valid = true
-
-  return true
+  return model
 }
 
 /**
@@ -624,82 +632,6 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
 })
 
 /**
- * Render Time
- * ```
- * select[name='dpicker-hour']
- * select[name='dpicker-minutes']
- * ```
- * @method
- * @listens DPicker#hourChange
- * @listens DPicker#minutesChange
- * @return {H} the rendered virtual dom hierarchy
- */
-DPicker.prototype.renderTime = injector(function renderTime(events, data, toRender) {
-  if (!data.time) { return }
-
-  let modelHours = data.model.hours()
-  if (data.meridiem) {
-    modelHours = modelHours > 12 ? modelHours - 12 : modelHours
-  }
-
-  let modelMinutes = data.model.minutes()
-
-  let hours = data.meridiem ? HOURS12 : HOURS24
-  let minutes = MINUTES.filter(e => e % data.step === 0)
-
-  if(data.model.isSame(data.min, 'day')) {
-    let minMinutes = data.min.minutes()
-    minutes = minutes.filter(e => e >= minMinutes)
-    let minHours = + data.meridiem ? data.min.format('h') : data.min.hours()
-    hours = hours.filter(e => e >= minHours)
-  }
-
-  if(data.model.isSame(data.max, 'day')) {
-    let maxMinutes = data.max.minutes()
-    minutes = minutes.filter(e => e <= maxMinutes)
-    let maxHours = + data.meridiem ? data.max.format('h') : data.max.hours()
-    hours = hours.filter(e => e <= maxHours)
-  }
-
-  let selects = [
-    h('select', {
-      onchange: events.hoursChange,
-      name: 'dpicker-hours',
-      'aria-label': 'Hours'
-    }, hours
-      .map((e, i) => h('option', {
-        value: e,
-        selected: e === modelHours,
-        key: e
-      }, e < 10 ? '0'+e : e))
-    ),
-    h('select', {
-      onchange: events.minutesChange,
-      name: 'dpicker-minutes',
-      'aria-label': 'Minutes'
-    },
-      minutes
-      .map(e => h('option', {
-        value: e,
-        selected: e === modelMinutes,
-        key: e
-      }, e < 10 ? '0'+e : ''+e))
-    )
-  ]
-
-  if (data.meridiem) {
-    let modelMeridiem = data.model.format('A')
-    selects.push(h('select', {
-      onchange: events.meridiemChange,
-      name: 'dpicker-meridiem'
-    }, ['AM', 'PM'].map(e => h('option', {value: e, selected: modelMeridiem === e}, e))
-    ))
-  }
-
-  return h('span.dpicker-time', selects)
-})
-
-/**
  * Render Days
  * ```
  * table
@@ -785,22 +717,18 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
   ])
 })
 
+/**
+ * The model setter, feel free to override through modules
+ * @param {Moment} newValue
+ */
+DPicker.prototype._modelSetter = function(newValue) {
+  this._data.empty = !newValue
 
-DPicker.prototype._minutesStep = function() {
-  if (this._data.step <= 1) {
-    return
+  if (newValue instanceof moment) {
+    this._data.model = this.isValid(newValue)
   }
 
-  let minutes = MINUTES.filter(e => e % this._data.step === 0)
-  let modelMinutes = this._data.model.minutes()
-
-  minutes[minutes.length] = 60
-  modelMinutes = minutes.reduce(function (prev, curr) {
-    return (Math.abs(curr - modelMinutes) < Math.abs(prev - modelMinutes) ? curr : prev)
-  });
-  minutes.length--
-
-  this._data.model.minutes(modelMinutes)
+  this._projector.scheduleRender()
 }
 
 Object.defineProperties(DPicker.prototype, {
@@ -850,17 +778,30 @@ Object.defineProperties(DPicker.prototype, {
     }
   },
 
+  /**
+   * @var {Boolean} DPicker#valid
+   * @description Is the current input valid
+   */
   'valid': {
     get: function() {
       return this._data.valid
     }
+  },
+
+  /**
+   * @var {Moment} DPicker#model
+   * @description Get/Set model, a Moment instance
+   */
+  'model': {
+    set: function(newValue) {
+      this._modelSetter(newValue)
+    },
+    get: function() {
+      return this._data.model
+    }
   }
 })
 
-/**
- * @var {Moment} DPicker#model
- * @description Get/Set model, a Moment instance
- */
 /**
  * @var {String} DPicker#format
  * @description Get/Set format, a Moment format string
@@ -885,58 +826,25 @@ Object.defineProperties(DPicker.prototype, {
  * @var {Array.<string>} DPicker#days
  * @description Get/Set days an array of strings representing days, defaults to moment.weekdaysShort()
  */
-/**
- * @var {String} DPicker#inputName
- * @description Get/Set input name
- */
-/**
- * @var {Boolean} DPicker#meridiem
- * @description Get/Set meridiem (12 vs 24 hours format)
- */
-/**
- * @var {Boolean} DPicker#time
- * @description Get/Set time wether to add time
- */
-/**
- * @var {Number} DPicker#step
- * @description Get/Set minutes step
- */
-;['model', 'format', 'display', 'months', 'days', 'inputName', 'min', 'max', 'time', 'meridiem', 'step'].forEach(e => {
- Object.defineProperty(DPicker.prototype, e, {
-    get: function() {
-      return this._data[e]
-    },
-    set: function(newValue) {
-      if (e === 'model') {
-        this._data.empty = !newValue
-
-        if (this.isValid(newValue)) {
-          this._data.model = newValue
-          this._minutesStep()
-        }
-      } else {
-        this._data[e] = newValue
-      }
-
-      this._projector.scheduleRender()
-    }
-  })
-})
 
 /**
- * Add calls on events through modules.
- * You can hook on every supported events, DPicker event will be called before yours. For example:
+ * A module looks like this:
  *
  * ```
- *  const myInputChange = DPicker.modules.myInputChange = {
- *    inputChange: function(evt) {
- *      //do something
- *      this.model = moment().add(1, 'days')
- *    }
- *  }
- * ```
+ * const myModule = DPicker.modules.myModule = {
+ *   events: {
+ *     inputChange: function() //you can override any events available or add yours
+ *   },
+ *   render: [
+ *     DPicker.injector(function renderTime(events, data) { }) //add dom elements through h
+ *   ],
+ *   calls: {
+ *    _initialize: function() { //do something on initialization } //here you can add a call at any DPicker method
+ *   }
+ * }
  *
- * Here, on every inputChange call, the function will add 1 day to the previous input
+ * Check out how arrow-navigation, modifiers and time are done it's a good start ;)
+ * ```
  * @property {Object} modules
  */
 DPicker.modules = {}

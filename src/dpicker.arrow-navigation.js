@@ -119,5 +119,7 @@ if (!DPicker) {
 }
 
 const arrowNavigation = DPicker.modules.arrowNavigation = {
-  dayKeyDown: DayKeyDown
+  events: {
+    dayKeyDown: DayKeyDown
+  }
 }

@@ -12,6 +12,7 @@ const map = {
   'dpicker': '../dist/dpicker.js',
   'dpicker.arrow-navigation': '../dist/dpicker.arrow-navigation.js',
   'dpicker.modifiers': '../dist/dpicker.modifiers.js',
+  'dpicker.time': '../dist/dpicker.time.js',
 }
 
 Module._resolveFilename = function(request, parent) {
@@ -45,13 +46,19 @@ global.createDatePicker = function createDatePicker(opts) {
   document.body.appendChild(container)
   let dpicker = new DPicker(container, opts || undefined)
 
+  let childs = [
+    dpicker.renderYears(dpicker._events, dpicker._data),
+    dpicker.renderMonths(dpicker._events, dpicker._data),
+  ]
+
+  //add module render functions
+  childs.push.apply(childs, dpicker._modulesRender.map(e => e(dpicker._events, dpicker._data)))
+  childs.push(dpicker.renderDays(dpicker._events, dpicker._data))
+
   global.DPickerProjector = maquetteQuery.createTestProjector(
     dpicker.renderContainer(dpicker._events, dpicker._data, [
       dpicker.renderInput(dpicker._events, dpicker._data),
-      dpicker.renderYears(dpicker._events, dpicker._data),
-      dpicker.renderMonths(dpicker._events, dpicker._data),
-      dpicker.renderTime(dpicker._events, dpicker._data),
-      dpicker.renderDays(dpicker._events, dpicker._data),
+      dpicker.render(dpicker._events, dpicker._data, childs)
     ])
   )
 

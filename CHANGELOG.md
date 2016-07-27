@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0
+
+`time-format` renamed to `meridiem`
+
 ## 2.0.0
 
 `isEmpty` renamed `empty`

@@ -107,7 +107,7 @@
     <fieldset class="fieldset columns small-1 medium-6">
       <legend>Datetime (12h format, 15 step)</legend>
       <label for="dp-test-label-2">Pick:
-        <input id="dp-test-label-2" type="datetime" format="DD/MM/YYYY hh:mm A" time-format="12" step="15"/>
+        <input id="dp-test-label-2" type="datetime" format="DD/MM/YYYY hh:mm A" meridiem="true" step="15"/>
       </label>
     </fieldset>
 
@@ -143,6 +143,7 @@
   <script src="../dist/dpicker.js"></script>
   <script src="../dist/dpicker.arrow-navigation.js"></script>
   <script src="../dist/dpicker.modifiers.js"></script>
+  <script src="../dist/dpicker.time.js"></script>
   <script>
 		;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
 

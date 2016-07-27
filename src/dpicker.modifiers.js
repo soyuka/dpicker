@@ -17,7 +17,7 @@ if (!DPicker) {
  * @param {Event} DOMEvent
  * @listens DPicker#inputChange
  */
-function InputChange(evt) {
+function ModifierInputChange(evt) {
 
   let first = evt.target.value.charAt(0)
   let x = evt.target.value.slice(1) || 0
@@ -31,11 +31,13 @@ function InputChange(evt) {
     x = -x
   }
 
-  this.model = moment().add(x, 'days')
+  this._data.model = moment().add(x, 'days')
 
   this.onChange()
 }
 
 const modifiers = DPicker.modules.modifiers = {
-  inputChange: InputChange
+  events: {
+    inputChange: ModifierInputChange
+  }
 }
