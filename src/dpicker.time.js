@@ -17,6 +17,7 @@ if (!DPicker) {
 const MINUTES = new Array(60).fill(0).map((e, i) => i)
 const HOURS24 = new Array(24).fill(0).map((e, i) => i)
 const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
+HOURS12.push(HOURS12.shift())
 
 /**
  * Render Time
@@ -35,6 +36,7 @@ const renderTime = DPicker.injector(function renderTime(events, data, toRender) 
   let modelHours = data.model.hours()
   if (data.meridiem) {
     modelHours = modelHours > 12 ? modelHours - 12 : modelHours
+    modelHours = modelHours === 0 ? 12 : modelHours
   }
 
   let modelMinutes = data.model.minutes()

@@ -90,7 +90,7 @@ describe('dpicker.time', function() {
 
     select.simulate.change({
       options: options,
-      selectedIndex: 0 //12
+      selectedIndex: 11 //12
     })
 
     dpicker.onChange = (data) => {
@@ -108,7 +108,7 @@ describe('dpicker.time', function() {
 
     select.simulate.change({
       options: options,
-      selectedIndex: 11 //11
+      selectedIndex: 10 //11
     })
 
     dpicker.onChange = (data) => {
@@ -117,7 +117,7 @@ describe('dpicker.time', function() {
 
     select.simulate.change({
       options: options,
-      selectedIndex: 0 //12
+      selectedIndex: 11 //12
     })
 
     dpicker.onChange = (data) => {
@@ -327,4 +327,43 @@ describe('dpicker.time', function() {
     let options = document.querySelector('select[name="dpicker-minutes"]').options
     expect(options).to.have.length.of(4)
   })
+
+  it('should have correct time AM/PM midnight', function(cb) {
+    const format = 'YYYY/MM/DD hh:mm A';
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'datetime')
+    input.setAttribute('min', '24/06/1991 15:53')
+    input.setAttribute('value', '24/06/1991 15:46')
+    input.setAttribute('format', format)
+    input.setAttribute('step', 15)
+    input.setAttribute('id', 't')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input, {
+      time: true,
+      meridiem: true,
+      format: format,
+      model: moment('1991/06/24 12:00 PM', format),
+    })
+
+    let moptions = document.querySelector('select[name="dpicker-meridiem"]').options
+
+    expect(dpicker.model.hours()).to.equal(12)
+    dpicker.model = dpicker.model.hours(0)
+
+
+    setTimeout(function() {
+      let t = document.querySelector('select[name="dpicker-hours"]')
+      expect(t.options[t.selectedIndex].innerHTML).to.equal('12')
+      t = document.querySelector('select[name="dpicker-meridiem"]')
+      expect(t.options[t.selectedIndex].innerHTML).to.equal('AM')
+      cb()
+    })
+
+  })
+
 })
