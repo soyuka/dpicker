@@ -5,7 +5,7 @@ if (!DPicker) {
 }
 
 /**
- * @module DPicker.modules.datetime
+ * @module DPicker.modules.time
  * @description
  * Adds the following options/attributes/getters/setters:
  *
@@ -26,7 +26,7 @@ HOURS12.push(HOURS12.shift())
  * select[name='dpicker-minutes']
  * ```
  * @method
- * @listens DPicker#hourChange
+ * @listens DPicker#hoursChange
  * @listens DPicker#minutesChange
  * @return {H} the rendered virtual dom hierarchy
  */
