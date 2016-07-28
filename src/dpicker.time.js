@@ -223,6 +223,13 @@ DPicker.prototype._minutesStep = function() {
   let minutes = MINUTES.filter(e => e % this._data.step === 0)
   let modelMinutes = this._data.model.minutes()
 
+  let minMinutes = this._data.min.minutes()
+
+  if (minMinutes > minutes[minutes.length - 1]) {
+    this._data.min.minutes(0)
+    this._data.min.add(1, 'hours')
+  }
+
   if (modelMinutes > minutes[minutes.length - 1]) {
     this._data.model.minutes(0)
     this._data.model.add(1, 'hours')
