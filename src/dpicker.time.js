@@ -104,10 +104,12 @@ const events = {
     this._data.empty = false
 
     let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
-    if (this._data.meridiem && this._data.model.format('A') === 'PM') {
-      val = val === 12 ? 12 : val + 12
-    } else if(val === 12) {
-      val = 0
+    if (this._data.meridiem) {
+      if(this._data.model.format('A') === 'PM') {
+        val = val === 12 ? 12 : val + 12
+      } else if (val === 12) {
+        val = 0
+      }
     }
 
     this._data.model.hours(val)
