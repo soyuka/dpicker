@@ -50,7 +50,7 @@ function getHoursMinutes(data) {
  * @return {H} the rendered virtual dom hierarchy
  */
 const renderTime = DPicker.injector(function renderTime(events, data, toRender) {
-  if (!data.time) { return }
+  if (!data.time) { return DPicker.h('span.dpicker-time', {style: 'display: none;'}) }
 
   let modelHours = data.model.hours()
   if (data.meridiem) {

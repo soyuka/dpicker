@@ -176,6 +176,7 @@ function DPicker(element, options = {}) {
   element.setAttribute('id', this._container)
   element.addEventListener('keydown', this._events.keyDown)
 
+  element.querySelector('input').addEventListener('blur', this._events.inputBlur)
   return this
 }
 
@@ -388,6 +389,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this._data.display = false
+      this._projector.scheduleRender()
     },
 
     /**
@@ -515,7 +517,6 @@ DPicker.prototype.renderInput = injector(function renderInput(events, data, toRe
     max: data.max.format(data.format),
     format: data.format,
     onchange: events.inputChange,
-    onblur: events.inputBlur,
     onfocus: events.inputFocus,
     name: data.inputName,
     'aria-invalid': data.valid,
