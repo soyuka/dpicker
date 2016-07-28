@@ -51,7 +51,8 @@ rules:
   dot-location: 0
   dot-notation: 0
   eqeqeq: 2
-  guard-for-in: 2
+  guard-for-in:
+    enabled: false
   no-alert: 2
   no-caller: 2
   no-case-declarations: 2

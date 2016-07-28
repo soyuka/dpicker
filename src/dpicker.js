@@ -160,7 +160,7 @@ function DPicker(element, options = {}) {
 
   let childs = [
     this.renderYears(this._events, this._data),
-    this.renderMonths(this._events, this._data),
+    this.renderMonths(this._events, this._data)
   ]
 
   //add module render functions
@@ -464,7 +464,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       document.getElementById(this.inputId).blur()
       this._data.display = false
-    },
+    }
   }
 }
 

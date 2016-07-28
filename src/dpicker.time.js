@@ -206,7 +206,7 @@ const time = DPicker.modules.time = {
       this._minutesStep()
       this._projector.scheduleRender()
     }
-  },
+  }
 }
 
 /**
@@ -230,7 +230,7 @@ DPicker.prototype._minutesStep = function() {
   minutes[minutes.length] = 60
   modelMinutes = minutes.reduce(function (prev, curr) {
     return (Math.abs(curr - modelMinutes) < Math.abs(prev - modelMinutes) ? curr : prev)
-  });
+  })
   minutes.length--
 
   this._data.model.minutes(modelMinutes)
