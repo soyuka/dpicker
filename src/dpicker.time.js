@@ -19,6 +19,25 @@ const HOURS24 = new Array(24).fill(0).map((e, i) => i)
 const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
 HOURS12.push(HOURS12.shift())
 
+function getHoursMinutes(data) {
+  let hours = data.meridiem ? HOURS12 : HOURS24
+  let minutes = MINUTES.filter(e => e % data.step === 0)
+
+  ;[data.min, data.max].map((e, i) => {
+    if(data.model.isSame(e, 'day')) {
+      let xHours = + data.meridiem ? e.format('h') : e.hours()
+      hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
+
+      if (data.model.isSame(e, 'hours')) {
+        let xMinutes = e.minutes()
+        minutes = minutes.filter(e => i === 0 ? e >= xMinutes : e <= xHours)
+      }
+    }
+  })
+
+  return {hours, minutes}
+}
+
 /**
  * Render Time
  * ```
@@ -40,21 +59,7 @@ const renderTime = DPicker.injector(function renderTime(events, data, toRender) 
   }
 
   let modelMinutes = data.model.minutes()
-
-  let hours = data.meridiem ? HOURS12 : HOURS24
-  let minutes = MINUTES.filter(e => e % data.step === 0)
-
-  ;[data.min, data.max].map((e, i) => {
-    if(data.model.isSame(e, 'day')) {
-      let xHours = + data.meridiem ? e.format('h') : e.hours()
-      hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
-
-      if (data.model.isSame(e, 'hours')) {
-        let xMinutes = e.minutes()
-        minutes = minutes.filter(e => i === 0 ? e >= xMinutes : e <= xHours)
-      }
-    }
-  })
+  let {hours, minutes} = getHoursMinutes(data)
 
   let selects = [
     DPicker.h('select', {
@@ -220,14 +225,14 @@ DPicker.prototype._minutesStep = function() {
     return
   }
 
-  let minutes = MINUTES.filter(e => e % this._data.step === 0)
+  let {hours, minutes} = getHoursMinutes(this._data)
+
   let modelMinutes = this._data.model.minutes()
 
-  let minMinutes = this._data.min.minutes()
-
-  if (minMinutes > minutes[minutes.length - 1]) {
+  if (minutes.length === 0) {
     this._data.min.minutes(0)
     this._data.min.add(1, 'hours')
+    let {hours, minutes} = getHoursMinutes(this._data)
   }
 
   if (modelMinutes > minutes[minutes.length - 1]) {
