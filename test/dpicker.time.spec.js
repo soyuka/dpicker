@@ -391,32 +391,39 @@ describe('dpicker.time', function() {
     })
 
     let hours = getElementByName('dpicker-hours')
-    let minutes = getElementByName('dpicker-minutes')
     let hoursOptions = document.querySelector('select[name="dpicker-hours"]')
-    let minutesOptions = document.querySelector('select[name="dpicker-minutes"]')
 
     let hoursIndex = hoursOptions.selectedIndex
+
+    dpicker.onChange = function() {
+      let minutes = getElementByName('dpicker-minutes')
+      expect(minutes.children).to.have.length.of(60)
+
+      dpicker.onChange = function() {
+        expect(dpicker.model.minutes()).to.equal(7)
+
+        dpicker.onChange = function() {
+          expect(dpicker.model.minutes()).to.equal(10)
+          cb()
+        }
+
+        hours.simulate.change({
+          options: hoursOptions.options,
+          selectedIndex: --hoursIndex
+        })
+      }
+
+      minutes.simulate.change({
+        selectedIndex: 0,
+        options: [{value: 7}]
+      })
+
+    }
 
     hours.simulate.change({
       options: hoursOptions.options,
       selectedIndex: ++hoursIndex
     })
-
-    minutes.simulate.change({
-      options: minutesOptions.options,
-      selectedIndex: 0
-    })
-
-    dpicker.onChange = function() {
-      expect(dpicker.model.minutes()).to.equal(10)
-      cb()
-    }
-
-    hours.simulate.change({
-      options: hoursOptions.options,
-      selectedIndex: --hoursIndex
-    })
-
   })
 
 })
