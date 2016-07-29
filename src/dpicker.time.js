@@ -58,8 +58,8 @@ const renderTime = DPicker.injector(function renderTime(events, data, toRender) 
     modelHours = modelHours === 0 ? 12 : modelHours
   }
 
-  let modelMinutes = data.model.minutes()
   let {hours, minutes} = getHoursMinutes(data)
+  let modelMinutes = data.model.minutes()
 
   let selects = [
     DPicker.h('select', {
@@ -118,6 +118,9 @@ const events = {
     }
 
     this._data.model.hours(val)
+
+    this._minutesStep()
+
     this.onChange()
   },
 
@@ -221,7 +224,7 @@ const time = DPicker.modules.time = {
  * @alias DPicker.prototype._minutesStep
  */
 DPicker.prototype._minutesStep = function() {
-  if (!this._data.time || this._data.step <= 1) {
+  if (!this._data.time) {
     return
   }
 
@@ -235,9 +238,18 @@ DPicker.prototype._minutesStep = function() {
     let {hours, minutes} = getHoursMinutes(this._data)
   }
 
+  if (this._data.model.minutes() < minutes[0]) {
+    this._data.model.minutes(minutes[0])
+    modelMinutes = minutes[0]
+  }
+
   if (modelMinutes > minutes[minutes.length - 1]) {
     this._data.model.minutes(0)
     this._data.model.add(1, 'hours')
+    return
+  }
+
+  if (this._data.step <= 1) {
     return
   }
 

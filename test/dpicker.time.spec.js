@@ -366,4 +366,57 @@ describe('dpicker.time', function() {
 
   })
 
+  it('should fix min hour if minutes exceed the last step available', function() {
+    let format = 'DD/MM/YYYY HH:mm'
+    let dpicker = createDatePicker({
+      format: format,
+      min: moment('24/06/1991 15:53', format),
+      model: moment('24/06/1991 15:54', format),
+      step: 15,
+      time: true
+    })
+
+    expect(dpicker.min.format(format)).to.equal('24/06/1991 16:00')
+    expect(dpicker.model.format(format)).to.equal('24/06/1991 16:00')
+
+  })
+
+  it('should fix min hour if minutes is less then the first step available', function(cb) {
+    let format = 'DD/MM/YYYY HH:mm'
+    let dpicker = createDatePicker({
+      format: format,
+      min: moment('24/06/1991 15:10', format),
+      model: moment('24/06/1991 15:10', format),
+      time: true
+    })
+
+    let hours = getElementByName('dpicker-hours')
+    let minutes = getElementByName('dpicker-minutes')
+    let hoursOptions = document.querySelector('select[name="dpicker-hours"]')
+    let minutesOptions = document.querySelector('select[name="dpicker-minutes"]')
+
+    let hoursIndex = hoursOptions.selectedIndex
+
+    hours.simulate.change({
+      options: hoursOptions.options,
+      selectedIndex: ++hoursIndex
+    })
+
+    minutes.simulate.change({
+      options: minutesOptions.options,
+      selectedIndex: 0
+    })
+
+    dpicker.onChange = function() {
+      expect(dpicker.model.minutes()).to.equal(10)
+      cb()
+    }
+
+    hours.simulate.change({
+      options: hoursOptions.options,
+      selectedIndex: --hoursIndex
+    })
+
+  })
+
 })

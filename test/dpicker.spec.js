@@ -369,19 +369,4 @@ describe('dpicker', function() {
     label.querySelectorAll('button')[0].focus()
     expect(dpicker.display).to.be.true
   })
-
-  it('should fix min hour if minutes exceed the last step available', function() {
-    let format = 'DD/MM/YYYY HH:mm'
-    let dpicker = createDatePicker({
-      format: format,
-      min: moment('24/06/1991 15:53', format),
-      model: moment('24/06/1991 15:54', format),
-      step: 15,
-      time: true
-    })
-
-    expect(dpicker.min.format(format)).to.equal('24/06/1991 16:00')
-    expect(dpicker.model.format(format)).to.equal('24/06/1991 16:00')
-
-  })
 })
