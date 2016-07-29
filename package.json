@@ -1,6 +1,6 @@
 {
   "name": "dpicker",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Minimalist date picker",
   "main": "dist/dpicker.js",
   "scripts": {
