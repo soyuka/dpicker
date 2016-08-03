@@ -856,9 +856,44 @@ Object.defineProperties(DPicker.prototype, {
  *    _initialize: function() { //do something on initialization } //here you can add a call at any DPicker method
  *   }
  * }
- *
- * Check out how arrow-navigation, modifiers and time are done it's a good start ;)
  * ```
+ *
+ * Here is an example that adds two buttons to navigate between months. We can add this code to `dpicker.month-navigation.js`:
+ *
+ * ```
+ * const renderPreviousMonth = DPicker.injector(function renderPreviousMonth(events, data, toRender) {
+ *   return DPicker.h('button', { onclick: events.previousMonth }, '<') //add some appropriate attributes
+ * })
+ *
+ * const renderNextMonth = DPicker.injector(function renderNextMonth(events, data, toRender) {
+ *   return DPicker.h('button', { onclick: events.nextMonth }, '>')
+ * })
+ *
+ * const monthNavigation = DPicker.modules.monthNavigation = {
+ *   render: {
+ *     previousMonth: renderPreviousMonth,
+ *     nextMonth: renderNextMonth
+ *   },
+ *   events: {
+ *     previousMonth: function previousMonth() {
+ *        this._data.model.add(-1, 'month')
+ *     },
+ *     nextMonth: function nextMonth(evt) {
+ *        this._data.model.add(1, 'month')
+ *     }
+ *   }
+ * }
+ *
+ * ```
+ *
+ * Make sure this code is loaded with DPicker. Then initialize a new DPicker by specifying a render order:
+ *
+ * ```
+ * new DPicker(document.getElementById('trythis'), {order: ['time', 'previousMonth', 'months', 'nextMonth', 'days'], time: true})
+ * ```
+ *
+ * For more, check out existing modules!
+ *
  * @property {Object} modules
  */
 DPicker.modules = {}
