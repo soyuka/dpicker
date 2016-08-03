@@ -165,9 +165,9 @@ const events = {
 
 const time = DPicker.modules.time = {
   events: events,
-  render: [
-    renderTime
-  ],
+  render: {
+    time: renderTime
+  },
   /*
    * @alias DPicker
    */

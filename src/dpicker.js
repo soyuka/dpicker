@@ -107,6 +107,7 @@ function isElementInContainer(parent, containerId) {
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
+ * @param {Array} [options.order=['months', 'years', 'time', 'days']] The dom elements appending order.
  * @listens DPicker#hide
  */
 function DPicker(element, options = {}) {
@@ -131,7 +132,8 @@ function DPicker(element, options = {}) {
       inputName: { default: 'dpicker-input', attribute: 'name' },
       inputId: { default: uuid(), attribute: 'id' },
       empty: { default: false },
-      valid: { default: true }
+      valid: { default: true },
+      order: { default: ['months', 'years', 'time', 'days'] }
     }
   }
 
@@ -158,19 +160,10 @@ function DPicker(element, options = {}) {
 
   this._initialize()
 
-  let childs = [
-    this.renderYears(this._events, this._data),
-    this.renderMonths(this._events, this._data)
-  ]
-
-  //add module render functions
-  childs.push.apply(childs, this._modulesRender.map(e => e(this._events, this._data)))
-  childs.push(this.renderDays(this._events, this._data))
-
   this._projector = maquette.createProjector()
   this._projector.append(element, this.renderContainer(this._events, this._data, [
     this.renderInput(this._events, this._data),
-    this.render(this._events, this._data, childs)
+    this.render(this._events, this._data, this.getChildrenRender())
   ]))
 
   element.setAttribute('id', this._container)
@@ -186,6 +179,24 @@ function DPicker(element, options = {}) {
  */
 DPicker.prototype._initialize = function() {
   this.isValid(this._data.model)
+}
+
+DPicker.prototype.getChildrenRender = function() {
+  let children = {
+    years: this.renderYears(this._events, this._data),
+    months: this.renderMonths(this._events, this._data)
+  }
+
+  //add module render functions
+  for (let module in this._modulesRender) {
+    for (let renderMethod in this._modulesRender[module]) {
+      children[renderMethod] = this._modulesRender[module][renderMethod](this._events, this._data)
+    }
+  }
+
+  children.days = this.renderDays(this._events, this._data)
+
+  return this._data.order.map(e => children[e])
 }
 
 /**
@@ -279,7 +290,7 @@ DPicker.prototype._parseInputAttributes = function(attributes) {
  */
 DPicker.prototype._loadModules = function loadModules() {
   this._events = this._loadEvents()
-  this._modulesRender = []
+  this._modulesRender = {}
 
   for (let moduleName in DPicker.modules) {
     let module = DPicker.modules[moduleName]
@@ -316,7 +327,9 @@ DPicker.prototype._loadModules = function loadModules() {
     }
 
     if (module.render) {
-      this._modulesRender = this._modulesRender.concat(module.render)
+      for (let i in module.render) {
+        this._modulesRender[i] = module.render
+      }
     }
 
     if (module.properties) {
