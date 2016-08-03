@@ -849,9 +849,9 @@ Object.defineProperties(DPicker.prototype, {
  *   events: {
  *     inputChange: function() //you can override any events available or add yours
  *   },
- *   render: [
- *     DPicker.injector(function renderTime(events, data) { }) //add dom elements through h
- *   ],
+ *   render: {
+ *     renderSomething: DPicker.injector(function renderSomething(events, data) { }) //add dom elements through hyperscript
+ *   },
  *   calls: {
  *    _initialize: function() { //do something on initialization } //here you can add a call at any DPicker method
  *   }
@@ -891,6 +891,8 @@ Object.defineProperties(DPicker.prototype, {
  * ```
  * new DPicker(document.getElementById('trythis'), {order: ['time', 'previousMonth', 'months', 'nextMonth', 'days'], time: true})
  * ```
+ *
+ * Now your date picker has two new buttons to select next/prev month in a click.
  *
  * For more, check out existing modules!
  *
