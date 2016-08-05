@@ -1,6 +1,7 @@
 #!/bin/bash
 git checkout gh-pages
 git reset --hard origin/master
+bower install
 gulp build-styles
 npm run coverage
 ./node_modules/.bin/jsdoc -c jsdoc.conf.json -R README.md -d . src/*.js
