@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.1.0
+
+Drop maquettejs hard dependency (see #1). You can now use your own hyperscript library, for example with mithriljs:
+
+```
+let dpicker = DPicker(label, {
+  h: mithril,
+  mount: function(element, toRender) {
+    mithril.render(element, toRender())
+  },
+  redraw: mithril.redraw
+})
+```
+
 ## 3.0.0
 
 `time-format` renamed to `meridiem`
