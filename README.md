@@ -106,7 +106,7 @@ Or with AM/PM time format (specify the time format, ie: 12, 12h)
 
 ```html
 <label for="dp-ex">Choose date and time
-  <input id="dp-ex" type="datetime" format="DD/MM/YYYY hh:mm A" time-format="12"/>
+  <input id="dp-ex" type="datetime" format="DD/MM/YYYY hh:mm A" meridiem="true" />
 </label>
 ```
 
