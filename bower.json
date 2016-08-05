@@ -28,11 +28,10 @@
     "coverage"
   ],
   "dependencies": {
-    "moment": "^2.13.0",
-    "maquette": "^2.3.3",
-    "foundation-sites": "^6.2.3"
+    "moment": "^2.13.0"
   },
   "devDependencies": {
-    "foundation-sites": "^6.2.1"
+    "maquette": "^2.3.3",
+    "foundation-sites": "^6.2.3"
   }
 }

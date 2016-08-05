@@ -214,7 +214,7 @@ const time = DPicker.modules.time = {
      */
     _modelSetter: function timeModelSetter(newValue) {
       this._minutesStep()
-      this._projector.scheduleRender()
+      this.redraw()
     }
   }
 }

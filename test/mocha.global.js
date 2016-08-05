@@ -6,6 +6,7 @@ const maquetteQuery = require('maquette-query')
 
 global.screen = {}
 global.requestAnimationFrame = requestFrame('request')
+global.maquette = require('maquette')
 
 const realResolve = Module._resolveFilename
 const map = {

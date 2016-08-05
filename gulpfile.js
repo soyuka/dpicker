@@ -35,7 +35,7 @@ function wrap() {
   transformStream._transform = function(file, encoding, callback) {
     let error = null
     let name = path.basename(file.path, '.js').replace('dpicker', 'DPicker')
-    let inject = ['moment', 'maquette']
+    let inject = ['moment']
 
     if (name != 'DPicker') {
       inject = ['DPicker', 'moment']

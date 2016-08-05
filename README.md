@@ -28,12 +28,14 @@ Package managers are only referencing `dpicker.js`! If you need time, you have t
 
 ## Usage
 
-DPicker depends on moment and maquette. Those can be included with your favorite module loader or through a CDN, for example:
+DPicker depends on moment and the hyperscript library of your choice. Those can be included with your favorite module loader or through a CDN, for example:
 
 ```html
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
 ```
+
+Note that [maquettejs](http://maquettejs.org/) is the default supported hyperscript library. To use you own library (ie mithril, hyperscript or ReactDOM etc.), please [follow these instructions](#custom-hyperscript-library).
 
 To create a date picker, just init the DPicker module within a container:
 
@@ -191,9 +193,34 @@ Want time? Add the [time](https://soyuka.github.io/dpicker/DPicker.modules.modul
 
 To know more about modules check out the [documentation](https://soyuka.github.io/dpicker/DPicker.html).
 
-DPicker depends on [maquettejs](http://maquettejs.org/) (~3.4Kb gz) for virtual dom and [momentjs](http://momentjs.com/) (~15.3Kb gz) for date manipulation.
+DPicker depends on [momentjs](http://momentjs.com/) (~15.3Kb gz) for date manipulation and a hyperscript library for virtual dom. The recommended one is [maquettejs](http://maquettejs.org/) (~3.4Kb gz).
 
 A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L56)
+
+## Custom hyperscript library
+
+To use your own hyperscript library, you have to declare 3 options:
+
+- `h` the hyperscript function
+- `mount(DOMElement container, Function toRender)` a function that mounts the virtual DOM to the DOM
+- `redraw()` a function that forces the virtual DOM to re-render
+
+For example, with [mithriljs](https://mithril.js.org) the DPicker would be instantiated like this:
+
+```javascript
+let mithril = require('mithril')
+
+let label = document.createElement('label')
+document.body.appendChild(label)
+
+let dpicker = DPicker(label, {
+  h: mithril,
+  mount: function(element, toRender) {
+    mithril.render(element, toRender())
+  },
+  redraw: mithril.redraw
+})
+```
 
 ## Why?
 

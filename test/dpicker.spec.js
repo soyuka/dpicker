@@ -378,4 +378,23 @@ describe('dpicker', function() {
     label.querySelectorAll('button')[0].focus()
     expect(dpicker.display).to.be.true
   })
+
+  it('should use mithriljs instead of maquette', function() {
+    let label = document.createElement('label')
+    document.body.appendChild(label)
+    let mithril = require('mithril')
+    let dpicker = DPicker(label, {
+      h: mithril,
+      mount: function(element, toRender) {
+        mithril.render(element, toRender())
+      },
+      redraw: mithril.redraw
+    })
+
+
+    let input = label.querySelector('input[type="text"]')
+
+    input.focus()
+    expect(dpicker.display).to.be.true
+  })
 })
