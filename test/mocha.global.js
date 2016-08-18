@@ -50,7 +50,7 @@ global.createDatePicker = function createDatePicker(opts) {
   global.DPickerProjector = maquetteQuery.createTestProjector(
     dpicker.renderContainer(dpicker._events, dpicker._data, [
       dpicker.renderInput(dpicker._events, dpicker._data),
-      dpicker.render(dpicker._events, dpicker._data, dpicker.getChildrenRender())
+      dpicker.render(dpicker._events, dpicker._data, dpicker.getRenderChild())
     ])
   )
 

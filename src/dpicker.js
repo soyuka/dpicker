@@ -170,7 +170,7 @@ function DPicker(element, options = {}) {
 
   this.mount(element, this.renderContainer(this._events, this._data, [
     this.renderInput(this._events, this._data),
-    this.render(this._events, this._data, this.getChildrenRender())
+    this.render(this._events, this._data, this.getRenderChild())
   ]))
 
   element.setAttribute('id', this._container)
@@ -204,7 +204,11 @@ DPicker.prototype.redraw = function() {
   this._projector.scheduleRender()
 }
 
-DPicker.prototype.getChildrenRender = function() {
+/**
+ * Allows to render more child elements with modules
+ * @return Array<VNode>
+ */
+DPicker.prototype.getRenderChild = function() {
   let children = {
     years: this.renderYears(this._events, this._data),
     months: this.renderMonths(this._events, this._data)
@@ -546,7 +550,7 @@ DPicker.prototype.isValid = function isValid(model) {
  * @return {H} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderInput = injector(function renderInput(events, data, toRender) {
-  return DPicker.h('input#'+data.inputId, {
+  return DPicker.h(`input#${data.inputId}`, {
     value: data.empty ? '' : data.model.format(data.format),
     type: 'text',
     min: data.min.format(data.format),
