@@ -193,13 +193,48 @@ The [modifiers](https://soyuka.github.io/dpicker/DPicker.modules.module_modifier
 
 Want time? Add the [time](https://soyuka.github.io/dpicker/DPicker.modules.module_time.html) module!
 
+You can also create a custom module so that DPicker reflects your needs. For example, adding two buttons to navigate through months is as easy as (add this code to `dpicker.month-navigation.js`):
+
+```javascript
+const renderPreviousMonth = DPicker.injector(function renderPreviousMonth(events, data, toRender) {
+  return DPicker.h('button', { onclick: events.previousMonth }, '<') //add some appropriate attributes
+})
+
+const renderNextMonth = DPicker.injector(function renderNextMonth(events, data, toRender) {
+  return DPicker.h('button', { onclick: events.nextMonth }, '>')
+})
+
+const monthNavigation = DPicker.modules.monthNavigation = {
+  render: {
+    previousMonth: renderPreviousMonth,
+    nextMonth: renderNextMonth
+  },
+  events: {
+    previousMonth: function previousMonth() {
+       this._data.model.add(-1, 'month')
+    },
+    nextMonth: function nextMonth(evt) {
+       this._data.model.add(1, 'month')
+    }
+  }
+}
+```
+
+Make sure this code is loaded with DPicker. Then initialize a new DPicker by specifying a render order:
+
+```javascript
+new DPicker(document.getElementById('trythis'), {order: ['time', 'previousMonth', 'months', 'nextMonth', 'days'], time: true})
+```
+
+Now your date picker has two new buttons to select next/prev month in a click.
+
 To know more about modules check out the [documentation](https://soyuka.github.io/dpicker/DPicker.html).
+
+## Virtual DOM
 
 DPicker depends on [momentjs](http://momentjs.com/) (~15.3Kb gz) for date manipulation and a hyperscript library for virtual dom. The recommended one is [maquettejs](http://maquettejs.org/) (~3.4Kb gz).
 
-A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L56)
-
-## Custom hyperscript library
+### Custom hyperscript library
 
 To use your own hyperscript library, you have to declare 3 options:
 
@@ -224,6 +259,10 @@ let dpicker = DPicker(label, {
 })
 ```
 
+### Angular
+
+A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L56)
+
 ## Why?
 
 I was searching for a simple date picker, with only basic features and an ability to work with any framework, or event plain javascript (VanillaJS).
@@ -231,10 +270,11 @@ If you know one that does have less than 1000 SLOC, please let me know.
 
 This date picker:
 
-- is light and easy to use, especially easy to maintain (core has ~500 SLOC) and to extend or add functionalities (see `onChange`).
+- is light and easy to use, especially easy to maintain (core has ~500 SLOC)
 - is framework agnostic, and no default css so that it fits well with foundation/bootstrap and angular/react
 - has HTML attributes compatibility with `input[type="date"]` (adds a `format` attribute) and `input[type="datetime"]` (adds a `meridiem` attribute on top of the `format` one if you need 12 hours time range). Define minutes step through the `step` attribute.
 - works with momentjs so that locale changes are a breeze
+- extensible through modules, use the core and implement yourself your specific needs easily
 
 What I think is good, and isn't straightforward in other date pickers is that your input's `Date` instance is separated from the input real value:
 
