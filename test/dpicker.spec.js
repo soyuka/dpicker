@@ -397,4 +397,24 @@ describe('dpicker', function() {
     input.focus()
     expect(dpicker.display).to.be.true
   })
+
+  it.skip('should use inferno instead of maquette', function() {
+    let label = document.createElement('label')
+    document.body.appendChild(label)
+    let h = require('inferno-hyperscript')
+    let InfernoDOM = require('inferno-dom')
+    let dpicker = DPicker(label, {
+      h: h,
+      mount: function(element, toRender) {
+        InfernoDOM.render(toRender(), element)
+      },
+      redraw: InfernoDOM.render //has to be tested
+    })
+
+
+    let input = label.querySelector('input[type="text"]')
+
+    input.focus()
+    expect(dpicker.display).to.be.true
+  })
 })
