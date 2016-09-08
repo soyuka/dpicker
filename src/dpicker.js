@@ -179,8 +179,9 @@ function DPicker(element, options = {}) {
   let input = element.querySelector('input')
 
   input.addEventListener('blur', this._events.inputBlur)
-  document.addEventListener('touchend', function() {
-    input.blur()
+
+  document.addEventListener('touchend', (e) => {
+    this._events.inputBlur(e)
   })
 
   return this
