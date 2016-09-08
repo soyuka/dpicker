@@ -176,7 +176,13 @@ function DPicker(element, options = {}) {
   element.setAttribute('id', this._container)
   element.addEventListener('keydown', this._events.keyDown)
 
-  element.querySelector('input').addEventListener('blur', this._events.inputBlur)
+  let input = element.querySelector('input')
+
+  input.addEventListener('blur', this._events.inputBlur)
+  document.addEventListener('touchend', function() {
+    input.blur()
+  })
+
   return this
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1
+
+Add touch friendly behavior #20
+
 ## 3.1.0
 
 Drop maquettejs hard dependency (see #1). You can now use your own hyperscript library, for example with mithriljs:
