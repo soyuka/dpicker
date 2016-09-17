@@ -1,7 +1,7 @@
 {
   "name": "dpicker",
   "version": "3.1.2",
-  "description": "Minimalist date picker",
+  "description": "A compliat minimal date picker.",
   "main": "dist/dpicker.js",
   "scripts": {
     "test": "./node_modules/.bin/_mocha",
