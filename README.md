@@ -261,7 +261,7 @@ let dpicker = DPicker(label, {
 
 ### Angular
 
-A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L56)
+A usage example with angular is available [here](https://github.com/soyuka/dpicker/blob/master/demo/index.html#L150)
 
 ## Why?
 
