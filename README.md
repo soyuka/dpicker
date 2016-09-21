@@ -10,7 +10,7 @@
 [Styles](https://soyuka.github.io/dpicker/demo/styles.html)
 [Documentation](https://soyuka.github.io/dpicker/DPicker.html)
 
-A compliant minimal date picker.
+A framework-agnostic minimal date picker.
 
 ## Installation
 
