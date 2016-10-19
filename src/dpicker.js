@@ -695,11 +695,18 @@ DPicker.prototype.renderMonths = injector(function renderMonths(events, data, to
 DPicker.prototype.renderDays = injector(function renderDays(events, data, toRender) {
   let daysInMonth = data.model.daysInMonth()
   let daysInPreviousMonth = data.model.clone().subtract(1, 'months').daysInMonth()
+  let firstLocaleDay = moment.localeData().firstDayOfWeek()
   let firstDay = +(data.model.clone().date(1).format('e')) - 1
   let currentDay = data.model.date()
 
   let minDay
   let maxDay
+
+  let days = new Array(7)
+
+  data.days.map((e, i) => {
+    days[i < firstLocaleDay ? 7 - i : i - firstLocaleDay] = e
+  })
 
   if(data.model.isSame(data.min, 'month')) {
     minDay = data.min.date()
@@ -716,7 +723,7 @@ DPicker.prototype.renderDays = injector(function renderDays(events, data, toRend
 
   return DPicker.h('table', [
     //headers
-    DPicker.h('tr', data.days.map(e => DPicker.h('th', e))),
+    DPicker.h('tr', days.map(e => DPicker.h('th', e))),
     //rows
     rows.map((e, row) => {
       //weeks filed with days
