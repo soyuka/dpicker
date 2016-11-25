@@ -211,10 +211,10 @@ const monthNavigation = DPicker.modules.monthNavigation = {
   },
   events: {
     previousMonth: function previousMonth() {
-       this._data.model.add(-1, 'month')
+       this._data.model = this._data.model.add(-1, 'month')
     },
     nextMonth: function nextMonth(evt) {
-       this._data.model.add(1, 'month')
+       this._data.model = this._data.model.add(1, 'month')
     }
   }
 }
