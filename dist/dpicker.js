@@ -41,8 +41,8 @@ function DPicker(element) {
   if (!(this instanceof DPicker)) {
     return new DPicker(element, options);
   }
-  if (typeof maquette === 'undefined' && require !== 'undefined') {
-    maquette = require('maquette');
+  if (typeof maquette === 'undefined' && typeof require === 'function') {
+    var maquette$__4 = require('maquette');
   }
   if (options.h && options.mount && options.redraw) {
     DPicker.h = options.h;
@@ -159,9 +159,9 @@ DPicker.prototype.getRenderChild = function() {
   });
 };
 DPicker.prototype._initData = function(options) {
-  var $__5 = this,
-      $__6 = function(i) {
-        var e = $__5.properties[i];
+  var $__6 = this,
+      $__7 = function(i) {
+        var e = $__6.properties[i];
         if (e.getset && !(i in DPicker.prototype)) {
           Object.defineProperty(DPicker.prototype, i, {
             get: function() {
@@ -173,36 +173,36 @@ DPicker.prototype._initData = function(options) {
             }
           });
         }
-        $__5._data[i] = e.default;
+        $__6._data[i] = e.default;
         if (options[i] === undefined) {
           return 0;
         }
         if (i === 'model' && !options[i]) {
-          $__5._data.empty = true;
+          $__6._data.empty = true;
           return 1;
         }
-        $__5._data[i] = options[i];
+        $__6._data[i] = options[i];
       },
-      $__7;
-  $__4: for (var i in this.properties) {
-    $__7 = $__6(i);
-    switch ($__7) {
+      $__8;
+  $__5: for (var i in this.properties) {
+    $__8 = $__7(i);
+    switch ($__8) {
       case 0:
-        continue $__4;
+        continue $__5;
       case 1:
-        continue $__4;
+        continue $__5;
     }
   }
 };
 DPicker.prototype._parseInputAttributes = function(attributes) {
-  var $__9 = this,
-      $__10 = function(i) {
-        var e = $__9.properties[i];
+  var $__10 = this,
+      $__11 = function(i) {
+        var e = $__10.properties[i];
         if (e.attribute === undefined) {
           return 0;
         }
         if (typeof e.attribute === 'function') {
-          $__9._data[i] = e.attribute(attributes);
+          $__10._data[i] = e.attribute(attributes);
           return 1;
         }
         var attribute = attributes.find(function(a) {
@@ -214,35 +214,35 @@ DPicker.prototype._parseInputAttributes = function(attributes) {
         var v = attribute.value;
         if (!v) {
           if (i === 'model') {
-            $__9._data.empty = true;
+            $__10._data.empty = true;
             return 3;
           }
           return 4;
         }
         if (e.moment === true) {
-          v = moment(attribute.value, $__9._data.format, true);
+          v = moment(attribute.value, $__10._data.format, true);
           if (v.isValid() === false) {
             return 5;
           }
         }
-        $__9._data[i] = v;
+        $__10._data[i] = v;
       },
-      $__11;
-  $__8: for (var i in this.properties) {
-    $__11 = $__10(i);
-    switch ($__11) {
+      $__12;
+  $__9: for (var i in this.properties) {
+    $__12 = $__11(i);
+    switch ($__12) {
       case 0:
-        continue $__8;
+        continue $__9;
       case 1:
-        continue $__8;
+        continue $__9;
       case 2:
-        continue $__8;
+        continue $__9;
       case 3:
-        continue $__8;
+        continue $__9;
       case 4:
-        continue $__8;
+        continue $__9;
       case 5:
-        continue $__8;
+        continue $__9;
     }
   }
 };
@@ -252,38 +252,38 @@ DPicker.prototype._loadModules = function loadModules() {
   this._modulesRender = {};
   for (var moduleName in DPicker.modules) {
     var module = DPicker.modules[moduleName];
-    var $__13 = this,
-        $__14 = function(event) {
-          if (!$__13._events[event]) {
-            $__13._events[event] = module.events[event].bind($__13);
+    var $__14 = this,
+        $__15 = function(event) {
+          if (!$__14._events[event]) {
+            $__14._events[event] = module.events[event].bind($__14);
             return 0;
           }
-          if (!$__13._events[event + '-internal']) {
-            $__13._events[event + '-internal'] = [$__13._events[event]];
-            $__13._events[event] = function(evt) {
+          if (!$__14._events[event + '-internal']) {
+            $__14._events[event + '-internal'] = [$__14._events[event]];
+            $__14._events[event] = function(evt) {
               $__2._events[event + '-internal'].map(function(e) {
                 return e.bind($__2)(evt);
               });
             };
           }
-          $__13._events[event + '-internal'].push(module.events[event]);
+          $__14._events[event + '-internal'].push(module.events[event]);
         },
-        $__15 = void 0;
-    $__12: for (var event in module.events) {
-      $__15 = $__14(event);
-      switch ($__15) {
+        $__16 = void 0;
+    $__13: for (var event in module.events) {
+      $__16 = $__15(event);
+      switch ($__16) {
         case 0:
-          continue $__12;
+          continue $__13;
       }
     }
-    var $__17 = this,
-        $__18 = function(call) {
+    var $__18 = this,
+        $__19 = function(call) {
           if (!DPicker.prototype.hasOwnProperty(call) || typeof module.calls[call] !== 'function') {
             return 0;
           }
-          if (!$__17[call + '-internal']) {
-            $__17[call + '-internal'] = [DPicker.prototype[call]];
-            $__17[call] = function() {
+          if (!$__18[call + '-internal']) {
+            $__18[call + '-internal'] = [DPicker.prototype[call]];
+            $__18[call] = function() {
               for (var args = [],
                   $__3 = 0; $__3 < arguments.length; $__3++)
                 args[$__3] = arguments[$__3];
@@ -292,14 +292,14 @@ DPicker.prototype._loadModules = function loadModules() {
               });
             };
           }
-          $__17[call + '-internal'].push(module.calls[call]);
+          $__18[call + '-internal'].push(module.calls[call]);
         },
-        $__19 = void 0;
-    $__16: for (var call in module.calls) {
-      $__19 = $__18(call);
-      switch ($__19) {
+        $__20 = void 0;
+    $__17: for (var call in module.calls) {
+      $__20 = $__19(call);
+      switch ($__20) {
         case 0:
-          continue $__16;
+          continue $__17;
       }
     }
     if (module.render) {
@@ -308,9 +308,9 @@ DPicker.prototype._loadModules = function loadModules() {
       }
     }
     if (module.properties) {
-      for (var i$__20 in module.properties) {
-        if (!this.properties[i$__20]) {
-          this.properties[i$__20] = module.properties[i$__20];
+      for (var i$__21 in module.properties) {
+        if (!this.properties[i$__21]) {
+          this.properties[i$__21] = module.properties[i$__21];
         }
       }
     }
