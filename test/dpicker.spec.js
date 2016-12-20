@@ -30,6 +30,15 @@ describe('dpicker', function() {
     expect(selects[1].getAttribute('name')).to.equal('dpicker-month')
   })
 
+  it('should init a dpicker with different order + not defined item', function() {
+    const dpicker = createDatePicker({order: ['years', 'months', 'foobar', 'days']})
+    expect(document.getElementById(dpicker.container)).not.to.be.null
+    let selects = document.querySelectorAll('select')
+
+    expect(selects[0].getAttribute('name')).to.equal('dpicker-year')
+    expect(selects[1].getAttribute('name')).to.equal('dpicker-month')
+  })
+
   it('should change year', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {

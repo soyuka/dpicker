@@ -230,7 +230,7 @@ DPicker.prototype.getRenderChild = function() {
 
   children.days = this.renderDays(this._events, this._data)
 
-  return this._data.order.map(e => children[e])
+  return this._data.order.filter(e => children[e]).map(e => children[e])
 }
 
 /**
