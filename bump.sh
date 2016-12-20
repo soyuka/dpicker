@@ -3,6 +3,7 @@
 [[ '' == $1 ]] && echo "Please provide patch, minor, major argument" && exit 1
 
 gulp
+npm test
 newver=$(npm --no-git-tag-version version $1)
 git add -f dist package.json
 git commit -m $newver
