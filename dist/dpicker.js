@@ -41,7 +41,7 @@ function DPicker(element) {
   if (!(this instanceof DPicker)) {
     return new DPicker(element, options);
   }
-  if (typeof maquette === 'undefined' && require !== 'undefined') {
+  if (typeof maquette === 'undefined' && typeof require === 'function') {
     maquette = require('maquette');
   }
   if (options.h && options.mount && options.redraw) {
