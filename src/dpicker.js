@@ -113,7 +113,7 @@ function DPicker(element, options = {}) {
     return new DPicker(element, options)
   }
 
-  let mReplica = maquette
+  let mReplica = typeof maquette === 'undefined' ? undefined : maquette
 
   //webpack compatibility, because this is an optional dependency
   if (typeof mReplica === 'undefined' && typeof require === 'function') {
