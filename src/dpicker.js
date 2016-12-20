@@ -113,6 +113,11 @@ function DPicker(element, options = {}) {
     return new DPicker(element, options)
   }
 
+  //webpack compatibility, because this is an optional dependency
+  if (typeof maquette === 'undefined' && require !== 'undefined') {
+    maquette = require('maquette')
+  }
+
   if (options.h && options.mount && options.redraw) {
     DPicker.h = options.h
     this.mount = options.mount
