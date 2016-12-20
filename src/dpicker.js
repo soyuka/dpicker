@@ -114,7 +114,7 @@ function DPicker(element, options = {}) {
   }
 
   //webpack compatibility, because this is an optional dependency
-  if (typeof maquette === 'undefined' && require !== 'undefined') {
+  if (typeof maquette === 'undefined' && typeof require === 'function') {
     maquette = require('maquette')
   }
 
