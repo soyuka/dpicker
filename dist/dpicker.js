@@ -41,16 +41,17 @@ function DPicker(element) {
   if (!(this instanceof DPicker)) {
     return new DPicker(element, options);
   }
-  if (typeof maquette === 'undefined' && require !== 'undefined') {
-    maquette = require('maquette');
+  var mReplica = typeof maquette === 'undefined' ? undefined : maquette;
+  if (typeof mReplica === 'undefined' && typeof require === 'function') {
+    mReplica = require('maquette');
   }
   if (options.h && options.mount && options.redraw) {
     DPicker.h = options.h;
     this.mount = options.mount;
     this.redraw = options.redraw;
-  } else if (typeof maquette !== 'undefined') {
-    DPicker.h = maquette.h;
-    this._projector = maquette.createProjector();
+  } else if (typeof mReplica !== 'undefined') {
+    DPicker.h = mReplica.h;
+    this._projector = mReplica.createProjector();
   } else {
     throw new ReferenceError('No hyperscript library registered!');
   }
