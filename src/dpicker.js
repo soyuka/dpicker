@@ -113,18 +113,20 @@ function DPicker(element, options = {}) {
     return new DPicker(element, options)
   }
 
+  let mReplica = maquette
+
   //webpack compatibility, because this is an optional dependency
-  if (typeof maquette === 'undefined' && typeof require === 'function') {
-    const maquette = require('maquette')
+  if (typeof mReplica === 'undefined' && typeof require === 'function') {
+    mReplica = require('maquette')
   }
 
   if (options.h && options.mount && options.redraw) {
     DPicker.h = options.h
     this.mount = options.mount
     this.redraw = options.redraw
-  } else if (typeof maquette !== 'undefined') {
-    DPicker.h = maquette.h
-    this._projector = maquette.createProjector()
+  } else if (typeof mReplica !== 'undefined') {
+    DPicker.h = mReplica.h
+    this._projector = mReplica.createProjector()
   } else {
     throw new ReferenceError('No hyperscript library registered!')
   }
