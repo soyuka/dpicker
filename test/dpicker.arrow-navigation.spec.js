@@ -15,7 +15,7 @@ describe('dpicker.arrow-navigation', function() {
     document.body.appendChild(label)
 
     let dateFocusIs = function(x) {
-      expect(document.activeElement.innerHTML).to.equal(''+x)
+      expect(document.activeElement.innerText).to.equal(x)
     }
 
     let keyDown = function(keyCode) {

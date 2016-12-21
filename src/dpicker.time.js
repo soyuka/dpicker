@@ -49,8 +49,8 @@ function getHoursMinutes(data) {
  * @listens DPicker#minutesChange
  * @return {H} the rendered virtual dom hierarchy
  */
-const renderTime = DPicker.injector(function renderTime(events, data, toRender) {
-  if (!data.time) { return DPicker.h('span.dpicker-time', {style: 'display: none;'}) }
+const renderTime = function renderTime(events, data, toRender) {
+  if (!data.time) { return DPicker.h('span', {style: 'display: none;', class: 'dpicker-time'}) }
 
   let modelHours = data.model.hours()
   if (data.meridiem) {
@@ -96,8 +96,8 @@ const renderTime = DPicker.injector(function renderTime(events, data, toRender) 
     ))
   }
 
-  return DPicker.h('span.dpicker-time', selects)
-})
+  return DPicker.h('span', {class: 'dpicker-time'}, selects)
+}
 
 const events = {
   /**
@@ -118,9 +118,8 @@ const events = {
     }
 
     this._data.model.hours(val)
-
     this._minutesStep()
-
+    this.redraw(['input', 'container'])
     this.onChange()
   },
 
@@ -132,6 +131,7 @@ const events = {
   minutesChange: function minutesChange(evt) {
     this._data.empty = false
     this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
+    this.redraw(['input', 'container'])
     this.onChange()
   },
 
@@ -152,6 +152,7 @@ const events = {
     }
 
     this._data.model.hours(hours)
+    this.redraw(['input', 'container'])
     this.onChange()
   },
 
@@ -214,7 +215,6 @@ const time = DPicker.modules.time = {
      */
     _modelSetter: function timeModelSetter(newValue) {
       this._minutesStep()
-      this.redraw()
     }
   }
 }

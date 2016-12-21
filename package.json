@@ -29,22 +29,17 @@
   "devDependencies": {
     "@soyuka/jhaml": "^1.0.8",
     "chai": "^3.5.0",
+    "chai-spies": "^0.7.1",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-traceur": "^0.17.2",
-    "gulp-uglify": "^1.5.3",
+    "gulp-uglify": "^2.0.0",
     "gulp-wrap": "^0.13.0",
-    "inferno-dom": "^0.7.26",
-    "inferno-hyperscript": "^2.0.3",
     "istanbul": "^0.4.4",
     "jsdoc": "^3.4.0",
     "jsdom": "^9.2.1",
     "jsdom-global": "^2.0.0",
-    "maquette": "^2.3.3",
-    "maquette-query": "^0.7.5",
-    "mithril": "^0.2.5",
-    "mocha": "^2.5.3",
-    "node-sass": "^3.8.0",
-    "request-frame": "^1.4.1"
+    "mocha": "^3.2.0",
+    "node-sass": "^4.1.1"
   }
 }

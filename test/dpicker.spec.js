@@ -1,6 +1,9 @@
 'use strict'
 const moment = require('moment')
-const expect = require('chai').expect
+const chai = require('chai')
+const spies = require('chai-spies')
+chai.use(spies)
+const expect = chai.expect
 
 function keyDown(keyCode, element) {
   var event = new window.Event('Event');
@@ -42,63 +45,53 @@ describe('dpicker', function() {
   it('should change year', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(select.children[selectedIndex].properties.selected).to.be.true
+        expect(select.children[selectedIndex].selected).to.be.true
 
-        let input = getElementByName('dpicker-input')
-        expect(''+dpicker.model.year()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.input)
+        let input = document.querySelector('input[name=dpicker-input]')
+        expect(''+dpicker.model.year()).to.equal(select.options[selectedIndex].value)
+        expect(input.value).to.equal(dpicker.input)
         cb()
       }
     })
 
     let selectedIndex = 4
-    let select = getElementByName('dpicker-year')
-    let options = document.querySelector('select[name="dpicker-year"]').options
-
-    select.simulate.change({
-      options: options,
-      selectedIndex: selectedIndex
-    })
-
+    let select = document.querySelector('select[name=dpicker-year]')
+    select.selectedIndex = selectedIndex
+    select.onchange({target: select})
   })
 
   it('should change month', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(select.children[selectedIndex].properties.selected).to.be.true
+        expect(select.children[selectedIndex].selected).to.be.true
 
-        let input = getElementByName('dpicker-input')
-        expect(''+dpicker.model.month()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.input)
+        let input = document.querySelector('input[name=dpicker-input]')
+        expect(''+dpicker.model.month()).to.equal(select.options[selectedIndex].value)
+        expect(input.value).to.equal(dpicker.input)
         cb()
       }
     })
 
     let selectedIndex = 4
-    let select = getElementByName('dpicker-month')
-
-    let options = document.querySelector('select[name="dpicker-month"]').options
-
-    select.simulate.change({
-      options: options,
-      selectedIndex: selectedIndex
-    })
+    let select = document.querySelector('select[name=dpicker-month]')
+    select.selectedIndex = selectedIndex
+    select.onchange({target: select})
   })
 
   it('should change day', function(cb) {
+    const fn = chai.spy()
+
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(dpicker.model.date()).to.equal(button.properties.value)
+        expect(fn).to.have.been.called()
+        expect(''+dpicker.model.date()).to.equal(button.value)
         expect(dpicker.display).to.equal(false)
         cb()
       }
     })
 
-    let button = DPickerProjector.query(function(vnode) {
-      return vnode.vnodeSelector == 'button'
-    })
-
-    button.simulate.click({value: button.properties.value})
+    let button = document.querySelectorAll('button')[0]
+    button.onclick({target: button, preventDefault: fn})
   })
 
   it('should have customized date range', function() {
@@ -186,10 +179,10 @@ describe('dpicker', function() {
   it('should have customized format', function() {
     const dpicker = createDatePicker()
 
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
     dpicker.format = 'MM/DD/YYYY'
 
-    expect(input.properties.value).to.equal(dpicker.input)
+    expect(input.value).to.equal(dpicker.input)
   })
 
   it('should change dpicker according to input change', function(cb) {
@@ -200,26 +193,29 @@ describe('dpicker', function() {
       }
     })
 
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
 
     dpicker.format = 'DD/MM/YYYY'
-    input.simulate.change({value: '24/06/1991'})
+    input.value = '24/06/1991'
+    input.onchange({target: input})
   })
 
   it('should not fail on invalid input change', function() {
     const dpicker = createDatePicker()
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
 
     dpicker.format = 'DD/MM/YYYY'
-    input.simulate.change({value: '24/06/1991'})
-    input.simulate.change({value: 'test'})
+    input.value = '24/06/1991'
+    input.onchange({target: input})
+    input.value = 'test'
+    input.onchange({target: input})
     expect(dpicker.input).to.equal('24/06/1991')
   })
 
   it('should display dpicker on input focus', function() {
     const dpicker = createDatePicker()
-    let input = getElementByName('dpicker-input')
-    input.simulate.focus()
+    let input = document.querySelector('input[name=dpicker-input]')
+    input.focus()
     expect(dpicker.display).to.be.true
   })
 
@@ -232,9 +228,9 @@ describe('dpicker', function() {
 
   it('should not hide container on inside click', function() {
     const dpicker = createDatePicker()
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
 
-    input.simulate.focus()
+    input.focus()
     expect(dpicker.display).to.be.true
     document.getElementById(dpicker.container).children[0].click()
     expect(dpicker.display).to.be.true
@@ -242,11 +238,12 @@ describe('dpicker', function() {
 
   it('should be empty', function() {
     const dpicker = createDatePicker()
-    let input = getElementByName('dpicker-input')
-
-    input.simulate.change({value: '24/06/1991'})
+    let input = document.querySelector('input[name=dpicker-input]')
+    input.value = '24/06/1991'
+    input.onchange({target: input})
     expect(dpicker._data.empty).to.be.false
-    input.simulate.change({value: ''})
+    input.value = ''
+    input.onchange({target: input})
     expect(dpicker._data.empty).to.be.true
   })
 
@@ -295,7 +292,7 @@ describe('dpicker', function() {
       }
     })
 
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
 
     input.simulate.change({value: '+'})
 
@@ -385,45 +382,6 @@ describe('dpicker', function() {
     input.focus()
     expect(dpicker.display).to.be.true
     label.querySelectorAll('button')[0].focus()
-    expect(dpicker.display).to.be.true
-  })
-
-  it('should use mithriljs instead of maquette', function() {
-    let label = document.createElement('label')
-    document.body.appendChild(label)
-    let mithril = require('mithril')
-    let dpicker = DPicker(label, {
-      h: mithril,
-      mount: function(element, toRender) {
-        mithril.render(element, toRender())
-      },
-      redraw: mithril.redraw
-    })
-
-
-    let input = label.querySelector('input[type="text"]')
-
-    input.focus()
-    expect(dpicker.display).to.be.true
-  })
-
-  it.skip('should use inferno instead of maquette', function() {
-    let label = document.createElement('label')
-    document.body.appendChild(label)
-    let h = require('inferno-hyperscript')
-    let InfernoDOM = require('inferno-dom')
-    let dpicker = DPicker(label, {
-      h: h,
-      mount: function(element, toRender) {
-        InfernoDOM.render(toRender(), element)
-      },
-      redraw: InfernoDOM.render //has to be tested
-    })
-
-
-    let input = label.querySelector('input[type="text"]')
-
-    input.focus()
     expect(dpicker.display).to.be.true
   })
 })

@@ -13,48 +13,41 @@ describe('dpicker.time', function() {
   it('should change hours (24h format)', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(select.children[selectedIndex].properties.selected).to.be.true
+        expect(select.options[selectedIndex].selected).to.be.true
 
-        let input = getElementByName('dpicker-input')
-        expect(''+dpicker.model.hours()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.input)
+        let input = document.querySelector('input[name=dpicker-input]')
+        expect(''+dpicker.model.hours()).to.equal(select.options[selectedIndex].value)
+        expect(input.value).to.equal(dpicker.input)
         cb()
       },
       time: true
     })
 
     let selectedIndex = 4
-    let select = getElementByName('dpicker-hours')
-    let options = document.querySelector('select[name="dpicker-hours"]').options
+    let select = document.querySelector('select[name="dpicker-hours"]')
+    select.selectedIndex = 4
 
-    select.simulate.change({
-      options: options,
-      selectedIndex: selectedIndex
-    })
-
+    select.onchange({target: select})
   })
 
   it('should change minutes (24h format)', function(cb) {
     const dpicker = createDatePicker({
       onChange: (data) => {
-        expect(select.children[selectedIndex].properties.selected).to.be.true
+        expect(select.options[selectedIndex].selected).to.be.true
 
-        let input = getElementByName('dpicker-input')
-        expect(''+dpicker.model.minutes()).to.equal(options[selectedIndex].value)
-        expect(input.properties.value).to.equal(dpicker.input)
+        let input = document.querySelector('input[name=dpicker-input]')
+        expect(''+dpicker.model.minutes()).to.equal(select.options[selectedIndex].value)
+        expect(input.value).to.equal(dpicker.input)
         cb()
       },
       time: true
     })
 
     let selectedIndex = 4
-    let select = getElementByName('dpicker-minutes')
-    let options = document.querySelector('select[name="dpicker-minutes"]').options
+    let select = document.querySelector('select[name="dpicker-minutes"]')
+    select.selectedIndex = selectedIndex
 
-    select.simulate.change({
-      options: options,
-      selectedIndex: selectedIndex
-    })
+    select.onchange({target: select})
   })
 
   it('should change hours AM (12h format)', function(cb) {
@@ -66,8 +59,7 @@ describe('dpicker.time', function() {
       model: moment('24/06/1991 03:40 PM', format)
     })
 
-    let meridiem = getElementByName('dpicker-meridiem')
-    let moptions = document.querySelector('select[name="dpicker-meridiem"]').options
+    let meridiem = document.querySelector('select[name="dpicker-meridiem"]')
 
     expect(dpicker.model.hours()).to.equal(15)
 
@@ -75,69 +67,55 @@ describe('dpicker.time', function() {
       expect(data.model.hours()).to.equal(3)
     }
 
-    //+test model
-    meridiem.simulate.change({
-      options: moptions,
-      selectedIndex: 0 //AM
-    })
+    meridiem.selectedIndex = 0 //AM
+    meridiem.onchange({target: meridiem})
 
-    let select = getElementByName('dpicker-hours')
-    let options = document.querySelector('select[name="dpicker-hours"]').options
+    let select = document.querySelector('select[name="dpicker-hours"]')
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(0)
     }
 
-    select.simulate.change({
-      options: options,
-      selectedIndex: 11 //12
+    select.selectedIndex = 11 //12
+    select.onchange({
+      target: select
     })
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(12)
     }
 
-    meridiem.simulate.change({
-      options: moptions,
-      selectedIndex: 1 //PM
-    })
+    meridiem.selectedIndex = 1 //PM
+    meridiem.onchange({target: meridiem})
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(23)
     }
 
-    select.simulate.change({
-      options: options,
-      selectedIndex: 10 //11
-    })
+    select.selectedIndex = 10 //11
+    select.onchange({target: select})
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(12)
     }
 
-    select.simulate.change({
-      options: options,
-      selectedIndex: 11 //12
-    })
+    select.selectedIndex = 11 //12
+    select.onchange({target: select})
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(0)
     }
 
-    meridiem.simulate.change({
-      options: moptions,
-      selectedIndex: 0 //AM
-    })
+    meridiem.selectedIndex = 0 //AM
+    meridiem.onchange({target: meridiem})
 
     dpicker.onChange = (data) => {
       expect(data.model.hours()).to.equal(12)
       cb()
     }
 
-    meridiem.simulate.change({
-      options: moptions,
-      selectedIndex: 1 //PM
-    })
+    meridiem.selectedIndex = 1 //PM
+    meridiem.onchange({target: meridiem})
   })
 
   it('should bind to an input[type="datetime"]', function() {
@@ -229,7 +207,7 @@ describe('dpicker.time', function() {
     expect(hours).to.have.length.of(3)
   })
 
-  it('should keep available hours - min (#11)', function(cb) {
+  it('should keep available hours - min (#11)', function() {
     let format = 'YYYY/MM/DD HH:mm';
     const dpicker = createDatePicker({
       time: true,
@@ -244,15 +222,13 @@ describe('dpicker.time', function() {
     dpicker.model = moment('1991/06/24 09:10', format)
     expect(dpicker.valid).to.be.false
     dpicker.model = moment('1991/06/24 11:10', format)
+    expect(dpicker.valid).to.be.true
 
-    setTimeout(function() {
-      hours = document.querySelector('select[name="dpicker-hours"]').options
-      expect(hours).to.have.length.of(14)
-      cb()
-    }, 100)
+    hours = document.querySelector('select[name="dpicker-hours"]').options
+    expect(hours).to.have.length.of(14)
   })
 
-  it('should keep available hours/minutes - max', function(cb) {
+  it('should keep available hours/minutes - max', function() {
     let format = 'YYYY/MM/DD HH:mm';
     const dpicker = createDatePicker({
       time: true,
@@ -270,13 +246,9 @@ describe('dpicker.time', function() {
     expect(dpicker.valid).to.be.false
     dpicker.model = moment('1991/06/24 09:10', format)
 
-    //wait for render
-    setTimeout(function() {
-      hours = document.querySelector('select[name="dpicker-hours"]').options
-      expect(hours).to.have.length.of(11)
-      expect(dpicker.valid).to.be.true
-      cb()
-    }, 100)
+    hours = document.querySelector('select[name="dpicker-hours"]').options
+    expect(hours).to.have.length.of(11)
+    expect(dpicker.valid).to.be.true
   })
 
   it('should find first value if minutes step (#8)', function() {
@@ -358,9 +330,9 @@ describe('dpicker.time', function() {
 
     setTimeout(function() {
       let t = document.querySelector('select[name="dpicker-hours"]')
-      expect(t.options[t.selectedIndex].innerHTML).to.equal('12')
+      expect(t.options[t.selectedIndex].innerText).to.equal(12)
       t = document.querySelector('select[name="dpicker-meridiem"]')
-      expect(t.options[t.selectedIndex].innerHTML).to.equal('AM')
+      expect(t.options[t.selectedIndex].innerText).to.equal('AM')
       cb()
     })
 
@@ -390,13 +362,10 @@ describe('dpicker.time', function() {
       time: true
     })
 
-    let hours = getElementByName('dpicker-hours')
-    let hoursOptions = document.querySelector('select[name="dpicker-hours"]')
-
-    let hoursIndex = hoursOptions.selectedIndex
+    let hours = document.querySelector('select[name="dpicker-hours"]')
 
     dpicker.onChange = function() {
-      let minutes = getElementByName('dpicker-minutes')
+      let minutes = document.querySelector('select[name=dpicker-minutes]')
       expect(minutes.children).to.have.length.of(60)
 
       dpicker.onChange = function() {
@@ -407,22 +376,22 @@ describe('dpicker.time', function() {
           cb()
         }
 
-        hours.simulate.change({
-          options: hoursOptions.options,
-          selectedIndex: --hoursIndex
+        hours.selectedIndex = --hours.selectedIndex
+        hours.onchange({
+          target: hours
         })
       }
 
-      minutes.simulate.change({
-        selectedIndex: 0,
-        options: [{value: 7}]
+      minutes.selectedIndex = 7
+      minutes.onchange({
+        target: minutes
       })
-
     }
 
-    hours.simulate.change({
-      options: hoursOptions.options,
-      selectedIndex: ++hoursIndex
+    hours.selectedIndex++
+
+    hours.onchange({
+      target: hours
     })
   })
 

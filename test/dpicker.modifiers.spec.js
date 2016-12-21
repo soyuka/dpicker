@@ -12,21 +12,26 @@ describe('dpicker.modifiers', function() {
     const now = moment()
     const dpicker = createDatePicker()
 
-    let input = getElementByName('dpicker-input')
+    let input = document.querySelector('input[name=dpicker-input]')
 
-    input.simulate.change({value: '24/06/1991'})
+    input.value = '24/06/1991'
+    input.onchange({target: input})
     expect(dpicker.model.format('YYYYMMDD')).to.equal('19910624')
 
-    input.simulate.change({value: '+'})
+    input.value = '+'
+    input.onchange({target: input})
     expect(dpicker.model.format('YYYYMMDD')).to.equal(now.format('YYYYMMDD'))
 
-    input.simulate.change({value: '+100'})
+    input.value = '+100'
+    input.onchange({target: input})
     expect(dpicker.model.format('YYYYMMDD')).to.equal(now.clone().add(100, 'days').format('YYYYMMDD'))
 
-    input.simulate.change({value: '-'})
+    input.value = '-'
+    input.onchange({target: input})
     expect(dpicker.model.format('YYYYMMDD')).to.equal(now.clone().subtract(1, 'days').format('YYYYMMDD'))
 
-    input.simulate.change({value: '-10'})
+    input.value = '-10'
+    input.onchange({target: input})
     expect(dpicker.model.format('YYYYMMDD')).to.equal(now.clone().subtract(10, 'days').format('YYYYMMDD'))
   })
 
@@ -38,7 +43,8 @@ describe('dpicker.modifiers', function() {
       }
     }})
 
-    let input = getElementByName('dpicker-input')
-    input.simulate.change({value: '+'})
+    let input = document.querySelector('input[name=dpicker-input]')
+    input.value = '+'
+    input.onchange({target: input})
   })
 })

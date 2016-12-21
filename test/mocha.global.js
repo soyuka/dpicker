@@ -1,12 +1,8 @@
 'use strict'
 require('jsdom-global')()
-const requestFrame = require('request-frame')
 const Module = require('module')
-const maquetteQuery = require('maquette-query')
 
 global.screen = {}
-global.requestAnimationFrame = requestFrame('request')
-global.maquette = require('maquette')
 
 const realResolve = Module._resolveFilename
 const map = {
@@ -27,12 +23,6 @@ Module._resolveFilename = function(request, parent) {
 
 const DPicker = require('dpicker')
 
-global.getElementByName = function getElementByName(name) {
-  return DPickerProjector.query(function(vnode) {
-    return vnode.properties && vnode.properties.name == name
-  })
-}
-
 let container
 
 global.createDatePicker = function createDatePicker(opts) {
@@ -45,14 +35,5 @@ global.createDatePicker = function createDatePicker(opts) {
   container = document.createElement('div')
   container.setAttribute('id', 'dpicker')
   document.body.appendChild(container)
-  let dpicker = new DPicker(container, opts || undefined)
-
-  global.DPickerProjector = maquetteQuery.createTestProjector(
-    dpicker.renderContainer(dpicker._events, dpicker._data, [
-      dpicker.renderInput(dpicker._events, dpicker._data),
-      dpicker.render(dpicker._events, dpicker._data, dpicker.getRenderChild())
-    ])
-  )
-
-  return dpicker
+  return new DPicker(container, opts || undefined)
 }

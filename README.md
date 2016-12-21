@@ -30,14 +30,11 @@ Package managers are only referencing `dpicker.js`! If you need time, you have t
 
 ## Usage
 
-DPicker depends on moment and the hyperscript library of your choice. Those can be included with your favorite module loader or through a CDN, for example:
+DPicker depends on moment. It can be included with your favorite module loader or through a CDN, for example:
 
 ```html
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maquette/2.1.6/maquette.min.js"></script>
 ```
-
-Note that [maquettejs](http://maquettejs.org/) is the default supported hyperscript library. To use you own library (ie mithril, hyperscript or ReactDOM etc.), please [follow these instructions](#custom-hyperscript-library).
 
 To create a date picker, just init the DPicker module within a container:
 
@@ -196,13 +193,13 @@ Want time? Add the [time](https://soyuka.github.io/dpicker/DPicker.modules.modul
 You can also create a custom module so that DPicker reflects your needs. For example, adding two buttons to navigate through months is as easy as (add this code to `dpicker.month-navigation.js`):
 
 ```javascript
-const renderPreviousMonth = DPicker.injector(function renderPreviousMonth(events, data, toRender) {
+const renderPreviousMonth = function renderPreviousMonth(events, data, toRender) {
   return DPicker.h('button', { onclick: events.previousMonth }, '<') //add some appropriate attributes
-})
+}
 
-const renderNextMonth = DPicker.injector(function renderNextMonth(events, data, toRender) {
+const renderNextMonth = function renderNextMonth(events, data, toRender) {
   return DPicker.h('button', { onclick: events.nextMonth }, '>')
-})
+}
 
 const monthNavigation = DPicker.modules.monthNavigation = {
   render: {
@@ -229,35 +226,6 @@ new DPicker(document.getElementById('trythis'), {order: ['time', 'previousMonth'
 Now your date picker has two new buttons to select next/prev month in a click.
 
 To know more about modules check out the [documentation](https://soyuka.github.io/dpicker/DPicker.html).
-
-## Virtual DOM
-
-DPicker depends on [momentjs](http://momentjs.com/) (~15.3Kb gz) for date manipulation and a hyperscript library for virtual dom. The recommended one is [maquettejs](http://maquettejs.org/) (~3.4Kb gz).
-
-### Custom hyperscript library
-
-To use your own hyperscript library, you have to declare 3 options:
-
-- `h` the hyperscript function
-- `mount(DOMElement container, Function toRender)` a function that mounts the virtual DOM to the DOM
-- `redraw()` a function that forces the virtual DOM to re-render
-
-For example, with [mithriljs](https://mithril.js.org) the DPicker would be instantiated like this:
-
-```javascript
-let mithril = require('mithril')
-
-let label = document.createElement('label')
-document.body.appendChild(label)
-
-let dpicker = DPicker(label, {
-  h: mithril,
-  mount: function(element, toRender) {
-    mithril.render(element, toRender())
-  },
-  redraw: mithril.redraw
-})
-```
 
 ### Angular
 
