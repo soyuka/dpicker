@@ -197,11 +197,9 @@ DPicker.prototype.merge = function(selector, replacement) {
 
   for (let i = 0; i < replacement.attributes.length; i++) {
     let attr = replacement.attributes[i]
-    let name = attr.name
-    let value = attr.value
 
-    if (child.getAttribute(name) !== value) {
-      child.setAttribute(name, value)
+    if (child.getAttribute(attr.name) !== attr.value) {
+      child.setAttribute(attr.name, attr.value)
     }
   }
 }
@@ -916,13 +914,13 @@ DPicker.h = DPicker.prototype.h = function h(element, props, children) {
   }
 
   for (let i in props) {
+    if (!props[i]) { continue; }
+
     if (i.substr(0, 2) === 'on') {
       el[i] = props[i]
     } else {
-      if (typeof props[i] === 'boolean') {
-        if (props[i] === true) {
-          el.setAttribute(i, i)
-        }
+      if (props[i] === true) {
+        el.setAttribute(i, i)
       } else {
         el.setAttribute(i, props[i])
       }
@@ -930,7 +928,7 @@ DPicker.h = DPicker.prototype.h = function h(element, props, children) {
   }
 
   for (let i = 0; i < children.length; i++) {
-    if (typeof children[i] === 'string' || typeof children[i] === 'number' || children[i] instanceof Number) {
+    if (typeof children[i] === 'string' || typeof children[i] === 'number') {
       el.innerText = children[i]
       break;
     }

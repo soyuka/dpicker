@@ -238,7 +238,7 @@ If you know one that does have less than 1000 SLOC, please let me know.
 
 This date picker:
 
-- is light and easy to use, especially easy to maintain (core has ~500 SLOC)
+- is light and easy to use, especially easy to maintain (core has ~500 SLOC + a 150 SLOC simplified hyperscript library)
 - is compliant and can be extended for your needs, and no default css so that it fits well with foundation/bootstrap or angular/react
 - has HTML attributes compatibility with `input[type="date"]` (adds a `format` attribute) and `input[type="datetime"]` (adds a `meridiem` attribute on top of the `format` one if you need 12 hours time range). Define minutes step through the `step` attribute.
 - works with momentjs so that locale changes are a breeze

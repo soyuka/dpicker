@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.0
+
+- Drop hyperscript library, it's not needed anymore and it's not possible to add a custom one
+- An invalid Date doesn't reset the value to the closest correct one, it leaves the choice to the user instead
+- A class `.invalid` is added to the input
+- `aria-*` attributes are now working
+
 ## 3.1.1
 
 Add touch friendly behavior #20

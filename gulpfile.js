@@ -75,8 +75,8 @@ gulp.task('check-size', ['default'], function(callback) {
   });
   stream.on('end', function() {
     console.log('gzipped size in kB:', length/1024)
-    if (length >= 3 * 1024) {
-      return callback(new Error('Claim that dpicker is only 3 kB gzipped no longer holds'))
+    if (length >= 4 * 1024) {
+      return callback(new Error('Claim that dpicker is only 4 kB gzipped no longer holds'))
     }
     callback()
   })
