@@ -570,7 +570,8 @@ DPicker.prototype.isValid = function isValid(model) {
     return false
   }
 
-  if (model < this._data.min || model > this._data.max) {
+  let unit = this.time ? 'minute' : 'day'
+  if (model.isBefore(this._data.min, unit) || model.isAfter(this._data.max, unit)) {
     this._data.valid = false
     return true
   }
