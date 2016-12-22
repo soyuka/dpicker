@@ -125,9 +125,18 @@ function DPicker(element, options = {}) {
 
   document.addEventListener('click', this._events.hide)
 
+  if (typeof element === 'undefined') {
+    throw new ReferenceError('Can not initialize DPicker without a container')
+  }
+
+  //small jquery fix: new DPicker($('<input type="datetime" name="mydatetime" autocomplete="off" step="30">'))
+  if (element.length !== undefined && element[0]) {
+      element = element[0]
+  }
+
   if (element.tagName === 'INPUT') {
     if (!element.parentNode) {
-      throw new ReferenceError('Can not init DPicker on an input without parent node')
+      throw new ReferenceError('Can not initialize DPicker on an input without parent node')
     }
 
     this._parseInputAttributes([].slice.call(element.attributes))
@@ -493,6 +502,9 @@ DPicker.prototype._loadEvents = function loadEvents() {
     yearChange: (evt) => {
       this._data.empty = false
       this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
+
+      this.isValid(this._data.model)
+
       this.redraw(['input', 'days'])
       this.onChange()
     },
@@ -505,6 +517,9 @@ DPicker.prototype._loadEvents = function loadEvents() {
     monthChange: (evt) => {
       this._data.empty = false
       this._data.model.month(evt.target.options[evt.target.selectedIndex].value)
+
+      this.isValid(this._data.model)
+
       this.redraw(['input', 'days'])
       this.onChange()
     },
@@ -523,7 +538,11 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this.display = false
       }
 
-      this.redraw(['input'])
+      //temp fix, model setter should call this
+      //@todo fix without moment.clone()      
+      this.isValid(this._data.model)
+
+      this.redraw(['input', 'container'])
       this.onChange()
     },
 

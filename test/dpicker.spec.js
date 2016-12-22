@@ -384,4 +384,25 @@ describe('dpicker', function() {
     label.querySelectorAll('button')[0].focus()
     expect(dpicker.display).to.be.true
   })
+
+  it.only('should be valid when dayClick is correct after invalid', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      max: moment('24/06/1991', 'DD/MM/YYYY'),
+      model: moment('26/06/1991', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY'
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    expect(dpicker.valid).to.be.false
+    
+    let buttons = document.querySelectorAll('button')
+    let button = buttons[buttons.length - 1]
+    button.onclick({target: button, preventDefault: chai.spy()})
+    expect(dpicker.valid).to.be.true
+
+  })
 })
