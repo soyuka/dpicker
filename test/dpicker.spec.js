@@ -385,7 +385,7 @@ describe('dpicker', function() {
     expect(dpicker.display).to.be.true
   })
 
-  it.only('should be valid when dayClick is correct after invalid', function() {
+  it('should be valid when dayClick is correct after invalid', function() {
     let label = document.createElement('label')
     let dpicker = DPicker(label, {
       max: moment('24/06/1991', 'DD/MM/YYYY'),
