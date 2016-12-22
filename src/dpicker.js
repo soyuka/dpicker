@@ -374,7 +374,7 @@ DPicker.prototype._loadModules = function loadModules() {
         }
       }
 
-      this._events[event+'-internal'].push(module.events[event])
+      this._events[event+'-internal'].unshift(module.events[event])
     }
 
     for (let call in module.calls) {
@@ -450,9 +450,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this._data.empty = false
       }
 
-      this.onChange()
-
       this.redraw(['input', 'container'])
+      this.onChange()
     },
 
     /**
