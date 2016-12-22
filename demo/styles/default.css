@@ -12,3 +12,7 @@ button.dpicker-active {
 .dpicker-visible {
   display: block;
 }
+
+.dpicker-invalid {
+  border-color: darkred;
+}

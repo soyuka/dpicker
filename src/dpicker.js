@@ -202,6 +202,18 @@ DPicker.prototype.merge = function(selector, replacement) {
       child.setAttribute(attr.name, attr.value)
     }
   }
+
+  for (let i = 0; i < child.attributes.length; i++) {
+    let attr = child.attributes[i]
+
+    if (!replacement.hasAttribute(attr.name)) {
+      child.removeAttribute(attr.name)
+    }
+  }
+
+  if (replacement.value !== child.value) {
+    child.value = replacement.value
+  }
 }
 
 /**
@@ -440,7 +452,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       this.onChange()
 
-      this.redraw(['container'])
+      this.redraw(['input', 'container'])
     },
 
     /**
@@ -589,7 +601,7 @@ DPicker.prototype.renderInput = function renderInput(events, data, toRender) {
     name: data.inputName,
     'aria-invalid': !data.valid,
     'aria-haspopup': true,
-    class: !data.valid ? 'invalid' : ''
+    class: !data.valid ? 'dpicker-invalid' : ''
   })
 }
 

@@ -34,6 +34,10 @@ label.dpicker .dpicker-container { top: inherit; }
           }
         }
 
+        .dpicker-invalid {
+            border-color: darkred;
+        }
+
         table {
             color: $black;
             text-align:center;
