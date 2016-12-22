@@ -261,7 +261,7 @@ describe('dpicker', function() {
       const dpicker = DPicker(input, {model: ''})
     } catch(e) {
       expect(e).to.be.an.instanceof(ReferenceError)
-      expect(e.message).to.equal('Can not init DPicker on an input without parent node')
+      expect(e.message).to.equal('Can not initialize DPicker on an input without parent node')
     }
   })
 

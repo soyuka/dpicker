@@ -542,7 +542,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       //@todo fix without moment.clone()      
       this.isValid(this._data.model)
 
-      this.redraw(['input', 'container'])
+      this.redraw(['input'])
       this.onChange()
     },
 
