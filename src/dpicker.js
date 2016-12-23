@@ -539,7 +539,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       //temp fix, model setter should call this
-      //@todo fix without moment.clone()      
+      //@todo fix without moment.clone()
       this.isValid(this._data.model)
 
       this.redraw(['input'])
@@ -755,7 +755,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let days = new Array(7)
 
   data.days.map((e, i) => {
-    days[i < firstLocaleDay ? 7 - i : i - firstLocaleDay] = e
+    days[i < firstLocaleDay ? 6 - i : i - firstLocaleDay] = e
   })
 
   if(data.model.isSame(data.min, 'month')) {
