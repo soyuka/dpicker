@@ -91,7 +91,7 @@ describe('dpicker', function() {
     })
 
     let button = document.querySelectorAll('button')[0]
-    button.onclick({target: button, preventDefault: fn})
+    button.onclick({target: button, preventDefault: fn, stopPropagation: fn})
   })
 
   it('should have customized date range', function() {
@@ -398,10 +398,10 @@ describe('dpicker', function() {
     let input = label.querySelector('input[type="text"]')
 
     expect(dpicker.valid).to.be.false
-    
+
     let buttons = document.querySelectorAll('button')
     let button = buttons[buttons.length - 1]
-    button.onclick({target: button, preventDefault: chai.spy()})
+    button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
     expect(dpicker.valid).to.be.true
 
   })

@@ -309,7 +309,6 @@ DPicker.prototype._initData = function(options) {
 
     this._data[i] = options[i]
   }
-
 }
 
 /**
@@ -531,6 +530,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      */
     dayClick: (evt) => {
       evt.preventDefault()
+      evt.stopPropagation()
       this._data.model.date(evt.target.value)
       this._data.empty = false
 
