@@ -950,10 +950,16 @@ DPicker.h = DPicker.prototype.h = function h(element, props, children) {
     if (i.substr(0, 2) === 'on') {
       el[i] = props[i]
     } else {
-      if (props[i] === true) {
-        el.setAttribute(i, i)
+      if (i === 'class') {
+        el.className = props[i]
+      } else if (props[i] === true) {
+        el[i] = i
       } else {
-        el.setAttribute(i, props[i])
+        if (!/^aria/.test(i)) {
+          el[i] = props[i]
+        } else {
+          el.setAttribute(i, props[i])
+        }
       }
     }
   }
