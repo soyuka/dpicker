@@ -26,6 +26,35 @@ function isElementInContainer(parent, containerId) {
   return false
 }
 
+function useSetAttribute(key) {
+  return /^aria/.test(key)
+}
+
+function setAttribute(el, key, value) {
+  if (useSetAttribute(key)) {
+    el.setAttribute(key, value)
+  } else {
+    el[key] = value
+  }
+}
+
+function getAttribute(el, key, value) {
+  if (useSetAttribute()) {
+    return el.getAttribute(key)
+  } else {
+    return el[key]
+  }
+}
+
+function removeAttribute(el, key) {
+  if (useSetAttribute()) {
+    return el.removeAttribute(key)
+  } else {
+    el[key] = undefined
+    return true
+  }
+}
+
 /**
  * *DPicker a simple date picker*
  *
@@ -154,7 +183,7 @@ function DPicker(element, options = {}) {
     this.render(this._events, this._data, this.getRenderChild())
   ]))
 
-  element.setAttribute('id', this._container)
+  element.id = this._container
   element.addEventListener('keydown', this._events.keyDown)
 
   let input = element.querySelector('input')
@@ -205,18 +234,18 @@ DPicker.prototype.merge = function(selector, replacement) {
   let child = this.rootElement.querySelector(selector)
 
   for (let i = 0; i < replacement.attributes.length; i++) {
-    let attr = replacement.attributes[i]
+    let {name, value} = replacement.attributes[i]
 
-    if (child.getAttribute(attr.name) !== attr.value) {
-      child.setAttribute(attr.name, attr.value)
+    if (getAttribute(child, name) !== value) {
+      setAttribute(child, name, value)
     }
   }
 
   for (let i = 0; i < child.attributes.length; i++) {
-    let attr = child.attributes[i]
+    let {name. value} = child.attributes[i]
 
-    if (!replacement.hasAttribute(attr.name)) {
-      child.removeAttribute(attr.name)
+    if (getAttribute(replacement, name) === undefined) {
+      removeAttribute(child, name)
     }
   }
 
@@ -955,11 +984,7 @@ DPicker.h = DPicker.prototype.h = function h(element, props, children) {
       } else if (props[i] === true) {
         el[i] = i
       } else {
-        if (!/^aria/.test(i)) {
-          el[i] = props[i]
-        } else {
-          el.setAttribute(i, props[i])
-        }
+        setAttribute(el, i, props[i])
       }
     }
   }
