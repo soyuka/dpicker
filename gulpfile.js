@@ -9,6 +9,7 @@ const jhaml = require('@soyuka/jhaml')
 const zlib = require('zlib')
 const fs = require('fs')
 const sass = require('node-sass')
+const concat = require('gulp-concat')
 
 const uml = (name, contents, inject) => {
   return `
@@ -53,9 +54,17 @@ function wrap() {
   return transformStream
 };
 
-gulp.task('default', function() {
-  let name
+gulp.task('polyfills', function() {
+  return gulp.src([
+    './node_modules/array.prototype.fill/index.js',
+    './node_modules/dom4/build/dom4.js',
+  ])
+  .pipe(concat('dpicker.polyfills.js'))
+  .pipe(uglify())
+  .pipe(gulp.dest('dist'))
+})
 
+gulp.task('default', ['polyfills'], function() {
   return gulp.src(['src/*.js', '!src/*.spec.js'])
   .pipe(traceur())
   .pipe(wrap())

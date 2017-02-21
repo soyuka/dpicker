@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/soyuka/dpicker#readme",
   "dependencies": {
+    "array.prototype.fill": "^1.0.2",
+    "dom4": "^1.8.3",
     "moment": "^2.13.0"
   },
   "devDependencies": {
@@ -31,6 +33,7 @@
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
     "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
     "gulp-traceur": "^0.17.2",
     "gulp-uglify": "^2.0.0",
