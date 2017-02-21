@@ -142,7 +142,8 @@ function DPicker(element, options = {}) {
       inputId: { default: uuid(), attribute: 'id' },
       empty: { default: false },
       valid: { default: true },
-      order: { default: ['months', 'years', 'time', 'days'] }
+      order: { default: ['months', 'years', 'time', 'days'] },
+      concatHoursAndMinutes: { default: false }
     }
   }
 
@@ -242,7 +243,7 @@ DPicker.prototype.merge = function(selector, replacement) {
   }
 
   for (let i = 0; i < child.attributes.length; i++) {
-    let {name. value} = child.attributes[i]
+    let {name, value} = child.attributes[i]
 
     if (getAttribute(replacement, name) === undefined) {
       removeAttribute(child, name)

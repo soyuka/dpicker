@@ -38,6 +38,10 @@ function getHoursMinutes(data) {
   return {hours, minutes}
 }
 
+function padLeftZero(v) {
+  return v < 10 ? '0'+v : ''+v
+}
+
 /**
  * Render Time
  * ```
@@ -60,32 +64,57 @@ const renderTime = function renderTime(events, data, toRender) {
 
   let {hours, minutes} = getHoursMinutes(data)
   let modelMinutes = data.model.minutes()
+  let selects = []
 
-  let selects = [
-    DPicker.h('select', {
-      onchange: events.hoursChange,
-      name: 'dpicker-hours',
-      'aria-label': 'Hours'
-    }, hours
-      .map((e, i) => DPicker.h('option', {
-        value: e,
-        selected: e === modelHours,
-        key: e
-      }, e < 10 ? '0'+e : e))
-    ),
-    DPicker.h('select', {
-      onchange: events.minutesChange,
-      name: 'dpicker-minutes',
-      'aria-label': 'Minutes'
-    },
-      minutes
-      .map(e => DPicker.h('option', {
-        value: e,
-        selected: e === modelMinutes,
-        key: e
-      }, e < 10 ? '0'+e : ''+e))
+  if (data.concatHoursAndMinutes) {
+  
+    selects.push(
+      DPicker.h('select', {
+        onchange: events.minuteHoursChange,
+        name: 'dpicker-time',
+        'aria-label': 'Time'
+      }, 
+      [].concat.apply([], minutes.map(minute => {
+        return hours.map(hour => `${hour}:${minute}`)
+      }))
+      .sort()
+      .map((value) => {
+        return DPicker.h('option', {
+          value: value,
+          selected: value === `${modelHours}:${modelMinutes}`,
+          key: value
+        }, value.split(':').map(padLeftZero).join(':'))
+      })
+      )
     )
-  ]
+
+  } else {
+    selects.push(
+      DPicker.h('select', {
+        onchange: events.hoursChange,
+        name: 'dpicker-hours',
+        'aria-label': 'Hours'
+      }, hours
+        .map((e, i) => DPicker.h('option', {
+          value: e,
+          selected: e === modelHours,
+          key: e
+        }, padLeftZero(e)))
+      ),
+      DPicker.h('select', {
+        onchange: events.minutesChange,
+        name: 'dpicker-minutes',
+        'aria-label': 'Minutes'
+      },
+        minutes
+        .map(e => DPicker.h('option', {
+          value: e,
+          selected: e === modelMinutes,
+          key: e
+        }, padLeftZero(e)))
+      )
+    )
+  }
 
   if (data.meridiem) {
     let modelMeridiem = data.model.format('A')
@@ -133,6 +162,13 @@ const events = {
     this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
     this.redraw(['input', 'container'])
     this.onChange()
+  },
+
+  minuteHoursChange: function minuteHoursChange(evt) {
+    let val = evt.target.options[evt.target.selectedIndex].value.split(':')
+
+    this._events.hoursChange({target: {options: [{value: val[0]}], selectedIndex: 0}})
+    this._events.minutesChange({target: {options: [{value: val[1]}], selectedIndex: 0}})
   },
 
   /**

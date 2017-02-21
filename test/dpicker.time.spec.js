@@ -330,7 +330,7 @@ describe('dpicker.time', function() {
 
     setTimeout(function() {
       let t = document.querySelector('select[name="dpicker-hours"]')
-      expect(t.options[t.selectedIndex].innerText).to.equal(12)
+      expect(t.options[t.selectedIndex].innerText).to.equal('12')
       t = document.querySelector('select[name="dpicker-meridiem"]')
       expect(t.options[t.selectedIndex].innerText).to.equal('AM')
       cb()
@@ -393,6 +393,25 @@ describe('dpicker.time', function() {
     hours.onchange({
       target: hours
     })
+  })
+
+  it('should concat hours and minutes', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      time: true,
+      concatHoursAndMinutes: true
+    })
+
+    document.body.appendChild(label)
+
+    let selects = document.querySelectorAll('select')
+
+    expect(selects).to.have.length.of(3)
+
+    let time = selects[2]
+
+    expect(time.name).to.equal('dpicker-time')
+    expect(time.options[0].value.split(':')).to.have.length.of(2)
   })
 
 })

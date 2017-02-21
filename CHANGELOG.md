@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.8
+
+- Adds an option `concatHoursAndMinutes` to merge hours and minutes in one `select`
+
 ## 4.0.0
 
 - Drop hyperscript library, it's not needed anymore and it's not possible to add a custom one
