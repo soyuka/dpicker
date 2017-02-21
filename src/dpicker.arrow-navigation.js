@@ -1,6 +1,6 @@
 'use strict'
 function positionInParent(children) {
-  return [].findIndex.call(children.parentNode.children, (c) => c === children)
+  return [].indexOf.call(children.parentNode.children, children)
 }
 
 /**

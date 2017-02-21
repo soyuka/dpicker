@@ -180,7 +180,7 @@ const time = DPicker.modules.time = {
     time: {
       default: false,
       attribute: (attributes) => {
-        let type = attributes.find(e => e.name === 'type')
+        let type = attributes.filter(e => e.name === 'type')[0]
         return !type ? false : type.value === 'datetime' ? true : false
       },
       getset: true
@@ -197,7 +197,7 @@ const time = DPicker.modules.time = {
     step: {
       default: 1,
       attribute: (attributes) => {
-        let step = attributes.find(e => e.name === 'step')
+        let step = attributes.filter(e => e.name === 'step')[0]
         return !step ? 1 : parseInt(step.value, 10)
       },
       getset: true

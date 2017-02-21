@@ -358,7 +358,7 @@ DPicker.prototype._parseInputAttributes = function(attributes) {
       continue
     }
 
-    let attribute = attributes.find(a => a.name === e.attribute)
+    let attribute = attributes.filter(a => a.name === e.attribute)[0]
 
     if (!attribute) {
       continue
