@@ -828,6 +828,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let firstDay = +(data.model.clone().date(1).format('e')) - 1
   let currentDay = data.model.date()
   let currentMonth = data.model.month()
+  let currentYear = data.model.year()
 
   let minDay
   let maxDay
@@ -887,21 +888,23 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
           day++
         }
 
+        let dayMonth = previousMonth ? currentMonth : (nextMonth ? currentMonth + 2 : currentMonth + 1)
+        let currentDayModel = moment(day + '-' + dayMonth + '-' + currentYear, 'DD-MM-YYYY')
+
         if (dayActive === false && data.siblingMonthDayClick === true) {
-          if (!nextMonth) {
-            dayActive = minMonth ? currentMonth - minMonth < 0 : true
-          } else {
-            dayActive = maxMonth ? currentMonth - maxMonth > 0 : true
-          }
+          dayActive = true
         }
 
-        if (dayActive === true && previousMonth === false && nextMonth === false) {
-          dayActive = typeof minDay !== 'undefined' ? day >= minDay : dayActive
-          dayActive = typeof maxDay !== 'undefined' ? day <= maxDay : dayActive
+        if (data.min && dayActive) {
+          dayActive = currentDayModel.isSameOrAfter(data.min, 'day')
+        }
 
-          if (currentDay === day) {
-            classActive = 'dpicker-active'
-          }
+        if (data.max && dayActive) {
+          dayActive = currentDayModel.isSameOrBefore(data.max, 'day')
+        }
+
+        if (dayActive === true && previousMonth === false && nextMonth === false && currentDay === day) {
+          classActive = 'dpicker-active'
         }
 
         return this.h(`td`, {
