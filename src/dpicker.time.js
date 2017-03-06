@@ -67,17 +67,37 @@ const renderTime = function renderTime(events, data, toRender) {
   let selects = []
 
   if (data.concatHoursAndMinutes) {
-  
     selects.push(
       DPicker.h('select', {
         onchange: events.minuteHoursChange,
         name: 'dpicker-time',
         'aria-label': 'Time'
-      }, 
+      },
       [].concat.apply([], minutes.map(minute => {
         return hours.map(hour => `${hour}:${minute}`)
       }))
-      .sort()
+      .sort((a, b) => {
+        a = a.split(':').map(parseFloat)
+        b = b.split(':').map(parseFloat)
+
+        if (a[0] < b[0]) {
+          return -1
+        }
+
+        if (a[0] > b[0]) {
+          return 1
+        }
+
+        if (a[1] < b[1]) {
+          return -1
+        }
+
+        if (a[1] > b[1]) {
+          return 1
+        }
+
+        return 0
+      })
       .map((value) => {
         return DPicker.h('option', {
           value: value,
