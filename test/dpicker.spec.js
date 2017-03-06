@@ -403,6 +403,79 @@ describe('dpicker', function() {
     let button = buttons[buttons.length - 1]
     button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
     expect(dpicker.valid).to.be.true
+  })
 
+  it('should enable click on previous month days', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('26/06/1991', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      siblingMonthDayClick: true
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let buttons = document.querySelectorAll('button')
+    let button = buttons[0]
+    button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
+    expect(dpicker.valid).to.be.true
+    expect(dpicker.model.month()).to.equal(4)
+  })
+
+  it('should enable click on next month days', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('26/06/1991', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      siblingMonthDayClick: true
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let buttons = document.querySelectorAll('button')
+    let button = buttons[buttons.length - 1]
+    button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
+    expect(dpicker.valid).to.be.true
+    expect(dpicker.model.month()).to.equal(6)
+  })
+
+  it('should not enable click on next month days if > max', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('26/06/1991', 'DD/MM/YYYY'),
+      max: moment('30/06/1991', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      siblingMonthDayClick: true
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let buttons = document.querySelectorAll('button')
+    let button = buttons[buttons.length - 1]
+    expect(button.innerText).to.equal(30)
+  })
+
+  it('should not enable click on previous month days if < min', function() {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('26/06/1991', 'DD/MM/YYYY'),
+      min: moment('10/06/1991', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      siblingMonthDayClick: true
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let buttons = document.querySelectorAll('button')
+    let button = buttons[0]
+    expect(button.innerText).to.equal(10)
   })
 })

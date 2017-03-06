@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.9
+
+- Adds an option to enable sibling month days
+
 ## 4.0.8
 
 - Adds an option `concatHoursAndMinutes` to merge hours and minutes in one `select`

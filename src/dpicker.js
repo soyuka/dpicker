@@ -113,10 +113,12 @@ function removeAttribute(el, key) {
  * @param {boolean} [options.display=true]
  * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
  * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
+ * @param {boolean} [options.siblingMonthDayClick=false] Enable sibling months day click
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
  * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
  * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
  * @param {Array} [options.order=['months', 'years', 'time', 'days']] The dom elements appending order.
+ * @param {boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
  * @listens DPicker#hide
  */
 function DPicker(element, options = {}) {
@@ -143,7 +145,8 @@ function DPicker(element, options = {}) {
       empty: { default: false },
       valid: { default: true },
       order: { default: ['months', 'years', 'time', 'days'] },
-      concatHoursAndMinutes: { default: false }
+      concatHoursAndMinutes: { default: false },
+      siblingMonthDayClick: { default: false }
     }
   }
 
@@ -576,6 +579,52 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.onChange()
     },
 
+    previousMonthDayClick: (evt) => {
+      if (!this._data.siblingMonthDayClick) {
+        return
+      }
+
+      evt.preventDefault()
+      evt.stopPropagation()
+      this._data.model.date(evt.target.value)
+      this._data.model.subtract(1, 'month')
+      this._data.empty = false
+
+      if (this._data.hideOnDayClick) {
+        this.display = false
+      }
+
+      //temp fix, model setter should call this
+      //@todo fix without moment.clone()
+      this.isValid(this._data.model)
+
+      this.redraw(['input', 'container'])
+      this.onChange()
+    },
+
+    nextMonthDayClick: (evt) => {
+      if (!this._data.siblingMonthDayClick) {
+        return
+      }
+
+      evt.preventDefault()
+      evt.stopPropagation()
+      this._data.model.date(evt.target.value)
+      this._data.model.add(1, 'month')
+      this._data.empty = false
+
+      if (this._data.hideOnDayClick) {
+        this.display = false
+      }
+
+      //temp fix, model setter should call this
+      //@todo fix without moment.clone()
+      this.isValid(this._data.model)
+
+      this.redraw(['input', 'container'])
+      this.onChange()
+    },
+
     /**
      * On day key down - not implemented
      * @Event DPicker#dayKeyDown
@@ -778,9 +827,12 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let firstLocaleDay = moment.localeData().firstDayOfWeek()
   let firstDay = +(data.model.clone().date(1).format('e')) - 1
   let currentDay = data.model.date()
+  let currentMonth = data.model.month()
 
   let minDay
   let maxDay
+  let minMonth
+  let maxMonth
 
   let days = new Array(7)
 
@@ -790,15 +842,19 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
 
   if(data.model.isSame(data.min, 'month')) {
     minDay = data.min.date()
+    minMonth = data.min.month()
   }
 
   if(data.model.isSame(data.max, 'month')) {
     maxDay = data.max.date()
+    maxMonth = data.max.month()
   }
 
   let rows = new Array(Math.ceil(.1+(firstDay + daysInMonth) / 7)).fill(0)
   let day
   let dayActive
+  let previousMonth = false
+  let nextMonth = false
   let loopend = true
 
   return this.h('table', [
@@ -813,7 +869,9 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
         if (col <= firstDay && row === 0) {
           day = daysInPreviousMonth - (firstDay - col)
           dayActive = false
+          previousMonth = true
         } else if (col === firstDay + 1 && row === 0) {
+          previousMonth = false
           day = 1
           dayActive = true
         } else {
@@ -821,9 +879,18 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
             day = 0
             dayActive = false
             loopend = false
+            nextMonth = true
           }
 
           day++
+        }
+
+        if (dayActive === false && data.siblingMonthDayClick === true) {
+          if (previousMonth) {
+            dayActive = minMonth ? currentMonth - minMonth < 0 : true
+          } else {
+            dayActive = maxMonth ? currentMonth - maxMonth > 0 : true
+          }
         }
 
         if (dayActive === true) {
@@ -838,7 +905,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
             value: day,
             'aria-label': dayActive ? 'Day ' + day : false,
             'aria-disabled': dayActive ? false : true,
-            onclick: dayActive ? events.dayClick : noop,
+            onclick: !dayActive ? noop : (!previousMonth && !nextMonth ? events.dayClick : (previousMonth ? events.previousMonthDayClick : events.nextMonthDayClick)),
             type: dayActive ? 'button' : null,
             onkeydown: dayActive ? events.dayKeyDown || noop : noop,
             class: currentDay === day ? 'dpicker-active' : ''
