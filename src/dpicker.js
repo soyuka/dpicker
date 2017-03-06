@@ -856,6 +856,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let previousMonth = false
   let nextMonth = false
   let loopend = true
+  let classActive = ''
 
   return this.h('table', [
     //headers
@@ -865,6 +866,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
       //weeks filed with days
       return this.h('tr', {key: row}, new Array(7).fill(0).map((e, col) => {
         dayActive = loopend
+        classActive = ''
 
         if (col <= firstDay && row === 0) {
           day = daysInPreviousMonth - (firstDay - col)
@@ -886,16 +888,20 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
         }
 
         if (dayActive === false && data.siblingMonthDayClick === true) {
-          if (previousMonth) {
+          if (!nextMonth) {
             dayActive = minMonth ? currentMonth - minMonth < 0 : true
           } else {
             dayActive = maxMonth ? currentMonth - maxMonth > 0 : true
           }
         }
 
-        if (dayActive === true) {
+        if (dayActive === true && previousMonth === false && nextMonth === false) {
           dayActive = typeof minDay !== 'undefined' ? day >= minDay : dayActive
           dayActive = typeof maxDay !== 'undefined' ? day <= maxDay : dayActive
+
+          if (currentDay === day) {
+            classActive = 'dpicker-active'
+          }
         }
 
         return this.h(`td`, {
@@ -908,7 +914,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
             onclick: !dayActive ? noop : (!previousMonth && !nextMonth ? events.dayClick : (previousMonth ? events.previousMonthDayClick : events.nextMonthDayClick)),
             type: dayActive ? 'button' : null,
             onkeydown: dayActive ? events.dayKeyDown || noop : noop,
-            class: currentDay === day ? 'dpicker-active' : ''
+            class: classActive
           }, day)
         ])
       }))
