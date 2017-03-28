@@ -25,24 +25,28 @@
   "homepage": "https://github.com/soyuka/dpicker#readme",
   "dependencies": {
     "array.prototype.fill": "^1.0.2",
+    "bel": "^4.6.0",
     "dom4": "^1.8.3",
-    "moment": "^2.13.0"
+    "moment": "^2.13.0",
+    "nanomorph": "^4.0.2",
+    "on-load": "^3.2.0",
+    "yo-yoify": "^3.5.0"
   },
   "devDependencies": {
     "@soyuka/jhaml": "^1.0.8",
+    "babel-plugin-yo-yoify": "^0.3.3",
+    "babel-preset-latest": "^6.24.0",
+    "babelify": "^7.3.0",
+    "browserify": "^14.1.0",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-traceur": "^0.17.2",
-    "gulp-uglify": "^2.0.0",
-    "gulp-wrap": "^0.13.0",
     "istanbul": "^0.4.4",
     "jsdoc": "^3.4.0",
     "jsdom": "^9.2.1",
     "jsdom-global": "^2.0.0",
     "mocha": "^3.2.0",
-    "node-sass": "^4.1.1"
+    "node-sass": "^4.1.1",
+    "uglifyify": "^3.0.4",
+    "unassertify": "^2.0.4"
   }
 }

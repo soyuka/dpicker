@@ -4,6 +4,8 @@ if (!DPicker) {
   throw new ReferenceError('DPicker is required for this extension to work')
 }
 
+const html = require('bel')
+
 /**
  * @module DPicker.modules.time
  * @description
@@ -54,7 +56,7 @@ function padLeftZero(v) {
  * @return {H} the rendered virtual dom hierarchy
  */
 const renderTime = function renderTime(events, data, toRender) {
-  if (!data.time) { return DPicker.h('span', {style: 'display: none;', class: 'dpicker-time'}) }
+  if (!data.time) { return html`<span style="display: none;" class="dpicker-time"` }
 
   let modelHours = data.model.hours()
   if (data.meridiem) {
@@ -65,87 +67,78 @@ const renderTime = function renderTime(events, data, toRender) {
   let {hours, minutes} = getHoursMinutes(data)
   let modelMinutes = data.model.minutes()
   let selects = []
+  let modelStringValue = `${modelHours}:${modelMinutes}`
 
   if (data.concatHoursAndMinutes) {
     selects.push(
-      DPicker.h('select', {
-        onchange: events.minuteHoursChange,
-        name: 'dpicker-time',
-        'aria-label': 'Time'
-      },
-      [].concat.apply([], minutes.map(minute => {
-        return hours.map(hour => `${hour}:${minute}`)
-      }))
-      .sort((a, b) => {
-        a = a.split(':').map(parseFloat)
-        b = b.split(':').map(parseFloat)
+      html`<select onchange="${events.minuteHoursChange}" name="dpicker-time" aria-label="time">
+        ${
+          [].concat.apply([], minutes.map(minute => {
+            return hours.map(hour => `${hour}:${minute}`)
+          }))
+          .sort((a, b) => {
+            a = a.split(':').map(parseFloat)
+            b = b.split(':').map(parseFloat)
 
-        if (a[0] < b[0]) {
-          return -1
+            if (a[0] < b[0]) {
+              return -1
+            }
+
+            if (a[0] > b[0]) {
+              return 1
+            }
+
+            if (a[1] < b[1]) {
+              return -1
+            }
+
+            if (a[1] > b[1]) {
+              return 1
+            }
+
+            return 0
+          })
+          .map((value) => {
+            const text = value.split(':').map(padLeftZero).join(':')
+            if (value === modelStringValue) {
+              return html`<option selected="selected" value="${value}">${text}</option>`
+            } else {
+              return html`<option value="${value}">${text}</option>`
+
+            }
+          })
         }
-
-        if (a[0] > b[0]) {
-          return 1
-        }
-
-        if (a[1] < b[1]) {
-          return -1
-        }
-
-        if (a[1] > b[1]) {
-          return 1
-        }
-
-        return 0
-      })
-      .map((value) => {
-        return DPicker.h('option', {
-          value: value,
-          selected: value === `${modelHours}:${modelMinutes}`,
-          key: value
-        }, value.split(':').map(padLeftZero).join(':'))
-      })
-      )
+      </select>`
     )
-
   } else {
     selects.push(
-      DPicker.h('select', {
-        onchange: events.hoursChange,
-        name: 'dpicker-hours',
-        'aria-label': 'Hours'
-      }, hours
-        .map((e, i) => DPicker.h('option', {
-          value: e,
-          selected: e === modelHours,
-          key: e
-        }, padLeftZero(e)))
-      ),
-      DPicker.h('select', {
-        onchange: events.minutesChange,
-        name: 'dpicker-minutes',
-        'aria-label': 'Minutes'
-      },
-        minutes
-        .map(e => DPicker.h('option', {
-          value: e,
-          selected: e === modelMinutes,
-          key: e
-        }, padLeftZero(e)))
-      )
+      html`<select onchange="${events.hoursChange}" name="dpicker-hours" aria-label="Hours">${
+        hours.map((e, i) => {
+          return html`<option selected="${e === modelHours ? 'selected' : null}" value="${e}">${padLeftZero(e)}</option>`
+        })
+      }</select>`,
+      html`<select onchange="${events.minutesChange}" name="dpicker=minutes" aria-label="Minutes">${
+        minutes.map((e, i) => {
+          return html`<option selected="${e === modelMinutes ? 'selected' : null}" value="${e}">${padLeftZero(e)}</option>`
+        })
+      }</select>`
     )
   }
 
   if (data.meridiem) {
     let modelMeridiem = data.model.format('A')
-    selects.push(DPicker.h('select', {
-      onchange: events.meridiemChange,
-      name: 'dpicker-meridiem'
-    }, ['AM', 'PM'].map(e => DPicker.h('option', {value: e, selected: modelMeridiem === e}, e))
-    ))
+    selects.push(html`<select onchange="${events.meridiemChange}" name="dpicker-meridiem">
+      ${['AM', 'PM'].map(e => {
+        if (modelMeridiem === e) {
+          return html`<option value="${e}" selected="selected">${e}</option>`
+        } else {
+          return html`<option value="${e}">${e}</option>`
+        }
+      })}
+    </select>`)
   }
 
-  return DPicker.h('span', {class: 'dpicker-time'}, selects)
+  return html`<span class="dpicker-time">${selects}</span>`
 }
 
 const events = {
@@ -168,7 +161,8 @@ const events = {
 
     this._data.model.hours(val)
     this._minutesStep()
-    this.redraw(['input', 'container'])
+    console.log('hourschange', 'redraw')
+    this.redraw()
     this.onChange()
   },
 
@@ -180,7 +174,7 @@ const events = {
   minutesChange: function minutesChange(evt) {
     this._data.empty = false
     this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
-    this.redraw(['input', 'container'])
+    this.redraw()
     this.onChange()
   },
 
@@ -208,7 +202,7 @@ const events = {
     }
 
     this._data.model.hours(hours)
-    this.redraw(['input', 'container'])
+    this.redraw()
     this.onChange()
   },
 
