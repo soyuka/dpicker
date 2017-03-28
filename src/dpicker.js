@@ -492,7 +492,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.redraw(['input', 'container'])
-      this.onChange()
+      this.onChange(true)
     },
 
     /**
@@ -512,6 +512,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.display = false
+      this.onChange(false)
     },
 
     /**
@@ -524,6 +525,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
       if (evt.target && evt.target.select) {
         evt.target.select()
       }
+
+      this.onChange(false)
     },
 
     /**
@@ -538,7 +541,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange()
+      this.onChange(true)
     },
 
     /**
@@ -553,7 +556,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange()
+      this.onChange(true)
     },
 
     /**
@@ -576,7 +579,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange()
+      this.onChange(true)
     },
 
     previousMonthDayClick: (evt) => {
@@ -599,7 +602,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'container'])
-      this.onChange()
+      this.onChange(true)
     },
 
     nextMonthDayClick: (evt) => {
@@ -622,7 +625,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'container'])
-      this.onChange()
+      this.onChange(true)
     },
 
     /**
@@ -651,6 +654,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       document.getElementById(this.inputId).blur()
       this.display = false
+      this.onChange(false)
     }
   }
 }
@@ -977,8 +981,8 @@ Object.defineProperties(DPicker.prototype, {
    */
   'onChange': {
     set: function(onChange) {
-      this._onChange = () => {
-        return !onChange ? false : onChange(this._data)
+      this._onChange = (modelChanged) => {
+        return !onChange ? false : onChange(this._data, modelChanged)
       }
     },
     get: function() {
