@@ -4,7 +4,7 @@
 
 `onChange` now has a second argument giving informations about the recent change, for example:
 
-```
+```javascript
 dpicker.onChange = function(data, event) {
   console.log('Model changed? %s', event.modelChanged ? 'yes' : 'no')
   console.log('DPicker event: %s', event.name)

@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    "yo-yoify"
+  ],
+  "presets": [
+    "env"
+  ]
+}

@@ -1,12 +1,4 @@
-'use strict'
-
-if (!DPicker) {
-  throw new ReferenceError('DPicker is required for this extension to work')
-}
-
-/**
- * @module DPicker.modules.modifiers
- */
+const DPicker = require('../dpicker.moment.js')
 
 /**
  * Enables modifiers on `+[num]` and `-[num]` where:
@@ -17,7 +9,7 @@ if (!DPicker) {
  * @param {Event} DOMEvent
  * @listens DPicker#inputChange
  */
-function ModifierInputChange(evt) {
+DPicker.events.inputChange = DPicker.decorate(DPicker.events.inputChange, function ModifierInputChange (evt) {
   let first = evt.target.value.charAt(0)
   let x = evt.target.value.slice(1) || 0
 
@@ -30,13 +22,11 @@ function ModifierInputChange(evt) {
     x = -x
   }
 
-  this._data.model = moment().add(x, 'days')
-
-  this.onChange()
-}
-
-const modifiers = DPicker.modules.modifiers = {
-  events: {
-    inputChange: ModifierInputChange
+  if (x < 0) {
+    this.model = DPicker.dateAdapter.subDays(new Date(), -x)
+  } else {
+    this.model = DPicker.dateAdapter.addDays(new Date(), x)
   }
-}
+
+  this.onChange({modelChanged: true, name: 'inputChange', event: evt})
+})

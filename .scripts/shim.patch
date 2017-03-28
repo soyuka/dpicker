@@ -1,0 +1,12 @@
+--- a/package.json
++++ b/package.json
+@@ -52,7 +52,6 @@
+     "unassertify": "^2.0.4"
+   },
+   "browserify-shim": {
+-    "moment": "global:moment",
+-    "../dpicker.moment.js": "global:DPicker"
++    "moment": "global:moment"
+   }
+ }
+

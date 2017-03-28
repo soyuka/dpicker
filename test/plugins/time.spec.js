@@ -3,8 +3,8 @@ const moment = require('moment')
 const expect = require('chai').expect
 
 describe('dpicker.time', function() {
-  const DPicker = require('dpicker')
-  require('dpicker.time')
+  const DPicker = window.DPicker
+  require('../../dist/dpicker.time.js')
 
   beforeEach(() => {
     document.body.innerHTML = ''
@@ -16,7 +16,7 @@ describe('dpicker.time', function() {
         expect(select.options[selectedIndex].selected).to.be.true
 
         let input = document.querySelector('input[name=dpicker-input]')
-        expect(''+dpicker.model.hours()).to.equal(select.options[selectedIndex].value)
+        expect(''+moment(dpicker.model).hours()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
       },
@@ -36,7 +36,7 @@ describe('dpicker.time', function() {
         expect(select.options[selectedIndex].selected).to.be.true
 
         let input = document.querySelector('input[name=dpicker-input]')
-        expect(''+dpicker.model.minutes()).to.equal(select.options[selectedIndex].value)
+        expect(''+moment(dpicker.model).minutes()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
       },
@@ -61,10 +61,10 @@ describe('dpicker.time', function() {
 
     let meridiem = document.querySelector('select[name="dpicker-meridiem"]')
 
-    expect(dpicker.model.hours()).to.equal(15)
+    expect(moment(dpicker.model).hours()).to.equal(15)
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(3)
+      expect(moment(data.model).hours()).to.equal(3)
     }
 
     meridiem.selectedIndex = 0 //AM
@@ -73,7 +73,7 @@ describe('dpicker.time', function() {
     let select = document.querySelector('select[name="dpicker-hours"]')
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(0)
+      expect(moment(data.model).hours()).to.equal(0)
     }
 
     select.selectedIndex = 11 //12
@@ -82,35 +82,35 @@ describe('dpicker.time', function() {
     })
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(12)
+      expect(moment(data.model).hours()).to.equal(12)
     }
 
     meridiem.selectedIndex = 1 //PM
     meridiem.onchange({target: meridiem})
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(23)
+      expect(moment(data.model).hours()).to.equal(23)
     }
 
     select.selectedIndex = 10 //11
     select.onchange({target: select})
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(12)
+      expect(moment(data.model).hours()).to.equal(12)
     }
 
     select.selectedIndex = 11 //12
     select.onchange({target: select})
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(0)
+      expect(moment(data.model).hours()).to.equal(0)
     }
 
     meridiem.selectedIndex = 0 //AM
     meridiem.onchange({target: meridiem})
 
     dpicker.onChange = (data) => {
-      expect(data.model.hours()).to.equal(12)
+      expect(moment(data.model).hours()).to.equal(12)
       cb()
     }
 
@@ -271,7 +271,7 @@ describe('dpicker.time', function() {
       {time: '11:34', expect: 30},
     ].map((e) => {
       dpicker.model = moment('1991/06/24 '+e.time, format)
-      expect(dpicker.model.minutes()).to.equal(e.expect);
+      expect(moment(dpicker.model).minutes()).to.equal(e.expect);
     })
   })
 
@@ -294,7 +294,7 @@ describe('dpicker.time', function() {
     expect(dpicker.time).to.equal(true)
     expect(dpicker.step).to.equal(15)
 
-    expect(dpicker.model.format(format)).to.equal('24/06/1991 16:00')
+    expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
     let options = document.querySelector('select[name="dpicker-minutes"]').options
     expect(options).to.have.length.of(4)
@@ -324,15 +324,15 @@ describe('dpicker.time', function() {
 
     let moptions = document.querySelector('select[name="dpicker-meridiem"]').options
 
-    expect(dpicker.model.hours()).to.equal(12)
-    dpicker.model = dpicker.model.hours(0)
+    expect(moment(dpicker.model).hours()).to.equal(12)
+    dpicker.model = moment(dpicker.model).hours(0)
 
 
     setTimeout(function() {
       let t = document.querySelector('select[name="dpicker-hours"]')
-      expect(t.options[t.selectedIndex].innerText).to.equal('12')
+      expect(t.options[t.selectedIndex].textContent.trim()).to.equal('12')
       t = document.querySelector('select[name="dpicker-meridiem"]')
-      expect(t.options[t.selectedIndex].innerText).to.equal('AM')
+      expect(t.options[t.selectedIndex].textContent.trim()).to.equal('AM')
       cb()
     })
 
@@ -348,8 +348,8 @@ describe('dpicker.time', function() {
       time: true
     })
 
-    expect(dpicker.min.format(format)).to.equal('24/06/1991 16:00')
-    expect(dpicker.model.format(format)).to.equal('24/06/1991 16:00')
+    expect(moment(dpicker.min).format(format)).to.equal('24/06/1991 16:00')
+    expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
   })
 
@@ -364,15 +364,15 @@ describe('dpicker.time', function() {
 
     let hours = document.querySelector('select[name="dpicker-hours"]')
 
-    dpicker.onChange = function() {
+    dpicker.onChange = function(data, event) {
       let minutes = document.querySelector('select[name=dpicker-minutes]')
       expect(minutes.children).to.have.length.of(60)
 
       dpicker.onChange = function() {
-        expect(dpicker.model.minutes()).to.equal(7)
+        expect(moment(dpicker.model).minutes()).to.equal(7)
 
         dpicker.onChange = function() {
-          expect(dpicker.model.minutes()).to.equal(10)
+          expect(moment(dpicker.model).minutes()).to.equal(10)
           cb()
         }
 
@@ -388,7 +388,7 @@ describe('dpicker.time', function() {
       })
     }
 
-    hours.selectedIndex++
+    hours.selectedIndex = 1
 
     hours.onchange({
       target: hours

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>dpicker - A framework-agnostic minimal date picker.</title>
+  <meta name="description" content="A framework-agnostic minimal date picker.">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script>
+  window.$docsify = {
+    name: 'dpicker',
+    repo: 'https://github.com/soyuka/dpicker',
+    loadSidebar: true,
+    executeScript: true,
+    maxLevel: 3,
+    subMaxLevel: 3,
+    coverpage: true,
+		themeColor: '#FFAB40',
+    plugins: [
+      function(hook) {
+        //hook to fix jsdoc2md links
+        hook.afterEach(function(html, next) {
+          var matches
+          var reg = /<a name="([^"]*)">/gi
+
+          while((matches = reg.exec(html)) !== null)  {
+             const replacement = '<a id="/_api?id='+matches[1].toLowerCase().replace('+', ' ')+'">'
+             html = html.replace(matches[0], replacement)
+          }
+
+          next(html)
+        })
+      }
+    ]
+  }
+</script>
+<script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+<script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+</html>

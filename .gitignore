@@ -1,6 +1,5 @@
 node_modules
-bower_components
 dist
-doc
 coverage
-demo/styles.html
+docs/_api.md
+docs/CHANGELOG.md
