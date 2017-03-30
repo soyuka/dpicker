@@ -492,7 +492,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.redraw(['input', 'container'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'inputChange', event: evt})
     },
 
     /**
@@ -512,7 +512,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.display = false
-      this.onChange(false)
+      this.onChange({modelChanged: false, name: 'inputBlur', event: evt})
     },
 
     /**
@@ -526,7 +526,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
         evt.target.select()
       }
 
-      this.onChange(false)
+      this.onChange({modelChanged: false, name: 'inputFocus', event: evt})
     },
 
     /**
@@ -541,7 +541,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'yearChange', event: evt})
     },
 
     /**
@@ -556,7 +556,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'monthChange', event: evt})
     },
 
     /**
@@ -579,7 +579,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'days'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'dayClick', event: evt})
     },
 
     previousMonthDayClick: (evt) => {
@@ -602,7 +602,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'container'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'previousMonthDayClick', event: evt})
     },
 
     nextMonthDayClick: (evt) => {
@@ -625,7 +625,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.isValid(this._data.model)
 
       this.redraw(['input', 'container'])
-      this.onChange(true)
+      this.onChange({modelChanged: true, name: 'nextMonthDayClick', event: evt})
     },
 
     /**
@@ -654,7 +654,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
 
       document.getElementById(this.inputId).blur()
       this.display = false
-      this.onChange(false)
+      this.onChange({modelChanged: false, name: 'keyDown', event: evt})
     }
   }
 }
@@ -981,8 +981,8 @@ Object.defineProperties(DPicker.prototype, {
    */
   'onChange': {
     set: function(onChange) {
-      this._onChange = (modelChanged) => {
-        return !onChange ? false : onChange(this._data, modelChanged)
+      this._onChange = (dpickerEvent) => {
+        return !onChange ? false : onChange(this._data, dpickerEvent)
       }
     },
     get: function() {

@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.2.0
+
+`onChange` now has a second argument giving informations about the recent change, for example:
+
+```
+dpicker.onChange = function(data, event) {
+  console.log('Model changed? %s', event.modelChanged ? 'yes' : 'no')
+  console.log('DPicker event: %s', event.name)
+  console.log('DPicker original event: %s', event.event)
+}
+```
+
 ## 4.0.9
 
 - Adds an option to enable sibling month days
