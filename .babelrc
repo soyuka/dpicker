@@ -3,6 +3,6 @@
     "yo-yoify"
   ],
   "presets": [
-    "latest"
+    "env"
   ]
 }

@@ -30,11 +30,14 @@
     "moment": "^2.13.0",
     "nanomorph": "soyuka/nanomorph#master",
     "on-load": "^3.2.0",
+    "standard": "^9.0.2",
     "yo-yoify": "^3.5.0"
   },
   "devDependencies": {
     "@soyuka/jhaml": "^1.0.8",
+    "babel-core": "^6.24.0",
     "babel-plugin-yo-yoify": "^0.3.3",
+    "babel-preset-env": "^1.3.2",
     "babel-preset-latest": "^6.24.0",
     "babelify": "^7.3.0",
     "browserify": "^14.1.0",
