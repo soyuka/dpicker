@@ -117,7 +117,7 @@ const renderTime = function renderTime(events, data, toRender) {
           return html`<option selected="${e === modelHours ? 'selected' : null}" value="${e}">${padLeftZero(e)}</option>`
         })
       }</select>`,
-      html`<select onchange="${events.minutesChange}" name="dpicker=minutes" aria-label="Minutes">${
+      html`<select onchange="${events.minutesChange}" name="dpicker-minutes" aria-label="Minutes">${
         minutes.map((e, i) => {
           return html`<option selected="${e === modelMinutes ? 'selected' : null}" value="${e}">${padLeftZero(e)}</option>`
         })
@@ -161,7 +161,6 @@ const events = {
 
     this._data.model.hours(val)
     this._minutesStep()
-    console.log('hourschange', 'redraw')
     this.redraw()
     this.onChange()
   },

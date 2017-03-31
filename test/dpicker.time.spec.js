@@ -330,9 +330,9 @@ describe('dpicker.time', function() {
 
     setTimeout(function() {
       let t = document.querySelector('select[name="dpicker-hours"]')
-      expect(t.options[t.selectedIndex].innerText).to.equal('12')
+      expect(t.options[t.selectedIndex].textContent.trim()).to.equal('12')
       t = document.querySelector('select[name="dpicker-meridiem"]')
-      expect(t.options[t.selectedIndex].innerText).to.equal('AM')
+      expect(t.options[t.selectedIndex].textContent.trim()).to.equal('AM')
       cb()
     })
 
@@ -364,7 +364,7 @@ describe('dpicker.time', function() {
 
     let hours = document.querySelector('select[name="dpicker-hours"]')
 
-    dpicker.onChange = function() {
+    dpicker.onChange = function(data, event) {
       let minutes = document.querySelector('select[name=dpicker-minutes]')
       expect(minutes.children).to.have.length.of(60)
 
@@ -388,7 +388,7 @@ describe('dpicker.time', function() {
       })
     }
 
-    hours.selectedIndex++
+    hours.selectedIndex = 1
 
     hours.onchange({
       target: hours

@@ -458,7 +458,7 @@ describe('dpicker', function() {
 
     let buttons = document.querySelectorAll('button')
     let button = buttons[buttons.length - 1]
-    expect(button.innerText).to.equal(30)
+    expect(button.textContent.trim()).to.equal('30')
   })
 
   it('should not enable click on previous month days if < min', function() {
@@ -476,6 +476,6 @@ describe('dpicker', function() {
 
     let buttons = document.querySelectorAll('button')
     let button = buttons[0]
-    expect(button.innerText).to.equal(10)
+    expect(button.textContent.trim()).to.equal('10')
   })
 })
