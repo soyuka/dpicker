@@ -21,7 +21,8 @@ Module._resolveFilename = function(request, parent) {
   return realResolve(request, parent)
 }
 
-const DPicker = require('dpicker')
+global.DPicker = require('dpicker')
+global.moment = require('moment')
 
 let container
 
