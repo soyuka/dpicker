@@ -228,17 +228,15 @@ const time = DPicker.modules.time = {
      */
     time: {
       default: false,
-      attribute: (attributes) => {
-        let type = attributes.filter(e => e.name === 'type')[0]
-        return !type ? false : type.value === 'datetime' ? true : false
-      },
-      getset: true
+      attribute: function(attributes) {
+        return attributes.type === 'datetime' ? true : undefined
+      }
     },
     /**
      * @var {Boolean} DPicker#meridiem
      * @description Get/Set meridiem (12 vs 24 hours format) (only when time included)
      */
-    meridiem: { default: false, attribute: 'meridiem', getset: true },
+    meridiem: { default: false, attribute: 'meridiem' },
     /**
      * @var {Number} DPicker#step
      * @description Get/Set minutes step (only when time included)
@@ -246,23 +244,21 @@ const time = DPicker.modules.time = {
     step: {
       default: 1,
       attribute: (attributes) => {
-        let step = attributes.filter(e => e.name === 'step')[0]
-        return !step ? 1 : parseInt(step.value, 10)
+        return attributes.step ? parseInt(attributes.step, 10) : undefined
       },
-      getset: true
     }
   },
   calls: {
     /**
      * @inheritdoc
      */
-    _initialize: function timeParseInputAttributes(attributes) {
+    initialize: function timeParseInputAttributes(attributes) {
       this._minutesStep()
     },
     /**
      * @inheritdoc
      */
-    _modelSetter: function timeModelSetter(newValue) {
+    modelSetter: function timeModelSetter(newValue) {
       this._minutesStep()
     }
   }

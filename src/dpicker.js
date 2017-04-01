@@ -30,51 +30,7 @@ function isElementInContainer(parent, containerId) {
 }
 
 /**
- * *DPicker a simple date picker*
- *
- * Every property is available through the `DPicker` instance and can be changed through the object lifecycle.
- *
- * Here is how to change the format for example:
- *
- * ```javascript
- * let dpicker = new DPicker(document.body);
- * // ... do things
- * dpicker.format = 'YYYY' //change the format
- * ```
- *
- * If you change locale moment, changes will automatically be taken into consideration. For example, set `moment.locale('fr')` to use french months.
- *
- * <a href="/dpicker/demo/index.html">Full demo here</a>
- * Some alternate stylesheets are available <a href="/dpicker/demo/styles.html">here</a>
- *
- * <h2 id="demo">Demo</h2>
- *
- * <script type="text/javascript">
- *    var style = document.createElement('style')
- *    style.type = 'text/css'
- *    style.rel = 'stylesheet'
- *    style.innerHTML = "td.dpicker-inactive{color: grey;}button.dpicker-active {background: coral;}.dpicker-invisible{display: none;}.dpicker-visible{display: block;}"
- *    document.head.appendChild(style)
- *  </script>
- *  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
- *  <script type="text/javascript" src="/dpicker/dist/dpicker.js"></script>
- *  <script type="text/javascript" src="/dpicker/dist/dpicker.arrow-navigation.js"></script>
- *  <script type="text/javascript" src="/dpicker/dist/dpicker.modifiers.js"></script>
- *  <div id="my-datepicker"></div>
- *  <script>
- *  var dp = new DPicker(document.getElementById('my-datepicker'))
- *  </script>
- *
- * Demo code:
- * ```html
- *  <div id="my-datepicker"></div>
- *  <script>
- *  var dp = new DPicker(document.getElementById('my-datepicker'))
- *  </script>
- * ```
- *
- * <hr/>
- *
+ * DPicker a simple date picker
  * @class
  * @param {Element} element DOM element where you want the date picker or an input
  * @param {Object} [options={}]
@@ -101,77 +57,160 @@ function DPicker(element, options = {}) {
     return new DPicker(element, options)
   }
 
-  this._container = uuid()
+  const {container, attributes} = this._getContainer(element)
 
-  if (!DPicker.hasOwnProperty('properties')) {
-    DPicker.prototype.properties = {
-      format: { default: 'DD/MM/YYYY', attribute: 'format', getset: true },
-      model: { default: moment(), moment: true, attribute: 'value' },
-      display: { default: false, getset: true },
-      hideOnDayClick: { default: true },
-      hideOnEnter: { default: true },
-      min: { default: moment('1986-01-01'), moment: true, attribute: 'min', getset: true },
-      max: { default: moment().add(1, 'year').month(11), moment: true, attribute: 'max', getset: true },
-      months: { default: moment.months(), getset: true },
-      days: { default: moment.weekdaysShort(), getset: true },
-      inputName: { default: 'dpicker-input', attribute: 'name' },
-      inputId: { default: uuid(), attribute: 'id' },
-      empty: { default: false },
-      valid: { default: true },
-      order: { default: ['months', 'years', 'time', 'days'] },
-      concatHoursAndMinutes: { default: false },
-      siblingMonthDayClick: { default: false }
+  this._container = uuid()
+  this._data = {}
+
+  const defaults = {
+    months: moment.months(),
+    days: moment.weekdaysShort(),
+    empty: false,
+    valid: true,
+    order: ['months', 'years', 'time', 'days'],
+    hideOnDayClick: true,
+    hideOnEnter: true,
+    concatHoursAndMinutes: false,
+    siblingMonthDayClick: false,
+    firstDayOfWeek: moment.localeData().firstDayOfWeek()
+  }
+
+  for (let i in defaults) {
+    if (options[i] !== undefined) {
+      this._data[i] = options[i]
+      continue
+    }
+
+    this._data[i] = defaults[i]
+  }
+
+  const inputName = element.getEttr
+  this._data.inputName = attributes.name ? attributes.name : options.inputName ? options.inputName : 'dpicker-input'
+  this._data.inputId = attributes.id ? attributes.id : options.inputId ? options.inputId : uuid()
+
+  this._setData('format', [attributes.format, 'DD/MM/YYYY'])
+
+  const methods = {
+    display: false,
+    min: moment('1986-01-01'),
+    max: moment().add(1, 'year').month(11),
+    format: this._data.format
+  }
+
+  for (let i in methods) {
+    if (options[i] !== undefined) {
+      methods[i] = options[i]
     }
   }
+
+  this._loadModules(methods, attributes, options)
+  this._createMethods(methods, attributes)
+
+  if (attributes.value === undefined || attributes.value === '') {
+    this._data.empty = true
+  }
+
+  //@TODO array defaultValues
+  this._setData('model', [attributes.value, options.model, moment()], true)
 
   this.onChange = options.onChange
 
-  this._data = {}
-  this._loadModules()
-  this._initData(options)
-
   document.addEventListener('click', this._events.hide)
-
-  if (typeof element === 'undefined') {
-    throw new ReferenceError('Can not initialize DPicker without a container')
-  }
-
-  //small jquery fix: new DPicker($('<input type="datetime" name="mydatetime" autocomplete="off" step="30">'))
-  if (element.length !== undefined && element[0]) {
-      element = element[0]
-  }
-
-  if (element.tagName === 'INPUT') {
-    if (!element.parentNode) {
-      throw new ReferenceError('Can not initialize DPicker on an input without parent node')
-    }
-
-    this._parseInputAttributes([].slice.call(element.attributes))
-
-    let parentNode = element.parentNode
-    element.parentNode.removeChild(element)
-    element = parentNode
-    element.classList.add('dpicker')
-  }
-
-  this._initialize()
-
-  this.mount(element)
-
-  element.id = this._container
-  element.addEventListener('keydown', this._events.keyDown)
-
-  let input = element.querySelector('input')
-
-  input.addEventListener('blur', this._events.inputBlur)
 
   document.addEventListener('touchend', (e) => {
     this._events.inputBlur(e)
   })
 
-  this.rootElement = element
+  this.initialize()
+
+  this.mount(container)
+
+  container.id = this._container
+  container.addEventListener('keydown', this._events.keyDown)
+
+  let input = container.querySelector('input')
+  input.addEventListener('blur', this._events.inputBlur)
 
   return this
+}
+
+DPicker.prototype._setData = function(key, values, isMoment = false) {
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] === undefined || values[i] === '') {
+        continue
+      }
+        
+      if (isMoment === false) {
+        this._data[key] = values[i]
+        break
+      }
+
+      if (values[i] instanceof moment && values[i].isValid()) {
+        this._data[key] = values[i]
+        break
+      }
+
+      this._data[key] = moment()
+
+      const date = moment(values[i], this._data.format, true)
+
+      if (date.isValid()) {
+        this._data[key] = date
+        break
+      }
+    }
+}
+
+DPicker.prototype._createGetSet = function(key) {
+  if (DPicker.prototype.hasOwnProperty(key)) {
+    return;
+  }
+
+  Object.defineProperty(DPicker.prototype, key, {
+    get: function() {
+      return this._data[key]
+    },
+    set: function(newValue) {
+      this._data[key] = newValue
+      this.redraw()
+    }
+  })
+}
+
+DPicker.prototype._createMethods = function(defaults, attributes) {
+  for (let i in defaults) {
+    this._createGetSet(i)
+    this._setData(i, [attributes[i], defaults[i]], defaults[i] instanceof moment)
+  }
+}
+
+DPicker.prototype._getContainer = function(container) {
+  if (typeof container === 'undefined') {
+    throw new ReferenceError('Can not initialize DPicker without a container')
+  }
+
+  const attributes = {}
+  ;[].slice.call(container.attributes).forEach((attribute) => {
+    attributes[attribute.name] = attribute.value
+  })
+
+  //small jquery fix: new DPicker($('<input type="datetime" name="mydatetime" autocomplete="off" step="30">'))
+  if (container.length !== undefined && container[0]) {
+      container = container[0]
+  }
+
+  if (container.tagName === 'INPUT') {
+    if (!container.parentNode) {
+      throw new ReferenceError('Can not initialize DPicker on an input without parent node')
+    }
+
+    let parentNode = container.parentNode
+    container.parentNode.removeChild(container)
+    container = parentNode
+    container.classList.add('dpicker')
+  }
+
+  return { container, attributes }
 }
 
 DPicker.prototype.getTree = function() {
@@ -185,7 +224,7 @@ DPicker.prototype.getTree = function() {
  * Called after parseInputAttributes but before render
  * Use it with modules to change things on initialization
  */
-DPicker.prototype._initialize = function() {
+DPicker.prototype.initialize = function() {
   this.isValid(this._data.model)
 }
 
@@ -220,94 +259,10 @@ DPicker.prototype.getRenderChild = function() {
 }
 
 /**
- * Initializes the _data property, creates appropriate getters and setters
- * Called after _loadModules
- * @internal
- * @param {Object} options - DPicker creation options
- */
-DPicker.prototype._initData = function(options) {
-  for (let i in this.properties) {
-    let e = this.properties[i]
-
-    if (e.getset && !(i in DPicker.prototype)) {
-      Object.defineProperty(DPicker.prototype, i, {
-        get: function() {
-          return this._data[i]
-        },
-        set: function(newValue) {
-          this._data[i] = newValue
-          this.redraw()
-        }
-      })
-    }
-
-    this._data[i] = e.default
-
-    if (options[i] === undefined) {
-      continue
-    }
-
-    if (i === 'model' && !options[i]) {
-      this._data.empty = true
-      continue
-    }
-
-    this._data[i] = options[i]
-  }
-}
-
-/**
- * Parse input attributes and fill dpicker data container on initialization
- * @param {Element} element - an input
- */
-DPicker.prototype._parseInputAttributes = function(attributes) {
-
-  for (let i in this.properties) {
-    let e = this.properties[i]
-
-    if (e.attribute === undefined) {
-      continue
-    }
-
-    if (typeof e.attribute === 'function') {
-      this._data[i] = e.attribute(attributes)
-      continue
-    }
-
-    let attribute = attributes.filter(a => a.name === e.attribute)[0]
-
-    if (!attribute) {
-      continue
-    }
-
-    let v = attribute.value
-
-    if (!v) {
-      if (i === 'model') {
-        this._data.empty = true
-        continue
-      }
-
-      continue
-    }
-
-    if (e.moment === true) {
-      v = moment(attribute.value, this._data.format, true)
-
-      if (v.isValid() === false) {
-        continue
-      }
-    }
-
-    this._data[i] = v
-  }
-}
-
-/**
  * Load modules
  * @internal
  */
-DPicker.prototype._loadModules = function loadModules() {
+DPicker.prototype._loadModules = function loadModules(methods, attributes, options) {
   this._events = this._loadEvents()
   this._modulesRender = {}
 
@@ -353,9 +308,15 @@ DPicker.prototype._loadModules = function loadModules() {
 
     if (module.properties) {
       for (let i in module.properties) {
-        if (!this.properties[i]) {
-          this.properties[i] = module.properties[i]
+        if (this._data[i]) {
+          continue
         }
+
+        let prop = module.properties[i]
+        let attribute = typeof prop.attribute === 'function' ? prop.attribute(attributes) : attributes[prop.attribute]
+
+        this._createGetSet(i)
+        this._setData(i, [attribute, options[i], prop.default], prop.isMoment ? true : false)
       }
     }
   }
@@ -725,7 +686,7 @@ DPicker.prototype.renderMonths = function renderMonths(events, data, toRender) {
 DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let daysInMonth = data.model.daysInMonth()
   let daysInPreviousMonth = data.model.clone().subtract(1, 'months').daysInMonth()
-  let firstLocaleDay = moment.localeData().firstDayOfWeek()
+  let firstLocaleDay = data.firstDayOfWeek
   let firstDay = +(data.model.clone().date(1).format('e')) - 1
   let currentDay = data.model.date()
   let currentMonth = data.model.month()
@@ -824,7 +785,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
  * The model setter, feel free to override through modules
  * @param {Moment} newValue
  */
-DPicker.prototype._modelSetter = function(newValue) {
+DPicker.prototype.modelSetter = function(newValue) {
   this._data.empty = !newValue
 
   if (this.isValid(newValue) === true) {
@@ -902,7 +863,7 @@ Object.defineProperties(DPicker.prototype, {
    */
   'model': {
     set: function(newValue) {
-      this._modelSetter(newValue)
+      this.modelSetter(newValue)
     },
     get: function() {
       return this._data.model
@@ -935,63 +896,8 @@ Object.defineProperties(DPicker.prototype, {
  * @description Get/Set days an array of strings representing days, defaults to moment.weekdaysShort()
  */
 
-/**
- * A module looks like this:
- *
- * ```
- * const myModule = DPicker.modules.myModule = {
- *   events: {
- *     inputChange: function() //you can override any events available or add yours
- *   },
- *   render: {
- *     renderSomething: function renderSomething(events, data) { } //add dom elements through hyperscript DPicker.h
- *   },
- *   calls: {
- *    _initialize: function() { //do something on initialization } //here you can add a call at any DPicker method
- *   }
- * }
- * ```
- *
- * Here is an example that adds two buttons to navigate between months. We can add this code to `dpicker.month-navigation.js`:
- *
- * ```
- * const renderPreviousMonth = function renderPreviousMonth(events, data, toRender) {
- *   return DPicker.h('button', { onclick: events.previousMonth }, '<') //add some appropriate attributes
- * }
- *
- * const renderNextMonth = function renderNextMonth(events, data, toRender) {
- *   return DPicker.h('button', { onclick: events.nextMonth }, '>')
- * }
- *
- * const monthNavigation = DPicker.modules.monthNavigation = {
- *   render: {
- *     previousMonth: renderPreviousMonth,
- *     nextMonth: renderNextMonth
- *   },
- *   events: {
- *     previousMonth: function previousMonth() {
- *        this._data.model.add(-1, 'month')
- *     },
- *     nextMonth: function nextMonth(evt) {
- *        this._data.model.add(1, 'month')
- *     }
- *   }
- * }
- *
- * ```
- *
- * Make sure this code is loaded with DPicker. Then initialize a new DPicker by specifying a render order:
- *
- * ```
- * new DPicker(document.getElementById('trythis'), {order: ['time', 'previousMonth', 'months', 'nextMonth', 'days'], time: true})
- * ```
- *
- * Now your date picker has two new buttons to select next/prev month in a click.
- *
- * For more, check out existing modules!
- *
+/*
  * @property {Object} modules
  */
 DPicker.modules = {}
-
 module.exports = DPicker
