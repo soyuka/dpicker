@@ -70,7 +70,7 @@ function DPicker(element, options = {}) {
     order: ['months', 'years', 'time', 'days'],
     hideOnDayClick: true,
     hideOnEnter: true,
-    concatHoursAndMinutes: false,
+    hideOnOutsideClick: true,
     siblingMonthDayClick: false,
     firstDayOfWeek: moment.localeData().firstDayOfWeek()
   }
@@ -110,7 +110,6 @@ function DPicker(element, options = {}) {
     this._data.empty = true
   }
 
-  //@TODO array defaultValues
   this._setData('model', [attributes.value, options.model, moment()], true)
 
   this.onChange = options.onChange
@@ -139,7 +138,7 @@ DPicker.prototype._setData = function(key, values, isMoment = false) {
       if (values[i] === undefined || values[i] === '') {
         continue
       }
-        
+
       if (isMoment === false) {
         this._data[key] = values[i]
         break
@@ -333,7 +332,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @param {Event} DOMEvent
      */
     hide: (evt) => {
-      if (this.display === false) {
+      if (this._data.hideOnOutsideClick === false || this.display === false) {
         return
       }
 
@@ -344,6 +343,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.display = false
+      this.onChange(false)
     },
 
     /**

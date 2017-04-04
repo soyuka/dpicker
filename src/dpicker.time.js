@@ -246,7 +246,9 @@ const time = DPicker.modules.time = {
       attribute: (attributes) => {
         return attributes.step ? parseInt(attributes.step, 10) : undefined
       },
-    }
+    },
+
+    concatHoursAndMinutes: { default: false }
   },
   calls: {
     /**
@@ -255,6 +257,11 @@ const time = DPicker.modules.time = {
     initialize: function timeParseInputAttributes(attributes) {
       this._minutesStep()
     },
+
+    redraw: function timeRedraw() {
+      this._minutesStep()
+    },
+
     /**
      * @inheritdoc
      */
