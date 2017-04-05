@@ -24,6 +24,7 @@ $browserify -g uglifyify src/polyfills.js -o dist/polyfills.min.js &
 
 wait
 
-echo $(node -pe "$(gzip -c dist/dpicker.min.js | wc -c) * 0.001") kb gz
+echo "dpicker.min.js.gz: " $(node -pe "$(gzip -c dist/dpicker.min.js | wc -c) * 0.001") kb
+echo "dpicker.time.min.js.gz: " $(node -pe "$(gzip -c dist/dpicker.time.min.js | wc -c) * 0.001") kb
 
 exit 0
