@@ -4,10 +4,9 @@
   "description": "A framework-agnostic minimal date picker.",
   "main": "dist/dpicker.js",
   "scripts": {
-    "test": "./node_modules/.bin/_mocha",
+    "test": "standard --global DPicker src/*.js && mocha",
     "build": "bash build.sh",
-    "doc": "./node_modules/.bin/jsdoc -c jsdoc.conf.json -R README.md -d doc src/*.js",
-    "coverage": "./node_modules/.bin/istanbul cover -x test.js -x src ./node_modules/.bin/_mocha"
+    "coverage": "istanbul cover -x test.js -x src _mocha"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,6 @@
     "yo-yoify": "^3.5.0"
   },
   "devDependencies": {
-    "standard": "^9.0.2",
     "@soyuka/jhaml": "^1.0.8",
     "babel-core": "^6.24.0",
     "babel-plugin-yo-yoify": "^0.4.0",
@@ -48,6 +46,7 @@
     "jsdom-global": "^2.0.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.1.1",
+    "standard": "^9.0.2",
     "uglifyify": "^3.0.4",
     "unassertify": "^2.0.4"
   }

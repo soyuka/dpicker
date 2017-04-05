@@ -6,8 +6,8 @@ const html = require('bel')
  * uuid generator
  * https://gist.github.com/jed/982883
  */
-function uuid() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,a=>(a^Math.random()*16>>a/4).toString(16))
+function uuid () {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, a => (a ^ Math.random() * 16 >> a / 4).toString(16))
 }
 
 /**
@@ -15,7 +15,7 @@ function uuid() {
  * @param {Element} parent a DOM node
  * @param {String} containerId the container id
  */
-function isElementInContainer(parent, containerId) {
+function isElementInContainer (parent, containerId) {
   while (parent && parent !== document) {
     if (parent.getAttribute('id') === containerId) {
       return true
@@ -49,8 +49,7 @@ function isElementInContainer(parent, containerId) {
  * @param {boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
  * @listens DPicker#hide
  */
-function DPicker(element, options = {}) {
-
+function DPicker (element, options = {}) {
   if (!(this instanceof DPicker)) {
     return new DPicker(element, options)
   }
@@ -137,57 +136,57 @@ function DPicker(element, options = {}) {
   return this
 }
 
-DPicker.prototype._setData = function(key, values, isMoment = false) {
-    for (let i = 0; i < values.length; i++) {
-      if (values[i] === undefined || values[i] === '') {
-        continue
-      }
-
-      if (isMoment === false) {
-        this._data[key] = values[i]
-        break
-      }
-
-      if (values[i] instanceof this.moment && values[i].isValid()) {
-        this._data[key] = values[i]
-        break
-      }
-
-      this._data[key] = this.moment()
-
-      const date = this.moment(values[i], this._data.format, true)
-
-      if (date.isValid()) {
-        this._data[key] = date
-        break
-      }
+DPicker.prototype._setData = function (key, values, isMoment = false) {
+  for (let i = 0; i < values.length; i++) {
+    if (values[i] === undefined || values[i] === '') {
+      continue
     }
+
+    if (isMoment === false) {
+      this._data[key] = values[i]
+      break
+    }
+
+    if (values[i] instanceof this.moment && values[i].isValid()) {
+      this._data[key] = values[i]
+      break
+    }
+
+    this._data[key] = this.moment()
+
+    const date = this.moment(values[i], this._data.format, true)
+
+    if (date.isValid()) {
+      this._data[key] = date
+      break
+    }
+  }
 }
 
-DPicker.prototype._createGetSet = function(key) {
+DPicker.prototype._createGetSet = function (key) {
   if (DPicker.prototype.hasOwnProperty(key)) {
     return
   }
 
   Object.defineProperty(DPicker.prototype, key, {
-    get: function() {
+    get: function () {
       return this._data[key]
     },
-    set: function(newValue) {
+    set: function (newValue) {
       this._data[key] = newValue
       this.redraw()
     }
   })
 }
 
-DPicker.prototype._createMethods = function(defaults, attributes) {
+DPicker.prototype._createMethods = function (defaults, attributes) {
   for (let i in defaults) {
     this._createGetSet(i)
     this._setData(i, [attributes[i], defaults[i]], defaults[i] instanceof this.moment)
   }
 }
 
-DPicker.prototype._getContainer = function(container) {
+DPicker.prototype._getContainer = function (container) {
   if (typeof container === 'undefined') {
     throw new ReferenceError('Can not initialize DPicker without a container')
   }
@@ -197,9 +196,9 @@ DPicker.prototype._getContainer = function(container) {
     attributes[attribute.name] = attribute.value
   })
 
-  //small jquery fix: new DPicker($('<input type="datetime" name="mydatetime" autocomplete="off" step="30">'))
+  // small jquery fix: new DPicker($('<input type="datetime" name="mydatetime" autocomplete="off" step="30">'))
   if (container.length !== undefined && container[0]) {
-      container = container[0]
+    container = container[0]
   }
 
   if (container.tagName === 'INPUT') {
@@ -220,13 +219,13 @@ DPicker.prototype._getContainer = function(container) {
  * Allows to render more child elements with modules
  * @return Array<VNode>
  */
-DPicker.prototype._getRenderChild = function() {
+DPicker.prototype._getRenderChild = function () {
   let children = {
     years: this.renderYears(this._events, this._data),
     months: this.renderMonths(this._events, this._data)
   }
 
-  //add module render functions
+  // add module render functions
   for (let render in this._modules.render) {
     children[render] = this._modules.render[render](this._events, this._data)
   }
@@ -239,14 +238,14 @@ DPicker.prototype._getRenderChild = function() {
 /**
  * Mount rendered element to the DOM
  */
-DPicker.prototype._mount = function(element) {
+DPicker.prototype._mount = function (element) {
   this._tree = this.getTree()
   element.appendChild(this._tree)
 }
 
-DPicker.prototype._decorate = function decorate(which, origin, key) {
+DPicker.prototype._decorate = function decorate (which, origin, key) {
   const self = this
-  return function() {
+  return function () {
     const decorations = self._modules[which][key]
 
     for (let i = 0; i < decorations.length; i++) {
@@ -263,7 +262,7 @@ DPicker.prototype._decorate = function decorate(which, origin, key) {
  * Load modules
  * @internal
  */
-DPicker.prototype._loadModules = function loadModules(attributes, options) {
+DPicker.prototype._loadModules = function loadModules (attributes, options) {
   this._modules = {calls: {}, events: {}, render: {}}
   const items = ['events', 'calls']
   const calls = ['initialize', 'redraw', 'modelSetter']
@@ -310,7 +309,7 @@ DPicker.prototype._loadModules = function loadModules(attributes, options) {
         let attribute = typeof prop.attribute === 'function' ? prop.attribute(attributes) : attributes[prop.attribute]
 
         this._createGetSet(i)
-        this._setData(i, [attribute, options[i], prop.default], prop.isMoment ? true : false)
+        this._setData(i, [attribute, options[i], prop.default], !!prop.isMoment)
       }
     }
   }
@@ -340,7 +339,7 @@ DPicker.prototype._loadModules = function loadModules(attributes, options) {
 /**
  * Load _event object
  */
-DPicker.prototype._loadEvents = function loadEvents() {
+DPicker.prototype._loadEvents = function loadEvents () {
   return {
     /**
      * Hides the date picker if user does not click inside the container
@@ -463,8 +462,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this.display = false
       }
 
-      //temp fix, model setter should call this
-      //@todo fix without moment.clone()
+      // temp fix, model setter should call this
+      // @todo fix without moment.clone()
       this.isValid(this._data.model)
 
       this.redraw()
@@ -486,8 +485,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this.display = false
       }
 
-      //temp fix, model setter should call this
-      //@todo fix without moment.clone()
+      // temp fix, model setter should call this
+      // @todo fix without moment.clone()
       this.isValid(this._data.model)
 
       this.redraw()
@@ -509,8 +508,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
         this.display = false
       }
 
-      //temp fix, model setter should call this
-      //@todo fix without moment.clone()
+      // temp fix, model setter should call this
+      // @todo fix without moment.clone()
       this.isValid(this._data.model)
 
       this.redraw()
@@ -549,7 +548,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
   }
 }
 
-DPicker.prototype.getTree = function() {
+DPicker.prototype.getTree = function () {
   return this.renderContainer(this._events, this._data, [
     this.renderInput(this._events, this._data),
     this.render(this._events, this._data, this._getRenderChild())
@@ -563,7 +562,7 @@ DPicker.prototype.getTree = function() {
  * @param {Moment} model
  * @return {boolean}
  */
-DPicker.prototype.isValid = function isValid(model) {
+DPicker.prototype.isValid = function isValid (model) {
   if (!(model instanceof this.moment) || !model.isValid()) {
     this._data.valid = false
     return false
@@ -587,7 +586,7 @@ DPicker.prototype.isValid = function isValid(model) {
  * @listens DPicker#inputFocus
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.renderInput = function renderInput(events, data, toRender) {
+DPicker.prototype.renderInput = function renderInput (events, data, toRender) {
   return html`<input
     id="${data.inputId}"
     value="${data.empty === true ? '' : data.model.format(data.format)}"
@@ -612,7 +611,7 @@ DPicker.prototype.renderInput = function renderInput(events, data, toRender) {
  * @method
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.renderContainer = function renderContainer(events, data, toRender) {
+DPicker.prototype.renderContainer = function renderContainer (events, data, toRender) {
   return html`<div class="dpicker">${toRender}</div>`
 }
 
@@ -630,7 +629,7 @@ DPicker.prototype.renderContainer = function renderContainer(events, data, toRen
  * @see DPicker#renderDays
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.render = function render(events, data, toRender) {
+DPicker.prototype.render = function render (events, data, toRender) {
   return html`<div
     aria-hidden="${data.display === false}"
     class="dpicker-container ${data.display === true ? 'dpicker-visible' : 'dpicker-invisible'}">
@@ -647,7 +646,7 @@ DPicker.prototype.render = function render(events, data, toRender) {
  * @listens DPicker#yearChange
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.renderYears = function renderYears(events, data, toRender) {
+DPicker.prototype.renderYears = function renderYears (events, data, toRender) {
   let modelYear = data.model.year()
   let futureYear = data.max.year() + 1
   let pastYear = data.min.year()
@@ -673,7 +672,7 @@ DPicker.prototype.renderYears = function renderYears(events, data, toRender) {
  * @listens DPicker#monthChange
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.renderMonths = function renderMonths(events, data, toRender) {
+DPicker.prototype.renderMonths = function renderMonths (events, data, toRender) {
   let modelMonth = data.model.month()
   let currentYear = data.model.year()
   let months = data.months
@@ -707,7 +706,7 @@ DPicker.prototype.renderMonths = function renderMonths(events, data, toRender) {
  * @listens DPicker#dayKeyDown
  * @return {H} the rendered virtual dom hierarchy
  */
-DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
+DPicker.prototype.renderDays = function renderDays (events, data, toRender) {
   let daysInMonth = data.model.daysInMonth()
   let daysInPreviousMonth = data.model.clone().subtract(1, 'months').daysInMonth()
   let firstLocaleDay = data.firstDayOfWeek
@@ -716,28 +715,13 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
   let currentMonth = data.model.month()
   let currentYear = data.model.year()
 
-  let minDay
-  let maxDay
-  let minMonth
-  let maxMonth
-
   let days = new Array(7)
 
   data.days.map((e, i) => {
     days[i < firstLocaleDay ? 6 - i : i - firstLocaleDay] = e
   })
 
-  if(data.model.isSame(data.min, 'month')) {
-    minDay = data.min.date()
-    minMonth = data.min.month()
-  }
-
-  if(data.model.isSame(data.max, 'month')) {
-    maxDay = data.max.date()
-    maxMonth = data.max.month()
-  }
-
-  let rows = new Array(Math.ceil(.1+(firstDay + daysInMonth) / 7)).fill(0)
+  let rows = new Array(Math.ceil(0.1 + (firstDay + daysInMonth) / 7)).fill(0)
   let day
   let dayActive
   let previousMonth = false
@@ -792,12 +776,11 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
 
         return html`<td class="${dayActive === true ? 'dpicker-active' : 'dpicker-inactive'}">
           ${
-            dayActive === true ?
-              html`<button value="${day}" aria-label="Day ${day}" aria-disabled="${dayActive}" onclick="${previousMonth === false && nextMonth === false ? events.dayClick : (previousMonth === true ? events.previousMonthDayClick : events.nextMonthDayClick)}" type="button" onkeydown="${events.dayKeyDown}" class="${classActive}">
+            dayActive === true
+              ? html`<button value="${day}" aria-label="Day ${day}" aria-disabled="${dayActive}" onclick="${previousMonth === false && nextMonth === false ? events.dayClick : (previousMonth === true ? events.previousMonthDayClick : events.nextMonthDayClick)}" type="button" onkeydown="${events.dayKeyDown}" class="${classActive}">
                 ${day}
               </button>`
-            :
-              html`<span class="${classActive}">${day}</span>`
+            : html`<span class="${classActive}">${day}</span>`
           }
           </td>`
       })}</tr>`
@@ -809,7 +792,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
  * Called after parseInputAttributes but before render
  * Use it with modules to change things on initialization
  */
-DPicker.prototype.initialize = function() {
+DPicker.prototype.initialize = function () {
   this.isValid(this._data.model)
 }
 
@@ -817,7 +800,7 @@ DPicker.prototype.initialize = function() {
  * The model setter, feel free to override through modules
  * @param {Moment} newValue
  */
-DPicker.prototype.modelSetter = function(newValue) {
+DPicker.prototype.modelSetter = function (newValue) {
   this._data.empty = !newValue
 
   if (this.isValid(newValue) === true) {
@@ -827,7 +810,7 @@ DPicker.prototype.modelSetter = function(newValue) {
   this.redraw()
 }
 
-DPicker.prototype.redraw = function() {
+DPicker.prototype.redraw = function () {
   const newTree = this.getTree()
   this._tree = nanomorph(this._tree, newTree)
 }
@@ -838,7 +821,7 @@ Object.defineProperties(DPicker.prototype, {
    * @description Get container id
    */
   'container': {
-    get: function() {
+    get: function () {
       return this._container
     }
   },
@@ -847,7 +830,7 @@ Object.defineProperties(DPicker.prototype, {
    * @description Get input id
    */
   'inputId': {
-    get: function() {
+    get: function () {
       return this._data.inputId
     }
   },
@@ -856,7 +839,7 @@ Object.defineProperties(DPicker.prototype, {
    * @description Get current input value (not the model)
    */
   'input': {
-    get: function() {
+    get: function () {
       if (this._data.empty) {
         return ''
       }
@@ -869,12 +852,12 @@ Object.defineProperties(DPicker.prototype, {
    * @description Set onChange method
    */
   'onChange': {
-    set: function(onChange) {
+    set: function (onChange) {
       this._onChange = (dpickerEvent) => {
         return !onChange ? false : onChange(this._data, dpickerEvent)
       }
     },
-    get: function() {
+    get: function () {
       return this._onChange
     }
   },
@@ -884,7 +867,7 @@ Object.defineProperties(DPicker.prototype, {
    * @description Is the current input valid
    */
   'valid': {
-    get: function() {
+    get: function () {
       return this._data.valid
     }
   },
@@ -894,10 +877,10 @@ Object.defineProperties(DPicker.prototype, {
    * @description Get/Set model, a Moment instance
    */
   'model': {
-    set: function(newValue) {
+    set: function (newValue) {
       this.modelSetter(newValue)
     },
-    get: function() {
+    get: function () {
       return this._data.model
     }
   }

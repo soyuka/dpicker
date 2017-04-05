@@ -21,13 +21,13 @@ const HOURS24 = new Array(24).fill(0).map((e, i) => i)
 const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
 HOURS12.push(HOURS12.shift())
 
-function getHoursMinutes(data) {
+function getHoursMinutes (data) {
   let hours = data.meridiem ? HOURS12 : HOURS24
   let minutes = MINUTES.filter(e => e % data.step === 0)
 
   ;[data.min, data.max].map((e, i) => {
-    if(data.model.isSame(e, 'day')) {
-      let xHours = + data.meridiem ? e.format('h') : e.hours()
+    if (data.model.isSame(e, 'day')) {
+      let xHours = +data.meridiem ? e.format('h') : e.hours()
       hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
 
       if (data.model.isSame(e, 'hours')) {
@@ -40,26 +40,26 @@ function getHoursMinutes(data) {
   return {hours, minutes}
 }
 
-function padLeftZero(v) {
-  return v < 10 ? '0'+v : ''+v
+function padLeftZero (v) {
+  return v < 10 ? '0' + v : '' + v
 }
 
 /**
  * Handles minutes steps to focus on the correct input and set the model minutes/hours
  */
-function minutesStep() {
+function minutesStep () {
   if (!this._data.time) {
     return
   }
 
-  let {hours, minutes} = getHoursMinutes(this._data)
+  let {minutes} = getHoursMinutes(this._data)
 
   let modelMinutes = this._data.model.minutes()
 
   if (minutes.length === 0) {
     this._data.min.minutes(0)
     this._data.min.add(1, 'hours')
-    let {hours, minutes} = getHoursMinutes(this._data)
+    minutes = getHoursMinutes(this._data).minutes
   }
 
   if (this._data.model.minutes() < minutes[0]) {
@@ -98,7 +98,7 @@ function minutesStep() {
  * @listens DPicker#minutesChange
  * @return {H} the rendered virtual dom hierarchy
  */
-const renderTime = function renderTime(events, data, toRender) {
+const renderTime = function renderTime (events, data, toRender) {
   if (!data.time) { return html`<span style="display: none;" class="dpicker-time"` }
 
   let modelHours = data.model.hours()
@@ -147,7 +147,6 @@ const renderTime = function renderTime(events, data, toRender) {
               return html`<option selected="selected" value="${value}">${text}</option>`
             } else {
               return html`<option value="${value}">${text}</option>`
-
             }
           })
         }
@@ -190,12 +189,12 @@ const events = {
     * @Event DPicker#hoursChange
     * @param {Event} DOMEvent
     */
-  hoursChange: function hoursChange(evt) {
+  hoursChange: function hoursChange (evt) {
     this._data.empty = false
 
     let val = parseInt(evt.target.options[evt.target.selectedIndex].value, 10)
     if (this._data.meridiem) {
-      if(this._data.model.format('A') === 'PM') {
+      if (this._data.model.format('A') === 'PM') {
         val = val === 12 ? 12 : val + 12
       } else if (val === 12) {
         val = 0
@@ -212,14 +211,14 @@ const events = {
     * @Event DPicker#minutesChange
     * @param {Event} DOMEvent
     */
-  minutesChange: function minutesChange(evt) {
+  minutesChange: function minutesChange (evt) {
     this._data.empty = false
     this._data.model.minutes(evt.target.options[evt.target.selectedIndex].value)
     this.redraw()
     this.onChange()
   },
 
-  minuteHoursChange: function minuteHoursChange(evt) {
+  minuteHoursChange: function minuteHoursChange (evt) {
     let val = evt.target.options[evt.target.selectedIndex].value.split(':')
 
     this._events.hoursChange({target: {options: [{value: val[0]}], selectedIndex: 0}})
@@ -231,7 +230,7 @@ const events = {
     * @Event DPicker#meridiemChange
     * @param {Event} DOMEvent
     */
-  meridiemChange: function meridiemChange(evt) {
+  meridiemChange: function meridiemChange (evt) {
     this._data.empty = false
     let val = evt.target.options[evt.target.selectedIndex].value
     let hours = this._data.model.hours()
@@ -250,7 +249,7 @@ const events = {
   /**
    * @inheritdoc
    */
-  inputChange: function() {
+  inputChange: function timeInputChange () {
     minutesStep.apply(this)
   }
 }
@@ -270,7 +269,7 @@ DPicker.modules.time = {
      */
     time: {
       default: false,
-      attribute: function(attributes) {
+      attribute: function (attributes) {
         return attributes.type === 'datetime' ? true : undefined
       }
     },
@@ -296,20 +295,19 @@ DPicker.modules.time = {
     /**
      * @inheritdoc
      */
-    initialize: function timeParseInputAttributes(attributes) {
+    initialize: function timeParseInputAttributes (attributes) {
       minutesStep.apply(this)
     },
 
-    redraw: function timeRedraw() {
+    redraw: function timeRedraw () {
       minutesStep.apply(this)
     },
 
     /**
      * @inheritdoc
      */
-    modelSetter: function timeModelSetter(newValue) {
+    modelSetter: function timeModelSetter (newValue) {
       minutesStep.apply(this)
     }
   }
 }
-

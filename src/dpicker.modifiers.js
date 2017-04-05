@@ -17,7 +17,7 @@ if (!DPicker) {
  * @param {Event} DOMEvent
  * @listens DPicker#inputChange
  */
-function ModifierInputChange(evt) {
+function ModifierInputChange (evt) {
   let first = evt.target.value.charAt(0)
   let x = evt.target.value.slice(1) || 0
 

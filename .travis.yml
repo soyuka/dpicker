@@ -12,8 +12,7 @@ install:
   - npm run build
 
 before_script:
-  - npm install -g codecov standard
-  - standard
+  - npm install -g codecov
 
 after_success:
   - npm run coverage
