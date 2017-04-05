@@ -12,8 +12,8 @@ install:
   - npm run build
 
 before_script:
-  - npm install -g codecov eslint
-  - eslint src
+  - npm install -g codecov standard
+  - standard
 
 after_success:
   - npm run coverage
