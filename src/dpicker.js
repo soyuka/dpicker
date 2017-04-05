@@ -160,7 +160,7 @@ DPicker.prototype._setData = function(key, values, isMoment = false) {
 
 DPicker.prototype._createGetSet = function(key) {
   if (DPicker.prototype.hasOwnProperty(key)) {
-    return;
+    return
   }
 
   Object.defineProperty(DPicker.prototype, key, {

@@ -287,7 +287,7 @@ DPicker.modules.time = {
       default: 1,
       attribute: (attributes) => {
         return attributes.step ? parseInt(attributes.step, 10) : undefined
-      },
+      }
     },
 
     concatHoursAndMinutes: { default: false }
