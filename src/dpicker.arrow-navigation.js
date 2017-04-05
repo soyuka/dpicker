@@ -118,7 +118,7 @@ if (!DPicker) {
   throw new ReferenceError('DPicker is required for this extension to work')
 }
 
-const arrowNavigation = DPicker.modules.arrowNavigation = {
+DPicker.modules.arrowNavigation = {
   events: {
     dayKeyDown: DayKeyDown
   }

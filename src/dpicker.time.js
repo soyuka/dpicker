@@ -255,7 +255,7 @@ const events = {
   }
 }
 
-const time = DPicker.modules.time = {
+DPicker.modules.time = {
   events: events,
   render: {
     time: renderTime

@@ -2,8 +2,6 @@
 const nanomorph = require('nanomorph')
 const html = require('bel')
 
-function noop() {}
-
 /**
  * uuid generator
  * https://gist.github.com/jed/982883

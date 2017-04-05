@@ -35,7 +35,7 @@ function ModifierInputChange(evt) {
   this.onChange()
 }
 
-const modifiers = DPicker.modules.modifiers = {
+DPicker.modules.modifiers = {
   events: {
     inputChange: ModifierInputChange
   }
