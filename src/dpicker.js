@@ -1,4 +1,3 @@
-'use strict'
 const nanomorph = require('nanomorph')
 const html = require('bel')
 

@@ -1,4 +1,3 @@
-'use strict'
 function positionInParent (children) {
   return [].indexOf.call(children.parentNode.children, children)
 }

@@ -3,8 +3,7 @@
 <img src="https://cdn.rawgit.com/soyuka/dpicker/master/logo.svg" width="140px">
 
 [![Build Status](https://travis-ci.org/soyuka/dpicker.svg?branch=master)](https://travis-ci.org/soyuka/dpicker)
-[![Code Climate](https://codeclimate.com/github/soyuka/dpicker/badges/gpa.svg)](https://codeclimate.com/github/soyuka/dpicker)
-[![Test Coverage](https://codeclimate.com/github/soyuka/dpicker/badges/coverage.svg)](https://codeclimate.com/github/soyuka/dpicker/coverage)
+[![codecov](https://codecov.io/gh/soyuka/dpicker/branch/master/graph/badge.svg)](https://codecov.io/gh/soyuka/dpicker)
 
 [Demo](https://soyuka.github.io/dpicker/demo/index.html)
 [Styles](https://soyuka.github.io/dpicker/demo/styles.html)

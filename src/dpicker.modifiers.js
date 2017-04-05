@@ -1,5 +1,3 @@
-'use strict'
-
 if (!DPicker) {
   throw new ReferenceError('DPicker is required for this extension to work')
 }
