@@ -5,7 +5,7 @@
   "main": "dist/dpicker.js",
   "scripts": {
     "test": "./node_modules/.bin/_mocha",
-    "build": "./build.sh",
+    "build": "bash build.sh",
     "doc": "./node_modules/.bin/jsdoc -c jsdoc.conf.json -R README.md -d doc src/*.js",
     "coverage": "./node_modules/.bin/istanbul cover -x test.js -x src ./node_modules/.bin/_mocha"
   },
@@ -30,10 +30,10 @@
     "moment": "^2.13.0",
     "nanomorph": "soyuka/nanomorph#master",
     "on-load": "^3.2.0",
-    "standard": "^9.0.2",
     "yo-yoify": "^3.5.0"
   },
   "devDependencies": {
+    "standard": "^9.0.2",
     "@soyuka/jhaml": "^1.0.8",
     "babel-core": "^6.24.0",
     "babel-plugin-yo-yoify": "^0.3.3",
