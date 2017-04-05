@@ -359,7 +359,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       }
 
       this.display = false
-      this.onChange(false)
+      this.onChange({modelChanged: false, name: 'hide', event: evt})
     },
 
     /**
