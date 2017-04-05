@@ -84,7 +84,6 @@ function DPicker(element, options = {}) {
     this._data[i] = defaults[i]
   }
 
-  const inputName = element.getEttr
   this._data.inputName = attributes.name ? attributes.name : options.inputName ? options.inputName : 'dpicker-input'
   this._data.inputId = attributes.id ? attributes.id : options.inputId ? options.inputId : uuid()
 
@@ -103,7 +102,8 @@ function DPicker(element, options = {}) {
     }
   }
 
-  this._loadModules(methods, attributes, options)
+  this._events = this._loadEvents()
+  this._loadModules(attributes, options)
   this._createMethods(methods, attributes)
 
   if (attributes.value === undefined || attributes.value === '') {
@@ -122,7 +122,7 @@ function DPicker(element, options = {}) {
 
   this.initialize()
 
-  this.mount(container)
+  this._mount(container)
 
   container.id = this._container
   container.addEventListener('keydown', this._events.keyDown)
@@ -212,44 +212,19 @@ DPicker.prototype._getContainer = function(container) {
   return { container, attributes }
 }
 
-DPicker.prototype.getTree = function() {
-  return this.renderContainer(this._events, this._data, [
-    this.renderInput(this._events, this._data),
-    this.render(this._events, this._data, this.getRenderChild())
-  ])
-}
-
-/**
- * Called after parseInputAttributes but before render
- * Use it with modules to change things on initialization
- */
-DPicker.prototype.initialize = function() {
-  this.isValid(this._data.model)
-}
-
-/**
- * Mount rendered element to the DOM
- */
-DPicker.prototype.mount = function(element) {
-  this._tree = this.getTree()
-  element.appendChild(this._tree)
-}
-
 /**
  * Allows to render more child elements with modules
  * @return Array<VNode>
  */
-DPicker.prototype.getRenderChild = function() {
+DPicker.prototype._getRenderChild = function() {
   let children = {
     years: this.renderYears(this._events, this._data),
     months: this.renderMonths(this._events, this._data)
   }
 
   //add module render functions
-  for (let module in this._modulesRender) {
-    for (let renderMethod in this._modulesRender[module]) {
-      children[renderMethod] = this._modulesRender[module][renderMethod](this._events, this._data)
-    }
+  for (let render in this._modules.render) {
+    children[render] = this._modules.render[render](this._events, this._data)
   }
 
   children.days = this.renderDays(this._events, this._data)
@@ -258,50 +233,66 @@ DPicker.prototype.getRenderChild = function() {
 }
 
 /**
+ * Mount rendered element to the DOM
+ */
+DPicker.prototype._mount = function(element) {
+  this._tree = this.getTree()
+  element.appendChild(this._tree)
+}
+
+DPicker.prototype._decorate = function decorate(which, origin, key) {
+  const self = this
+  return function() {
+    const decorations = self._modules[which][key]
+
+    for (let i = 0; i < decorations.length; i++) {
+      if (decorations[i].apply(self, arguments) === false) {
+        return false
+      }
+    }
+
+    return origin.apply(self, arguments)
+  }
+}
+
+/**
  * Load modules
  * @internal
  */
-DPicker.prototype._loadModules = function loadModules(methods, attributes, options) {
-  this._events = this._loadEvents()
-  this._modulesRender = {}
+DPicker.prototype._loadModules = function loadModules(attributes, options) {
+  this._modules = {calls: {}, events: {}, render: {}}
+  const items = ['events', 'calls']
+  const calls = ['initialize', 'redraw', 'modelSetter']
 
   for (let moduleName in DPicker.modules) {
     let module = DPicker.modules[moduleName]
 
-    for (let event in module.events) {
-      if (!this._events[event]) {
-        this._events[event] = module.events[event].bind(this)
-        continue
-      }
+    for (let i = 0; i < items.length; i++) {
+      const which = items[i]
 
-      if (!this._events[event+'-internal']) {
-        this._events[event+'-internal'] = [this._events[event]]
-        this._events[event] = (evt) => {
-          this._events[event+'-internal'].map(e => e.bind(this)(evt))
+      for (let key in module[which]) {
+        if (which === items[0] && this._events[key] === undefined) {
+          this._events[key] = module[which][key].bind(this)
+          continue
+        }
+
+        const fn = module[which][key]
+
+        if (this._modules[which][key] === undefined) {
+          this._modules[which][key] = [fn]
+        } else {
+          this._modules[which][key].push(fn)
         }
       }
-
-      this._events[event+'-internal'].unshift(module.events[event])
-    }
-
-    for (let call in module.calls) {
-      if (!DPicker.prototype.hasOwnProperty(call) || typeof module.calls[call] !== 'function') {
-        continue
-      }
-
-      if (!this[call+'-internal']) {
-        this[call+'-internal'] = [DPicker.prototype[call]]
-        this[call] = (...args) => {
-          this[call+'-internal'].map(e => e.apply(this, args))
-        }
-      }
-
-      this[call+'-internal'].push(module.calls[call])
     }
 
     if (module.render) {
       for (let i in module.render) {
-        this._modulesRender[i] = module.render
+        if (i in this._modules.render) {
+          throw new ReferenceError('Can not override a render method')
+        }
+
+        this._modules.render[i] = module.render[i]
       }
     }
 
@@ -316,6 +307,27 @@ DPicker.prototype._loadModules = function loadModules(methods, attributes, optio
 
         this._createGetSet(i)
         this._setData(i, [attribute, options[i], prop.default], prop.isMoment ? true : false)
+      }
+    }
+  }
+
+  for (let i = 0; i < items.length; i++) {
+    const which = items[i]
+    const keys = i === 0 ? Object.keys(this._events) : calls
+
+    for (let j = 0; j < keys.length; j++) {
+      const key = keys[j]
+
+      if (this._modules[which][key] === undefined) {
+        continue
+      }
+
+      if (i === 0) {
+        const origin = this._events[key]
+        this._events[key] = this._decorate(which, origin, key)
+      } else {
+        const origin = this[key]
+        this[key] = this._decorate(which, origin, key)
       }
     }
   }
@@ -506,7 +518,8 @@ DPicker.prototype._loadEvents = function loadEvents() {
      * @Event DPicker#dayKeyDown
      * @param {Event} DOMEvent
      */
-    dayKeyDown: () => {},
+    dayKeyDown: () => {
+    },
 
     /**
      * On key down inside the dpicker container,
@@ -530,6 +543,13 @@ DPicker.prototype._loadEvents = function loadEvents() {
       this.onChange({modelChanged: false, name: 'keyDown', event: evt})
     }
   }
+}
+
+DPicker.prototype.getTree = function() {
+  return this.renderContainer(this._events, this._data, [
+    this.renderInput(this._events, this._data),
+    this.render(this._events, this._data, this._getRenderChild())
+  ])
 }
 
 /**
@@ -779,6 +799,14 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
       })}</tr>`
     })}
   </table>`
+}
+
+/**
+ * Called after parseInputAttributes but before render
+ * Use it with modules to change things on initialization
+ */
+DPicker.prototype.initialize = function() {
+  this.isValid(this._data.model)
 }
 
 /**

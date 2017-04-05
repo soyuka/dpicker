@@ -45,6 +45,49 @@ function padLeftZero(v) {
 }
 
 /**
+ * Handles minutes steps to focus on the correct input and set the model minutes/hours
+ */
+function minutesStep() {
+  if (!this._data.time) {
+    return
+  }
+
+  let {hours, minutes} = getHoursMinutes(this._data)
+
+  let modelMinutes = this._data.model.minutes()
+
+  if (minutes.length === 0) {
+    this._data.min.minutes(0)
+    this._data.min.add(1, 'hours')
+    let {hours, minutes} = getHoursMinutes(this._data)
+  }
+
+  if (this._data.model.minutes() < minutes[0]) {
+    this._data.model.minutes(minutes[0])
+    modelMinutes = minutes[0]
+  }
+
+  if (modelMinutes > minutes[minutes.length - 1]) {
+    this._data.model.minutes(0)
+    this._data.model.add(1, 'hours')
+    return
+  }
+
+  if (this._data.step <= 1) {
+    return
+  }
+
+  minutes[minutes.length] = 60
+  modelMinutes = minutes.reduce(function (prev, curr) {
+    return (Math.abs(curr - modelMinutes) < Math.abs(prev - modelMinutes) ? curr : prev)
+  })
+
+  minutes.length--
+
+  this._data.model.minutes(modelMinutes)
+}
+
+/**
  * Render Time
  * ```
  * select[name='dpicker-hour']
@@ -160,7 +203,6 @@ const events = {
     }
 
     this._data.model.hours(val)
-    this._minutesStep()
     this.redraw()
     this.onChange()
   },
@@ -209,7 +251,7 @@ const events = {
    * @inheritdoc
    */
   inputChange: function() {
-    this._minutesStep()
+    minutesStep.apply(this)
   }
 }
 
@@ -255,61 +297,19 @@ const time = DPicker.modules.time = {
      * @inheritdoc
      */
     initialize: function timeParseInputAttributes(attributes) {
-      this._minutesStep()
+      minutesStep.apply(this)
     },
 
     redraw: function timeRedraw() {
-      this._minutesStep()
+      minutesStep.apply(this)
     },
 
     /**
      * @inheritdoc
      */
     modelSetter: function timeModelSetter(newValue) {
-      this._minutesStep()
+      minutesStep.apply(this)
     }
   }
 }
 
-/**
- * Handles minutes steps to focus on the correct input and set the model minutes/hours
- * @alias DPicker.prototype._minutesStep
- */
-DPicker.prototype._minutesStep = function() {
-  if (!this._data.time) {
-    return
-  }
-
-  let {hours, minutes} = getHoursMinutes(this._data)
-
-  let modelMinutes = this._data.model.minutes()
-
-  if (minutes.length === 0) {
-    this._data.min.minutes(0)
-    this._data.min.add(1, 'hours')
-    let {hours, minutes} = getHoursMinutes(this._data)
-  }
-
-  if (this._data.model.minutes() < minutes[0]) {
-    this._data.model.minutes(minutes[0])
-    modelMinutes = minutes[0]
-  }
-
-  if (modelMinutes > minutes[minutes.length - 1]) {
-    this._data.model.minutes(0)
-    this._data.model.add(1, 'hours')
-    return
-  }
-
-  if (this._data.step <= 1) {
-    return
-  }
-
-  minutes[minutes.length] = 60
-  modelMinutes = minutes.reduce(function (prev, curr) {
-    return (Math.abs(curr - modelMinutes) < Math.abs(prev - modelMinutes) ? curr : prev)
-  })
-  minutes.length--
-
-  this._data.model.minutes(modelMinutes)
-}
