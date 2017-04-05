@@ -1,7 +1,6 @@
 'use strict'
 const nanomorph = require('nanomorph')
 const html = require('bel')
-const moment = require('moment')
 
 /**
  * uuid generator
@@ -56,6 +55,12 @@ function DPicker(element, options = {}) {
     return new DPicker(element, options)
   }
 
+  if (options.moment === undefined) {
+    options.moment = require('moment')
+  }
+
+  this.moment = options.moment
+
   const {container, attributes} = this._getContainer(element)
 
   this._container = uuid()
@@ -90,8 +95,8 @@ function DPicker(element, options = {}) {
 
   const methods = {
     display: false,
-    min: moment('1986-01-01'),
-    max: moment().add(1, 'year').month(11),
+    min: this.moment('1986-01-01'),
+    max: this.moment().add(1, 'year').month(11),
     format: this._data.format
   }
 
@@ -109,7 +114,7 @@ function DPicker(element, options = {}) {
     this._data.empty = true
   }
 
-  this._setData('model', [attributes.value, options.model, moment()], true)
+  this._setData('model', [attributes.value, options.model, this.moment()], true)
 
   this.onChange = options.onChange
 
@@ -143,14 +148,14 @@ DPicker.prototype._setData = function(key, values, isMoment = false) {
         break
       }
 
-      if (values[i] instanceof moment && values[i].isValid()) {
+      if (values[i] instanceof this.moment && values[i].isValid()) {
         this._data[key] = values[i]
         break
       }
 
-      this._data[key] = moment()
+      this._data[key] = this.moment()
 
-      const date = moment(values[i], this._data.format, true)
+      const date = this.moment(values[i], this._data.format, true)
 
       if (date.isValid()) {
         this._data[key] = date
@@ -178,7 +183,7 @@ DPicker.prototype._createGetSet = function(key) {
 DPicker.prototype._createMethods = function(defaults, attributes) {
   for (let i in defaults) {
     this._createGetSet(i)
-    this._setData(i, [attributes[i], defaults[i]], defaults[i] instanceof moment)
+    this._setData(i, [attributes[i], defaults[i]], defaults[i] instanceof this.moment)
   }
 }
 
@@ -366,7 +371,7 @@ DPicker.prototype._loadEvents = function loadEvents() {
       if (!evt.target.value) {
         this._data.empty = true
       } else {
-        let newModel = moment(evt.target.value, this._data.format, true)
+        let newModel = this.moment(evt.target.value, this._data.format, true)
 
         if (this.isValid(newModel) === true) {
           this._data.model = newModel
@@ -559,7 +564,7 @@ DPicker.prototype.getTree = function() {
  * @return {boolean}
  */
 DPicker.prototype.isValid = function isValid(model) {
-  if (!(model instanceof moment) || !model.isValid()) {
+  if (!(model instanceof this.moment) || !model.isValid()) {
     this._data.valid = false
     return false
   }
@@ -767,7 +772,7 @@ DPicker.prototype.renderDays = function renderDays(events, data, toRender) {
         }
 
         let dayMonth = previousMonth ? currentMonth : (nextMonth ? currentMonth + 2 : currentMonth + 1)
-        let currentDayModel = moment(day + '-' + dayMonth + '-' + currentYear, 'DD-MM-YYYY')
+        let currentDayModel = this.moment(day + '-' + dayMonth + '-' + currentYear, 'DD-MM-YYYY')
 
         if (dayActive === false && data.siblingMonthDayClick === true) {
           dayActive = true

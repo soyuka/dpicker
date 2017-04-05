@@ -30,7 +30,7 @@ function ModifierInputChange(evt) {
     x = -x
   }
 
-  this._data.model = moment().add(x, 'days')
+  this._data.model = this.moment().add(x, 'days')
 
   this.onChange()
 }
