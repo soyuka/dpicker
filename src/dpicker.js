@@ -67,8 +67,8 @@ function DPicker(element, options = {}) {
   this._data = {}
 
   const defaults = {
-    months: moment.months(),
-    days: moment.weekdaysShort(),
+    months: this.moment.months(),
+    days: this.moment.weekdaysShort(),
     empty: false,
     valid: true,
     order: ['months', 'years', 'time', 'days'],
@@ -76,7 +76,7 @@ function DPicker(element, options = {}) {
     hideOnEnter: true,
     hideOnOutsideClick: true,
     siblingMonthDayClick: false,
-    firstDayOfWeek: moment.localeData().firstDayOfWeek()
+    firstDayOfWeek: this.moment.localeData().firstDayOfWeek()
   }
 
   for (let i in defaults) {
