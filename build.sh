@@ -10,8 +10,8 @@ build() {
         args="-s DPicker $args"
   fi
 
-  sh -c "$browserify $args src/$1 -o dist/$1.js"
-  sh -c "$browserify -g uglifyify $args src/$1 | $uglifyjs -c > dist/$1.min.js"
+  sh -c "$browserify -u moment $args src/$1 -o dist/$1.js"
+  sh -c "$browserify -u moment -g uglifyify $args src/$1 | $uglifyjs -c > dist/$1.min.js"
 }
 
 rm dist/* &> /dev/null

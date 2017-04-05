@@ -1,6 +1,7 @@
 'use strict'
 const nanomorph = require('nanomorph')
 const html = require('bel')
+const moment = require('moment')
 
 /**
  * uuid generator
