@@ -1,5 +1,23 @@
 const nanomorph = require('nanomorph')
 const html = require('bel')
+const addYears = require('date-fns/fp/addYears')
+const setMonth = require('date-fns/fp/setMonth')
+const setYear = require('date-fns/fp/setYear')
+const setMinutes = require('date-fns/fp/setMinutes')
+const setHours = require('date-fns/fp/setHours')
+const setSeconds = require('date-fns/fp/setSeconds')
+const setMilliseconds = require('date-fns/fp/setMilliseconds')
+
+const format = require('date-fns/format')
+const parse = require('date-fns/parse')
+const isValid = require('date-fns/isValid')
+const isBefore = require('date-fns/isBefore')
+
+const INVALID_DATE = 'Invalid Date'
+
+function isDate(d) {
+  return d instanceof Date
+}
 
 /**
  * uuid generator
@@ -53,20 +71,14 @@ function DPicker (element, options = {}) {
     return new DPicker(element, options)
   }
 
-  if (options.moment === undefined) {
-    options.moment = require('moment')
-  }
-
-  this.moment = options.moment
-
   const {container, attributes} = this._getContainer(element)
 
   this._container = uuid()
   this._data = {}
 
   const defaults = {
-    months: this.moment.months(),
-    days: this.moment.weekdaysShort(),
+    months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
+    days: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
     empty: false,
     valid: true,
     order: ['months', 'years', 'time', 'days'],
@@ -74,7 +86,7 @@ function DPicker (element, options = {}) {
     hideOnEnter: true,
     hideOnOutsideClick: true,
     siblingMonthDayClick: false,
-    firstDayOfWeek: this.moment.localeData().firstDayOfWeek()
+    firstDayOfWeek: 1
   }
 
   for (let i in defaults) {
@@ -93,8 +105,8 @@ function DPicker (element, options = {}) {
 
   const methods = {
     display: false,
-    min: this.moment('1986-01-01'),
-    max: this.moment().add(1, 'year').month(11),
+    min: new Date(1986, 0, 1),
+    max: addYears(setMonth(new Date(), 11), 1),
     format: this._data.format
   }
 
@@ -109,14 +121,14 @@ function DPicker (element, options = {}) {
 
   for (let i in methods) {
     this._createGetSet(i)
-    this._setData(i, [attributes[i], methods[i]], methods[i] instanceof this.moment)
+    this._setData(i, [attributes[i], methods[i]], methods[i] instanceof Date)
   }
 
   if (attributes.value === undefined || attributes.value === '') {
     this._data.empty = true
   }
 
-  this._setData('model', [attributes.value, options.model, this.moment()], true)
+  this._setData('model', [attributes.value, options.model, new Date()], true)
 
   this.onChange = options.onChange
 
@@ -143,31 +155,31 @@ function DPicker (element, options = {}) {
  * _setData is a helper to set this._data values
  * @param {String} key
  * @param {Array} values the first value that is not undefined will be set in this._data[key]
- * @param {Boolean} isMoment whether this value should be a moment instance
+ * @param {Boolean} date whether this value should be a date
  */
-DPicker.prototype._setData = function (key, values, isMoment = false) {
+DPicker.prototype._setData = function (key, values, date = false) {
   for (let i = 0; i < values.length; i++) {
     if (values[i] === undefined || values[i] === '') {
       continue
     }
 
-    if (isMoment === false) {
+    if (date === false) {
       this._data[key] = values[i]
       break
     }
 
-    if (values[i] instanceof this.moment && values[i].isValid()) {
+    if (isDate(values[i]) && this._isValidDateWithFormat(values[i])) {
       this._data[key] = values[i]
       break
     }
 
-    this._data[key] = this.moment()
+    this._data[key] = new Date()
 
-    const date = this.moment(values[i], this._data.format, true)
+    // prefer immutability here
+    const parsed = parse(values[i], this._data.format, new Date())
 
-    if (date.isValid()) {
+    if (parsed !== INVALID_DATE) {
       this._data[key] = date
-      break
     }
   }
 }
@@ -333,7 +345,7 @@ DPicker.prototype._loadModules = function loadModules (attributes, options) {
         let attribute = typeof prop.attribute === 'function' ? prop.attribute(attributes) : attributes[prop.attribute]
 
         this._createGetSet(i)
-        this._setData(i, [attribute, options[i], prop.default], !!prop.isMoment)
+        this._setData(i, [attribute, options[i], prop.default], isDate(prop.default))
       }
     }
   }
@@ -394,9 +406,10 @@ DPicker.prototype._loadEvents = function loadEvents () {
       if (!evt.target.value) {
         this._data.empty = true
       } else {
-        let newModel = this.moment(evt.target.value, this._data.format, true)
+        let newModel = parse(evt.target.value, this._data.format, new Date())
 
-        if (this.isValid(newModel) === true) {
+        //sets the valid flag and returns if date is valid
+        if (this._checkValidity(newModel) === true) {
           this._data.model = newModel
         }
 
@@ -448,9 +461,10 @@ DPicker.prototype._loadEvents = function loadEvents () {
      */
     yearChange: (evt) => {
       this._data.empty = false
-      this._data.model.year(evt.target.options[evt.target.selectedIndex].value)
 
-      this.isValid(this._data.model)
+      setYear(this._data.model, evt.target.options[evt.target.selectedIndex].value)
+
+      this._checkValidity(this._data.model)
 
       this.redraw()
       this.onChange({modelChanged: true, name: 'yearChange', event: evt})
@@ -479,6 +493,7 @@ DPicker.prototype._loadEvents = function loadEvents () {
     dayClick: (evt) => {
       evt.preventDefault()
       evt.stopPropagation()
+
       this._data.model.date(evt.target.value)
       this._data.empty = false
 
@@ -488,7 +503,7 @@ DPicker.prototype._loadEvents = function loadEvents () {
 
       // temp fix, model setter should call this
       // @todo fix without moment.clone()
-      this.isValid(this._data.model)
+      // this.isValid(this._data.model)
 
       this.redraw()
       this.onChange({modelChanged: true, name: 'dayClick', event: evt})
@@ -580,20 +595,40 @@ DPicker.prototype.getTree = function () {
 }
 
 /**
+ * @param {Date} date
+ * si + format()
+ */
+DPicker.prototype._isValidDateWithFormat = function(date) {
+  const formatted = format(date, this._data.format/* , locale? */)
+  const parsed = parse(date, this._data.format, new Date())
+
+  return parsed !== INVALID_DATE && parsed === date
+}
+
+function resetDateSeconds(date) {
+  return setSeconds(setMilliseconds(date, 0), 0)
+}
+
+function resetDateHours(date) {
+  return setHours(setMinutes(resetDateSeconds(date, 0), 0), 0)
+}
+
+/**
  * Checks whether the given model is a valid moment instance
  * This method does set the `.valid` flag by checking min/max allowed inputs
  * Note that it will return `true` if the model is valid even if it's not in the allowed range
  * @param {Moment} model
  * @return {boolean}
  */
-DPicker.prototype.isValid = function isValid (model) {
-  if (!(model instanceof this.moment) || !model.isValid()) {
+DPicker.prototype._checkValidity = function checkValidity (date) {
+  if (!this._isValidDateWithFormat(date)) {
     this._data.valid = false
     return false
   }
 
-  let unit = this.time ? 'minute' : 'day'
-  if (model.isBefore(this._data.min, unit) || model.isAfter(this._data.max, unit)) {
+  let temp = time ? resetDateSeconds(this._data.model) : resetDateHours(this._data.model)
+
+  if (isBefore(temp, this._data.min) || isAfter(temp, this._data.max)) {
     this._data.valid = false
     return true
   }
@@ -615,8 +650,8 @@ DPicker.prototype.renderInput = function renderInput (events, data, toRender) {
     id="${data.inputId}"
     value="${data.empty === true ? '' : data.model.format(data.format)}"
     type="text"
-    min="${data.min.format(data.format)}"
-    max="${data.max.format(data.format)}"
+    min="${data.min}"
+    max="${data.max}"
     format="${data.format}"
     onchange="${events.inputChange}"
     onfocus="${events.inputFocus}"
@@ -817,17 +852,17 @@ DPicker.prototype.renderDays = function renderDays (events, data, toRender) {
  * Use it with modules to change things on initialization
  */
 DPicker.prototype.initialize = function () {
-  this.isValid(this._data.model)
+  this._checkValidity(this._data.model)
 }
 
 /**
- * The model setter, feel free to override through modules
+ * The model setter, feel free to decorate through modules
  * @param {Moment} newValue
  */
 DPicker.prototype.modelSetter = function (newValue) {
   this._data.empty = !newValue
 
-  if (this.isValid(newValue) === true) {
+  if (this._checkValidity(newValue) === true) {
     this._data.model = newValue
   }
 

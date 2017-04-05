@@ -25,6 +25,7 @@
   "dependencies": {
     "array.prototype.fill": "^1.0.2",
     "bel": "^4.6.0",
+    "date-fns": "date-fns/date-fns#v2",
     "dom4": "^1.8.3",
     "moment": "^2.13.0",
     "nanomorph": "soyuka/nanomorph#master",
