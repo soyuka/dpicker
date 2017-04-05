@@ -145,7 +145,9 @@
   <script src="../dist/dpicker.modifiers.js"></script>
   <script src="../dist/dpicker.time.js"></script>
   <script>
-		;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(e => new DPicker(e));
+    ;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e) {
+      new DPicker(e)
+    });
 
     angular.module('myModule', [])
 
@@ -156,7 +158,7 @@
         template: '<button class="button" ng-click="toggle($event)">Toggle</button><button class="button" ng-click="tomorrow($event)">Tomorrow</button><button class="button" ng-click="today($event)">Today</button>',
         scope: true,
         link: function(scope, element, attrs) {
-          let dpicker = new DPicker(element[0])
+          var dpicker = new DPicker(element[0])
 
           scope.toggle = function(evt) {
             dpicker.display = !dpicker.display
@@ -191,7 +193,7 @@
           }
 
           if (scope.ngModel) {
-            let model = moment(scope.ngModel, scope.dpicker.format, true)
+            var model = moment(scope.ngModel, scope.dpicker.format, true)
             if (model.isValid()) {
               scope.dpicker.model = model
             }
@@ -202,7 +204,7 @@
           //Move ng-class to input
           if (attrs.ngClass) {
             element[0].removeAttribute('ng-class')
-            let e
+            var e
 
             if (element[0].tagName == 'INPUT') {
               e = element[0]
