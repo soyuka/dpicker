@@ -11,8 +11,11 @@ install:
   - npm install
   - npm run build
 
+before_script:
+  - npm install -g codeclimate-test-reporter eslint
+  - eslint src
+
 after_success:
-  - npm install -g codeclimate-test-reporter
   - npm run coverage
   - CODECLIMATE_REPO_TOKEN=1a5a920d9c50908c07be3678ac79497ae6b4b94f89a1b2638aa8a4455e7e7c3a codeclimate-test-reporter < coverage/lcov.info
 
