@@ -1,6 +1,7 @@
 #!env /bin/sh
 
 browserify="$(npm bin)/browserify"
+uglifyjs="$(npm bin)/uglifyjs"
 
 build() {
   args="-g unassertify -t babelify"
@@ -10,7 +11,7 @@ build() {
   fi
 
   sh -c "$browserify $args src/$1 -o dist/$1.js"
-  sh -c "$browserify -g uglifyify $args src/$1 -o dist/$1.min.js"
+  sh -c "$browserify -g uglifyify $args src/$1 | $uglifyjs -c > dist/$1.min.js"
 }
 
 rm dist/* &> /dev/null
