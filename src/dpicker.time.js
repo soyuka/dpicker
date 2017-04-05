@@ -19,6 +19,11 @@ const HOURS24 = new Array(24).fill(0).map((e, i) => i)
 const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
 HOURS12.push(HOURS12.shift())
 
+/**
+ * Get hours and minutes according to the given _data (meridiem, min/max consideration)
+ * @param {Object} data
+ * @return {hours, minutes}
+ */
 function getHoursMinutes (data) {
   let hours = data.meridiem ? HOURS12 : HOURS24
   let minutes = MINUTES.filter(e => e % data.step === 0)
@@ -38,6 +43,10 @@ function getHoursMinutes (data) {
   return {hours, minutes}
 }
 
+/**
+ * Pad left for minutes \o/
+ * @param {Number} v
+ */
 function padLeftZero (v) {
   return v < 10 ? '0' + v : '' + v
 }
@@ -297,14 +306,10 @@ DPicker.modules.time = {
       minutesStep.apply(this)
     },
 
-    redraw: function timeRedraw () {
-      minutesStep.apply(this)
-    },
-
     /**
      * @inheritdoc
      */
-    modelSetter: function timeModelSetter (newValue) {
+    redraw: function timeRedraw () {
       minutesStep.apply(this)
     }
   }

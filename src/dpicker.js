@@ -106,7 +106,11 @@ function DPicker (element, options = {}) {
 
   this._events = this._loadEvents()
   this._loadModules(attributes, options)
-  this._createMethods(methods, attributes)
+
+  for (let i in methods) {
+    this._createGetSet(i)
+    this._setData(i, [attributes[i], methods[i]], methods[i] instanceof this.moment)
+  }
 
   if (attributes.value === undefined || attributes.value === '') {
     this._data.empty = true
@@ -135,6 +139,12 @@ function DPicker (element, options = {}) {
   return this
 }
 
+/**
+ * _setData is a helper to set this._data values
+ * @param {String} key
+ * @param {Array} values the first value that is not undefined will be set in this._data[key]
+ * @param {Boolean} isMoment whether this value should be a moment instance
+ */
 DPicker.prototype._setData = function (key, values, isMoment = false) {
   for (let i = 0; i < values.length; i++) {
     if (values[i] === undefined || values[i] === '') {
@@ -162,6 +172,11 @@ DPicker.prototype._setData = function (key, values, isMoment = false) {
   }
 }
 
+/**
+ * Creates getters and setters for a given key
+ * When the setter is called we will redraw
+ * @param {String} key
+ */
 DPicker.prototype._createGetSet = function (key) {
   if (DPicker.prototype.hasOwnProperty(key)) {
     return
@@ -178,13 +193,11 @@ DPicker.prototype._createGetSet = function (key) {
   })
 }
 
-DPicker.prototype._createMethods = function (defaults, attributes) {
-  for (let i in defaults) {
-    this._createGetSet(i)
-    this._setData(i, [attributes[i], defaults[i]], defaults[i] instanceof this.moment)
-  }
-}
-
+/**
+ * Gives the dpicker container and it's attributes
+ * If the container is an input, the parentNode is the container but the attributes are the input's ones
+ * @param {Element} container
+ */
 DPicker.prototype._getContainer = function (container) {
   if (typeof container === 'undefined') {
     throw new ReferenceError('Can not initialize DPicker without a container')
@@ -242,6 +255,13 @@ DPicker.prototype._mount = function (element) {
   element.appendChild(this._tree)
 }
 
+/**
+ * Creates a decorator
+ * @internal
+ * @param {String} which    one of events, calls
+ * @param {Function} origin the origin function that will be decorated
+ * @param {String} key      the key of the "which" we need to decorate
+ */
 DPicker.prototype._decorate = function decorate (which, origin, key) {
   const self = this
   return function () {
@@ -258,8 +278,13 @@ DPicker.prototype._decorate = function decorate (which, origin, key) {
 }
 
 /**
- * Load modules
+ * Load modules:
+ * - Prepare new events or calls that'd need decoration
+ * - Check for new yet-to-be rendered elements
+ * - Prepare new properties
  * @internal
+ * @param {Object} attributes the input attributes for the default value (module properties)
+ * @param {Object} options    options object given to DPicker constructor
  */
 DPicker.prototype._loadModules = function loadModules (attributes, options) {
   this._modules = {calls: {}, events: {}, render: {}}

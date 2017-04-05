@@ -146,7 +146,7 @@
   <script src="../dist/dpicker.time.js"></script>
   <script>
     ;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e) {
-      new DPicker(e)
+      new DPicker(e, {moment: moment})
     });
 
     angular.module('myModule', [])
@@ -158,7 +158,7 @@
         template: '<button class="button" ng-click="toggle($event)">Toggle</button><button class="button" ng-click="tomorrow($event)">Tomorrow</button><button class="button" ng-click="today($event)">Today</button>',
         scope: true,
         link: function(scope, element, attrs) {
-          var dpicker = new DPicker(element[0])
+          var dpicker = new DPicker(element[0], {moment: moment})
 
           scope.toggle = function(evt) {
             dpicker.display = !dpicker.display
@@ -186,7 +186,7 @@
         },
         require: 'ngModel',
         link: function(scope, element, attrs, ngModelCtrl) {
-          scope.dpicker = new DPicker(element[0])
+          scope.dpicker = new DPicker(element[0], {moment: moment})
 
           scope.dpicker.onChange = function() {
             ngModelCtrl.$setViewValue(scope.dpicker.model)
