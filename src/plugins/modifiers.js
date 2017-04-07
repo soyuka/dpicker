@@ -1,6 +1,4 @@
-if (!DPicker) {
-  throw new ReferenceError('DPicker is required for this extension to work')
-}
+const DPicker = require('../dpicker.js')
 
 /**
  * @module DPicker.modules.modifiers
@@ -28,13 +26,16 @@ function ModifierInputChange (evt) {
     x = -x
   }
 
-  this._data.model = this.moment().add(x, 'days')
-
-  this.onChange()
-}
-
-DPicker.modules.modifiers = {
-  events: {
-    inputChange: ModifierInputChange
+  if (x < 0) {
+    this.model = DPicker._dateAdapter.subDays(new Date(), -x)
+  } else {
+    this.model = DPicker._dateAdapter.addDays(new Date(), x)
   }
+
+  this.onChange({modelChanged: true, name: 'inputChange', event: evt})
 }
+
+/**
+ * @inheritdoc
+ */
+DPicker._events.inputChange = DPicker.decorate(DPicker._events.inputChange, ModifierInputChange)

@@ -1,3 +1,5 @@
+const DPicker = require('../dpicker.js')
+
 function positionInParent (children) {
   return [].indexOf.call(children.parentNode.children, children)
 }
@@ -112,12 +114,4 @@ function DayKeyDown (evt) {
   }
 }
 
-if (!DPicker) {
-  throw new ReferenceError('DPicker is required for this extension to work')
-}
-
-DPicker.modules.arrowNavigation = {
-  events: {
-    dayKeyDown: DayKeyDown
-  }
-}
+DPicker._events.dayKeyDown = DPicker.decorate(DPicker._events.dayKeyDown, DayKeyDown)

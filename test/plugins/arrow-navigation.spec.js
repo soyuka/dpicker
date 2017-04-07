@@ -1,12 +1,13 @@
 'use strict'
 const moment = require('moment')
 const expect = require('chai').expect
-const DPicker = require('dpicker')
 
 describe('dpicker.arrow-navigation', function() {
+  let DPicker = window.DPicker
+  require('../../dist/dpicker.arrow-navigation')
+
   before(() => {
     document.body.innerHTML = ''
-    require('dpicker.arrow-navigation')
   })
 
   it('should enable arrows navigation on days', function() {

@@ -140,13 +140,10 @@
   </div>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-  <script src="../dist/dpicker.js"></script>
-  <script src="../dist/dpicker.arrow-navigation.js"></script>
-  <script src="../dist/dpicker.modifiers.js"></script>
-  <script src="../dist/dpicker.time.js"></script>
+  <script src="../dist/dpicker.all.js"></script>
   <script>
     ;[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e) {
-      new DPicker(e, {moment: moment})
+      new DPicker(e)
     });
 
     angular.module('myModule', [])

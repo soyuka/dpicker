@@ -13,7 +13,7 @@ function keyDown(keyCode, element) {
 }
 
 describe('dpicker', function() {
-  const DPicker = require('dpicker')
+  const DPicker = require('../dist/dpicker')
 
   beforeEach(() => {
     document.body.innerHTML = ''
@@ -48,7 +48,7 @@ describe('dpicker', function() {
         expect(select.children[selectedIndex].selected).to.be.true
 
         let input = document.querySelector('input[name=dpicker-input]')
-        expect(''+dpicker.model.year()).to.equal(select.options[selectedIndex].value)
+        expect(''+moment(dpicker.model).year()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
       }
@@ -66,7 +66,7 @@ describe('dpicker', function() {
         expect(select.children[selectedIndex].selected).to.be.true
 
         let input = document.querySelector('input[name=dpicker-input]')
-        expect(''+dpicker.model.month()).to.equal(select.options[selectedIndex].value)
+        expect(''+moment(dpicker.model).month()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
       }
@@ -84,7 +84,7 @@ describe('dpicker', function() {
     const dpicker = createDatePicker({
       onChange: (data) => {
         expect(fn).to.have.been.called()
-        expect(''+dpicker.model.date()).to.equal(button.value)
+        expect(''+moment(dpicker.model).date()).to.equal(button.value)
         expect(dpicker.display).to.equal(false)
         cb()
       }
@@ -142,9 +142,9 @@ describe('dpicker', function() {
 
     expect(dpicker.inputId).to.equal('t')
     expect(dpicker.format).to.equal('YYYY-MM-DD')
-    expect(dpicker.min.format('YYYY-MM-DD')).to.equal('1991-06-24')
-    expect(dpicker.max.format('YYYY-MM-DD')).to.equal('1992-11-21')
-    expect(dpicker.model.format('YYYY-MM-DD')).to.equal('1992-10-10')
+    expect(moment(dpicker.min).format('YYYY-MM-DD')).to.equal('1991-06-24')
+    expect(moment(dpicker.max).format('YYYY-MM-DD')).to.equal('1992-11-21')
+    expect(moment(dpicker.model).format('YYYY-MM-DD')).to.equal('1992-10-10')
 
     input = document.getElementById('t')
     expect(input.getAttribute('type')).to.equal('text')
@@ -276,7 +276,9 @@ describe('dpicker', function() {
 
     dpicker.model = moment('24/06/1991', 'DD/MM/YYYY')
     expect(dpicker._data.empty).to.be.false
-    dpicker.model = ''
+    input = label.querySelector('input')
+    input.value = ''
+    input.onchange({target: input})
     expect(dpicker._data.empty).to.be.true
   })
 
@@ -421,7 +423,7 @@ describe('dpicker', function() {
     let button = buttons[0]
     button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
     expect(dpicker.valid).to.be.true
-    expect(dpicker.model.month()).to.equal(4)
+    expect(moment(dpicker.model).month()).to.equal(4)
   })
 
   it('should enable click on next month days', function() {
@@ -440,7 +442,7 @@ describe('dpicker', function() {
     let button = buttons[buttons.length - 1]
     button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
     expect(dpicker.valid).to.be.true
-    expect(dpicker.model.month()).to.equal(6)
+    expect(moment(dpicker.model).month()).to.equal(6)
   })
 
   it('should not enable click on next month days if > max', function() {
@@ -479,3 +481,7 @@ describe('dpicker', function() {
     expect(button.textContent.trim()).to.equal('10')
   })
 })
+
+require('./plugins/arrow-navigation.spec.js')
+require('./plugins/modifiers.spec.js')
+require('./plugins/time.spec.js')

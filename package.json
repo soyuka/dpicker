@@ -4,7 +4,7 @@
   "description": "A framework-agnostic minimal date picker.",
   "main": "dist/dpicker.js",
   "scripts": {
-    "test": "standard --global DPicker src/*.js && mocha",
+    "test": "standard --global DPicker src/*.js && mocha -b",
     "build": "bash build.sh",
     "coverage": "istanbul cover -x test.js -x src _mocha"
   },
@@ -38,6 +38,7 @@
     "babel-preset-env": "^1.3.2",
     "babelify": "^7.3.0",
     "browserify": "^14.1.0",
+    "browserify-shim": "^3.8.14",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
     "istanbul": "^0.4.4",
@@ -49,5 +50,9 @@
     "standard": "^9.0.2",
     "uglifyify": "^3.0.4",
     "unassertify": "^2.0.4"
+  },
+  "browserify-shim": {
+    "moment": "global:moment",
+    "../dpicker.js": "global:DPicker"
   }
 }

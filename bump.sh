@@ -8,7 +8,7 @@ if [[ $1 == 'patch' || $1 == 'minor' || $1 == 'major' ]]; then
         tag='latest'
 fi
 
-bash build.sh
+bash build.sh forpublish
 npm test
 newver=$(npm --no-git-tag-version version $1)
 git add -f dist package.json
