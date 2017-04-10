@@ -121,6 +121,24 @@ function getMinutes (date) {
 }
 
 /**
+ * Get Seconds
+ * @param {Date} date
+ * @return {Number}
+ */
+function getSeconds (date) {
+  return _getMoment(date, false).seconds()
+}
+
+/**
+ * Get Milliseconds
+ * @param {Date} date
+ * @return {Number}
+ */
+function getMilliseconds (date) {
+  return _getMoment(date, false).milliseconds()
+}
+
+/**
  * Set Date
  * @param {Date} date
  * @param {Number} day
@@ -130,10 +148,22 @@ function setDate (date, day) {
   return _getMoment(date).date(day).toDate()
 }
 
+/**
+ * Set Minutes
+ * @param {Date} date
+ * @param {Number} minutes
+ * @return {Date}
+ */
 function setMinutes (date, minutes) {
   return _getMoment(date).minutes(minutes).toDate()
 }
 
+/**
+ * Set Hours
+ * @param {Date} date
+ * @param {Number} hours
+ * @return {Date}
+ */
 function setHours (date, hours) {
   return _getMoment(date).hours(hours).toDate()
 }
@@ -216,16 +246,6 @@ function subDays (date, num) {
  */
 function subMonths (date, num) {
   return _getMoment(date).subtract(num, MONTH_TOKEN).toDate()
-}
-
-/**
- * Parses a string and return a Date
- * @param {String} dateString
- * @param {String} format
- * @return {Date}
- */
-function parse (dateString, format) {
-  return moment(dateString, format).toDate()
 }
 
 /**
@@ -374,6 +394,8 @@ module.exports = {
   getMonth: getMonth,
   getDate: getDate,
   getMinutes: getMinutes,
+  getSeconds: getSeconds,
+  getMilliseconds: getMilliseconds,
   setDate: setDate,
   setMinutes: setMinutes,
   setHours: setHours,
@@ -385,7 +407,6 @@ module.exports = {
   addHours: addHours,
   subDays: subDays,
   subMonths: subMonths,
-  parse: parse,
   format: format,
   daysInMonth: daysInMonth,
   firstWeekDay: firstWeekDay,

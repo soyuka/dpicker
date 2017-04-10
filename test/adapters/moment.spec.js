@@ -47,6 +47,18 @@ function doTest (Adapter) {
     expect(adapter.getDate(date)).to.equal(24)
   })
 
+  it('should test getHours ', () => {
+    const date = new Date(1991, 5, 24, 12)
+
+    expect(adapter.getHours(date)).to.equal(12)
+  })
+
+  it('should test getMinutes ', () => {
+    const date = new Date(1991, 5, 24, 12, 50)
+
+    expect(adapter.getMinutes(date)).to.equal(50)
+  })
+
   it('should test getMonth ', () => {
     const date = new Date(1991, 5, 24)
 
@@ -69,6 +81,18 @@ function doTest (Adapter) {
     const date = new Date(1991, 5, 24)
 
     expect(adapter.getMonth(adapter.setMonth(date, 6))).to.equal(6)
+  })
+
+  it('should test setHours ', () => {
+    const date = new Date(1991, 5, 24)
+
+    expect(adapter.getHours(adapter.setHours(date, 12))).to.equal(12)
+  })
+
+  it('should test setMinutes ', () => {
+    const date = new Date(1991, 5, 24)
+
+    expect(adapter.getMinutes(adapter.setMinutes(date, 50))).to.equal(50)
   })
 
   it('should test setYear ', () => {
@@ -102,6 +126,13 @@ function doTest (Adapter) {
     expect(adapter.getYear(adapter.addYears(date, 2))).to.equal(1993)
   })
 
+  it('should add hours', () => {
+    const date = new Date(1991, 5, 24, 10)
+
+    expect(adapter.getHours(adapter.addHours(date, 2))).to.equal(12)
+    expect(adapter.getHours(adapter.addHours(date, 1))).to.equal(11)
+  })
+
   it('should sub days', () => {
     const date = new Date(1991, 5, 24)
 
@@ -121,14 +152,6 @@ function doTest (Adapter) {
     const newDate = adapter.subMonths(date, 6)
     expect(adapter.getMonth(newDate)).to.equal(11)
     expect(adapter.getYear(newDate)).to.equal(1990)
-  })
-
-  it('should parse', () => {
-    const date = adapter.parse('24/06/1991', 'DD/MM/YYYY')
-
-    expect(adapter.getDate(date)).to.equal(24)
-    expect(adapter.getMonth(date)).to.equal(5)
-    expect(adapter.getYear(date)).to.equal(1991)
   })
 
   it('should format', () => {
@@ -156,17 +179,27 @@ function doTest (Adapter) {
   it('should reset seconds from date', () => {
     const date = adapter.resetSeconds(new Date())
 
-    expect(date.getSeconds()).to.equal(0)
-    expect(date.getMilliseconds()).to.equal(0)
+    expect(adapter.getSeconds(date)).to.equal(0)
+    expect(adapter.getMilliseconds(date)).to.equal(0)
   })
 
   it('should reset hours from date', () => {
     const date = adapter.resetHours(new Date())
 
-    expect(date.getSeconds()).to.equal(0)
-    expect(date.getMilliseconds()).to.equal(0)
-    expect(date.getMinutes()).to.equal(0)
-    expect(date.getHours()).to.equal(0)
+    expect(adapter.getSeconds(date)).to.equal(0)
+    expect(adapter.getMilliseconds(date)).to.equal(0)
+    expect(adapter.getMinutes(date)).to.equal(0)
+    expect(adapter.getHours(date)).to.equal(0)
+  })
+
+  it('should get Meridiem', () => {
+    const date = new Date(1991, 5, 24, 11, 20)
+
+    expect(adapter.getMeridiem(date)).to.equal('AM')
+
+    const date2 = new Date(1991, 5, 24, 15, 20)
+
+    expect(adapter.getMeridiem(date2)).to.equal('PM')
   })
 
   it('should reset minutes from date', () => {
@@ -175,6 +208,42 @@ function doTest (Adapter) {
     expect(date.getSeconds()).to.equal(0)
     expect(date.getMilliseconds()).to.equal(0)
     expect(date.getMinutes()).to.equal(0)
+  })
+
+  it('should test isBefore', () => {
+    expect(adapter.isBefore(new Date(1991, 5, 24), new Date(1991, 6, 24))).to.be.true
+  })
+
+  it('should test isAfter', () => {
+    expect(adapter.isAfter(new Date(1991, 6, 24), new Date(1991, 5, 24))).to.be.true
+  })
+
+  it('should test isSameOrBefore', () => {
+    expect(adapter.isSameOrBefore(new Date(1991, 5, 24), new Date(1991, 5, 24))).to.be.true
+    expect(adapter.isSameOrBefore(new Date(1991, 4, 24), new Date(1991, 5, 24))).to.be.true
+  })
+
+  it('should test isSameOrAfter', () => {
+    expect(adapter.isSameOrAfter(new Date(1991, 5, 24), new Date(1991, 5, 24))).to.be.true
+    expect(adapter.isSameOrAfter(new Date(1991, 6, 24), new Date(1991, 5, 24))).to.be.true
+  })
+
+  it('should test isSameDay', () => {
+    expect(adapter.isSameDay(new Date(1991, 5, 24, 22, 1), new Date(1991, 5, 24, 12, 1))).to.be.true
+    expect(adapter.isSameDay(new Date(1991, 3, 24, 22, 1), new Date(1991, 5, 24, 12, 1))).to.be.false
+    expect(adapter.isSameDay(new Date(1991, 5, 22, 22, 1), new Date(1991, 5, 24, 12, 1))).to.be.false
+  })
+
+  it('should test isSameHours', () => {
+    expect(adapter.isSameHours(new Date(1991, 5, 24, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.true
+    expect(adapter.isSameHours(new Date(1991, 3, 24, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.false
+    expect(adapter.isSameHours(new Date(1991, 5, 22, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.false
+  })
+
+  it('should test isSameMonth', () => {
+    expect(adapter.isSameMonth(new Date(1991, 5, 21, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.true
+    expect(adapter.isSameMonth(new Date(1991, 3, 24, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.false
+    expect(adapter.isSameMonth(new Date(1990, 5, 22, 22, 1), new Date(1991, 5, 24, 22, 1))).to.be.false
   })
 }
 
