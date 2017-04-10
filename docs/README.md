@@ -34,16 +34,24 @@ Modules alone (needs the core to be included first):
 
 For example with the [unpkg cdn](https://unpkg.com):
 
-```
+```html
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.datetime.min.js"></script>
 ```
 
 Is the same as:
 
-```
+```html
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.time.min.js"></script>
 ```
+
+For old browser support, you can will need the `polyfill` file:
+
+```html
+<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/polyfills.min.js"></script>
+```
+
+?> Those polyfills are [array.prototype.fill](https://www.npmjs.com/package/array.prototype.fill) and [dom4](https://www.npmjs.com/package/dom4)
 
 ## Usage
 
