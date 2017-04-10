@@ -17,7 +17,7 @@ build() {
   if [[ $3 == 1 ]]; then
         args="-s DPicker $args"
   else
-        args="-x ./src/dpicker.js $args"
+        args="-x ./src/dpicker.moment.js $args"
   fi
 
   echo  "Browserifying src/$1 => $2"
@@ -35,7 +35,8 @@ mkdir dist &> /dev/null
 echo
 echo "Build"
 
-build "dpicker" "dpicker" 1 &
+build "dpicker.moment" "dpicker" 1 &
+build "dpicker" "dpicker.core" 1 &
 build "plugins/time" "dpicker.time" &
 build "plugins/modifiers" "dpicker.modifiers" &
 build "plugins/arrow-navigation" "dpicker.arrow-navigation" &
@@ -60,6 +61,8 @@ if [[ $RELEASE_BUILD == 1 ]]; then
 
   # undo changes
   patch -R package.json .scripts/shim.patch
+
+  rm package.json.orig
 
   echo  "Browserifying polyfills"
   $browserify -g uglifyify src/polyfills.js -o dist/polyfills.min.js

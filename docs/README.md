@@ -17,14 +17,16 @@ npm install dpicker --save
 bower install dpicker --save
 ```
 
-!> Package managers are only referencing `dpicker.js`! To keep `dpicker` small, every new feature is added through a module.
-You can either use those separatly, or use one of the pre-built package.
+!> Package managers are only referencing `dpicker.core.js`! This is useful to build your own package! See below for pre-built packages.
+
+To keep `dpicker` small, every new feature is added through a module. You can either use those separatly, or use one of the pre-built package.
 
 We've built-in the following for an easy installation (suffix with `.min.js` for the minified version):
 
-- `dpicker.all` contains every module (~7.6kb)
+- `dpicker.all` contains every module (~7.7kb)
 - `dpicker.datetime` contains only core and time (~6.9kb)
-- `dpicker` contains only core (~5.6kb)
+- `dpicker` contains core with momentjs adapter (~5.6kb)
+- `dpicker.core` contains only core (~4.89kb)
 
 Modules alone (needs the core to be included first):
 
@@ -181,6 +183,23 @@ dp.time = true
 ```
 
 Available properties are listed in the [api documentation](_api#dpickerelement-options), where [some properties](_api#dpicker_properties) belong to modules.
+
+Let's get further with Javascript with the [`onChange` method](_api#onchangedata-dpickerevent). This is a hook to listen to any change that comes from DPicker. It helps integrating the date picker in any framework.
+
+```javascript
+var container = document.getElementById('dpicker')
+var dp = new DPicker(container)
+
+dp.onChange = function(data, DPickerEvent) {
+  // has the model changed?
+  console.log(DPickerEvent.modelChanged)
+  // the name of the internal event
+  console.log(DPickerEvent.name)
+  // the origin DOM event
+  console.dir(DPickerEvent.event)
+}
+
+```
 
 ## CSS
 
@@ -355,8 +374,10 @@ angular.module('DPicker')
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModelCtrl) {
 			scope.dpicker = new DPicker(element[0])
-			scope.dpicker.onChange = function() {
-				ngModelCtrl.$setViewValue(scope.dpicker.model)
+			scope.dpicker.onChange = function(data, DPickerEvent) {
+        if (DPickerEvent.modelChanged === true) {
+          ngModelCtrl.$setViewValue(scope.dpicker.model)
+        }
 			}
 
 			if (scope.ngModel && scope.ngModel instanceof Date) {
@@ -416,8 +437,11 @@ export class PrefixDpickerDirective implements ControlValueAccessor, OnInit {
       console.error(e.message)
     }
 
-    this.dpicker.onChange = () => {
-      this.onChangeCallback(this.dpicker.model)
+    this.dpicker.onChange = (data, DPickerEvent) => {
+      if (DPickerEvent.modelChanged === true) {
+        this.onChangeCallback(this.dpicker.model)
+      }
+
       this.onTouchedCallback()
     }
   }

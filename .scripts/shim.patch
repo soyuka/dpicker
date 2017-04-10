@@ -5,7 +5,7 @@
    },
    "browserify-shim": {
 -    "moment": "global:moment",
--    "../dpicker.js": "global:DPicker"
+-    "../dpicker.moment.js": "global:DPicker"
 +    "moment": "global:moment"
    }
  }
