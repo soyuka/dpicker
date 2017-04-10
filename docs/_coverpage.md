@@ -9,7 +9,7 @@
 - Fully featured
 - Extendable - build you own modules
 
-[GitHub](https://github.com/soyuka/dpicker)
+[Demo](_demo)
 [Get Started](#installation)
 
 ![color](#f8f8f8)

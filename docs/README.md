@@ -47,7 +47,7 @@ Is the same as:
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.time.min.js"></script>
 ```
 
-For old browser support, you can will need the `polyfill` file:
+For old browser support, you will need the `polyfill` file:
 
 ```html
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/polyfills.min.js"></script>
@@ -496,7 +496,7 @@ Html:
 <form #f='ngForm'>
   valid: {{f.valid}} {{foo}}
    <div>
-     <input type='text' prefixDpicker max='12/12/2016' [(ngModel)]='foo' name: 'bar' />
+     <input type='text' prefixDpicker max='12/12/2016' [(ngModel)]='foo' name='bar' />
    </div>
 </form>
 ```
@@ -604,9 +604,9 @@ console.log(dpicker.model) //the Date instance
 console.log(dpicker.input) //the input value, a formatted date
 ```
 
-## Thanks
+## Credits
 
-DPicker refactor (<4 => 5) motivation:
+DPicker refactor (from `4` to `5`) motivation:
 
 - [date-fns](https://github.com/date-fns/date-fns) - because I think this is a good alternative to momentjs, especially since it's immutable
 - [nanomorph](https://github.com/yoshuawuyts/nanomorph), in fact [@yoshuawuyts](https://github.com/yoshuawuyts) writings in general
