@@ -311,6 +311,24 @@ new DPicker(element, {order: ['previousMonth', 'months', 'years', 'nextMonth', '
 
 This module is actually available [here](https://github.com/soyuka/dpicker/blob/development/src/plugins/navigation.js).
 
+If you don't want to use `bel`, just use native DOM elements. For example, this adds a confirm button:
+
+```
+//add 'closeButton' to the `order` array
+DPicker._renders.closeButton = function renderCloseButton(events, data) {
+  const button = document.createElement('button')
+  button.innerText = 'Confirm'
+  button.type = 'button'
+  button.classList.add('dpicker-close-button')
+  button.addEventListener('click', events.hidePicker)
+  return button
+}
+
+DPicker._events.hidePicker = function hidePicker() {
+  this.display = false
+}
+```
+
 ### Go further
 
 Sometimes, you just want to do more work when one of the [available events or methods](_api) from DPicker are called. For this to work we can `decorate` public methods or events.
@@ -540,7 +558,7 @@ export function CycleDPicker (sources) {
 
 ## Date Adapter
 
-Because framework agnostic also means that we don't want to force you to use one or another Date library, DPicker uses a `DateAdapter`. It's a simple bridge module that exposes needed functions. If you want to implement your own date adapter, implement the [DateAdapter as documented in the API](_api#momentadapter).
+Because framework agnostic also means that we don't want to force you to use one or another Date library, DPicker uses a `DateAdapter`. It's a simple bridge module that exposes needed functions. If you want to implement your own date adapter, implement the [DateAdapter as documented in the API](_api#momentadapter). Dates MUST be immutable!
 
 Referencing the `dateAdapter` of your choice is done through the static property:
 
