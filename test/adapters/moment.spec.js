@@ -1,3 +1,4 @@
+'use strict'
 const MomentDateAdapter = require('../../src/adapters/moment.js')
 const moment = require('moment')
 const expect = require('chai').expect
