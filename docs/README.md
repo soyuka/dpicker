@@ -55,13 +55,15 @@ For old browser support, you can will need the `polyfill` file:
 
 ?> Those polyfills are [array.prototype.fill](https://www.npmjs.com/package/array.prototype.fill) and [dom4](https://www.npmjs.com/package/dom4)
 
-## Usage
-
-DPicker relies on [momentjs](momentjs.com) (soon [date-fns](https://github.com/date-fns/date-fns) as an alternative!). It can be included with your favorite module loader or through a CDN, for example:
+The default library to handle dates is `momentjs`, just add it to your script:
 
 ```html
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 ```
+
+?> I'm working on getting `date-fns` as alternative, please let me know if you wish to see other date adapters. Want to build your own take a look at the [Date adapter section](#date-adapter)
+
+## Usage
 
 To create a date picker, just init the DPicker module within a container:
 
@@ -540,13 +542,25 @@ export function CycleDPicker (sources) {
 
 Because framework agnostic also means that we don't want to force you to use one or another Date library, DPicker uses a `DateAdapter`. It's a simple bridge module that exposes needed functions. If you want to implement your own date adapter, implement the [DateAdapter as documented in the API](_api#momentadapter).
 
-?> **TODO** Release a package with no default date adapters
-
 Referencing the `dateAdapter` of your choice is done through the static property:
 
 ```javascript
 DPicker._dateAdapter = MyDateAdapter
 ```
+
+For this to work nicely, I'd recommend to use `dpicker.core.js` and to build with `browserify`. The end file will look like this:
+
+```javascript
+const DPicker = require('dpicker')
+const MyDateAdapter = require('./my.date.adapter')
+
+DPicker._dateAdapter = MyDateAdapter
+
+// Require some extensions here
+require('node_modules/dpicker/dist/dpicker.time.js')
+```
+
+Use our 100% coverage test case instead of building your own tests!
 
 ## Why?
 
