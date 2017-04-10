@@ -47,7 +47,7 @@ if [[ $RELEASE_BUILD == 1 ]]; then
   echo  "Build release files"
 
   # Patching package.json
-  patch package.json build/shim.patch
+  patch package.json .scripts/shim.patch
 
   # Build date + time
   echo  "Browerifying datetime"
@@ -59,7 +59,7 @@ if [[ $RELEASE_BUILD == 1 ]]; then
   sh -c "$browserify $MIN_ARGS -s DPicker src/all -o dist/dpicker.all.min.js"
 
   # undo changes
-  patch -R package.json build/shim.patch
+  patch -R package.json .scripts/shim.patch
 
   echo  "Browserifying polyfills"
   $browserify -g uglifyify src/polyfills.js -o dist/polyfills.min.js
