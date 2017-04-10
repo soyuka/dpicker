@@ -1,6 +1,5 @@
 const nanomorph = require('nanomorph')
 const html = require('bel')
-const MomentDateAdapter = require('./adapters/moment.js')
 
 /**
  * DPicker
@@ -283,8 +282,21 @@ DPicker.prototype.getTree = function () {
  * @TODO rename _checkValidity
  */
 DPicker.prototype.isValid = function checkValidity (date) {
-  const temp = this.time ? DPicker._dateAdapter.resetSeconds(date) : DPicker._dateAdapter.resetHours(date)
-  const isSame = DPicker._dateAdapter.isSameDay(date, this._data.min) || DPicker._dateAdapter.isSameDay(date, this._data.max)
+  if (DPicker._dateAdapter.isValid(date) === false) {
+    this._data.valid = false
+    return false
+  }
+
+  let isSame
+  let temp
+
+  if (this._data.time === false) {
+    temp = DPicker._dateAdapter.resetHours(date)
+    isSame = DPicker._dateAdapter.isSameDay(temp, this._data.min) || DPicker._dateAdapter.isSameDay(temp, this._data.max)
+  } else {
+    temp = DPicker._dateAdapter.resetSeconds(date)
+    isSame = DPicker._dateAdapter.isSameHours(temp, this._data.min) || DPicker._dateAdapter.isSameHours(temp, this._data.max)
+  }
 
   if (isSame === false && (DPicker._dateAdapter.isBefore(temp, this._data.min) || DPicker._dateAdapter.isAfter(temp, this._data.max))) {
     this._data.valid = false
@@ -549,6 +561,14 @@ Object.defineProperties(DPicker.prototype, {
       return DPicker._dateAdapter.format(this._data.model, this._data.format)
     }
   },
+  /**
+   * @method onChange
+   * @param {Object} data
+   * @param {Object} DPickerEvent
+   * @param {Boolean} DPickerEvent.modelChanged whether the model has changed
+   * @param {String} DPickerEvent.name the DPicker internal event name
+   * @param {Event} DPickerEvent.event the original DOM event
+   */
   'onChange': {
     set: function (onChange) {
       this._onChange = (dpickerEvent) => {
@@ -810,7 +830,7 @@ DPicker._properties = {display: false}
  * @property {DateAdapter} _dateAdapter The date adapter
  * @see {@link /_api?id=module_momentadapter|MomentDateAdapter}
  */
-DPicker._dateAdapter = MomentDateAdapter
+DPicker._dateAdapter = undefined
 
 /**
  * uuid generator

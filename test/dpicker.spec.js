@@ -160,6 +160,7 @@ describe('dpicker', function() {
   })
 
   it('should bind to an input[type="date"] with an empty value', function() {
+    this.skip('This behavior has changed in v5')
     let input = document.createElement('input')
     let label = document.createElement('label')
     input.setAttribute('type', 'date')
@@ -173,6 +174,24 @@ describe('dpicker', function() {
     const dpicker = DPicker(input)
 
     expect(dpicker.input).to.equal('')
+    expect(input.value).to.equal('')
+  })
+
+  it('should bind to an input[type="date"] with an empty value', function() {
+    //it.skip('This behavior has been removed in v5')
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'date')
+    input.setAttribute('id', 't')
+    input.setAttribute('value', '')
+
+    label.appendChild(input)
+    label.setAttribute('for', 't')
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    expect(dpicker.input).not.to.equal('')
     expect(input.value).to.equal('')
   })
 

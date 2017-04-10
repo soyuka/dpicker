@@ -1,5 +1,5 @@
 const html = require('bel')
-const DPicker = require('../dpicker.js')
+const DPicker = require('../dpicker.moment.js')
 
 const MINUTES = new Array(60).fill(0).map((e, i) => i)
 const HOURS24 = new Array(24).fill(0).map((e, i) => i)

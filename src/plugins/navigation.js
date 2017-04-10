@@ -1,4 +1,4 @@
-const DPicker = require('../dpicker.js')
+const DPicker = require('../dpicker.moment.js')
 const html = require('bel')
 
 /**
