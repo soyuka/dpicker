@@ -106,7 +106,7 @@ function DPicker (element, options = {}) {
     }
   }
 
-  if (attributes.value === undefined || attributes.value === '') {
+  if (options.empty === true) {
     this._data.empty = true
   }
 
@@ -134,6 +134,12 @@ function DPicker (element, options = {}) {
   return this
 }
 
+/**
+ * Helper to set the `selected` attribute on `<option>` tags
+ * @link https://github.com/yoshuawuyts/nanomorph/pull/54
+ * @param {Element} element
+ * @param {boolean} test set selected when true
+ */
 DPicker.prototype._setSelected = function (element, test) {
   if (test === true) {
     element.setAttribute('selected', 'selected')
@@ -191,6 +197,7 @@ DPicker.prototype._createGetSet = function (key) {
     },
     set: function (newValue) {
       this._data[key] = newValue
+      this.isValid(this._data.model)
       this.redraw()
     }
   })
@@ -274,9 +281,10 @@ DPicker.prototype.getTree = function () {
  * @TODO rename _checkValidity
  */
 DPicker.prototype.isValid = function checkValidity (date) {
-  let temp = this.time ? DPicker._dateAdapter.resetSeconds(date) : DPicker._dateAdapter.resetHours(date)
+  const temp = this.time ? DPicker._dateAdapter.resetSeconds(date) : DPicker._dateAdapter.resetHours(date)
+  const isSame = DPicker._dateAdapter.isSameDay(date, this._data.min) || DPicker._dateAdapter.isSameDay(date, this._data.max)
 
-  if (DPicker._dateAdapter.isBefore(temp, this._data.min) || DPicker._dateAdapter.isAfter(temp, this._data.max)) {
+  if (isSame === false && (DPicker._dateAdapter.isBefore(temp, this._data.min) || DPicker._dateAdapter.isAfter(temp, this._data.max))) {
     this._data.valid = false
     return true
   }
@@ -339,7 +347,7 @@ DPicker.prototype.renderContainer = function (events, data, toRender) {
 DPicker.prototype.render = function (events, data, toRender) {
   return html`<div
     aria-hidden="${data.display === false}"
-    class="dpicker-container ${data.display === true ? 'dpicker-visible' : 'dpicker-invisible'}">
+    class="dpicker-container ${data.display === true ? 'dpicker-visible' : 'dpicker-invisible'} ${data.time === true ? 'dpicker-has-time' : ''}">
     ${toRender}
     </div>`
 }
