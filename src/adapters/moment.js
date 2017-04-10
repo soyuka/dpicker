@@ -1,3 +1,7 @@
+/**
+ * ## MomentAdapter
+ */
+
 const moment = require('moment')
 
 const DAY_TOKEN = 'd'

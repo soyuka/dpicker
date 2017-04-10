@@ -1,3 +1,7 @@
+/**
+ * ## Time
+ */
+
 const html = require('bel')
 const DPicker = require('../dpicker.js')
 
@@ -20,7 +24,7 @@ const MERIDIEM_TOKENS = ['AM', 'PM']
 /**
  * Get hours and minutes according to the given _data (meridiem, min/max consideration)
  * @param {Object} data
- * @return {hours, minutes} both arrays of numbers
+ * @return {Object} `{hours, minutes}` both arrays of numbers
  */
 function getHoursMinutes (data) {
   let hours = data.meridiem ? HOURS12 : HOURS24

@@ -2,6 +2,6 @@
 
 - [Home](/)
 - [Demo](_demo.md)
-- [Api](api.md)
+- [Api](_api.md)
 - [Changelog](changelog.md)
 

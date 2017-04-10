@@ -1,3 +1,7 @@
+/**
+ * ## Modifiers
+ */
+
 const DPicker = require('../dpicker.js')
 
 /**

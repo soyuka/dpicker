@@ -5,7 +5,7 @@ function positionInParent (children) {
 }
 
 /**
- * @module DPicker.modules.arrowNavigation
+ * @class ArrowNavigation
  */
 
 function left (td, table) {

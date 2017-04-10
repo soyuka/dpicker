@@ -1,3 +1,7 @@
+/**
+ * ## Navigation
+ */
+
 const DPicker = require('../dpicker.js')
 
 const html = require('bel')

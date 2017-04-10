@@ -1,6 +1,6 @@
 node_modules
-bower_components
 dist
-doc
 coverage
-demo/styles.html
+docs/api/*
+!docs/api/.gitkeep
+docs/_api.md

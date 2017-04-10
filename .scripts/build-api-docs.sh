@@ -1,15 +1,24 @@
-#!/bin/bash
-git checkout gh-pages
-git reset --hard origin/master
-bower install
-gulp build-styles
-npm run coverage
-./node_modules/.bin/jsdoc -c jsdoc.conf.json -R README.md -d . src/*.js
-git add .
-git add -f coverage
-git add -f dist
-git add -f demo/index.html
-git add -f demo/styles.html
-git commit -m 'bump doc'
-git push -fu origin gh-pages
-git checkout master
+#!env /bin/bash
+
+markdox src/dpicker.js -o docs/api/dpicker.md
+
+for f in src/adapters/*.js; do
+  b=$(basename $f)
+  echo "Api docs for $b"
+  markdox $f -o docs/api/adapters_${b/\.js/\.md}
+done
+
+for f in src/plugins/*.js; do
+  b=$(basename $f)
+  echo "Api docs for $b"
+  markdox $f -o docs/api/plugins_${b/\.js/\.md}
+done
+
+rm docs/_api.md &> /dev/null
+touch docs/_api.md
+echo "# DPicker" >> docs/_api.md
+cat docs/api/dpicker.md >> docs/_api.md
+echo "# Plugins" >> docs/_api.md
+cat docs/api/plugins_* >> docs/_api.md
+echo "# Adapters" >> docs/_api.md
+cat docs/api/adapters_** >> docs/_api.md
