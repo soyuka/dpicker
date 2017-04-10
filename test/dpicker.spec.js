@@ -12,6 +12,8 @@ function keyDown(keyCode, element) {
   element.dispatchEvent(event);
 }
 
+require('./adapters/moment.spec.js')
+
 describe('dpicker', function() {
   const DPicker = require('../dist/dpicker')
 
@@ -216,6 +218,21 @@ describe('dpicker', function() {
 
     dpicker.format = 'DD/MM/YYYY'
     input.value = '24/06/1991'
+    input.onchange({target: input})
+  })
+
+  it('should give empty input after input changed to empty string', function(cb) {
+    const dpicker = createDatePicker({
+      onChange: (data) => {
+        expect(dpicker.input).to.equal('')
+        cb()
+      }
+    })
+
+    let input = document.querySelector('input[name=dpicker-input]')
+
+    dpicker.format = 'DD/MM/YYYY'
+    input.value = ''
     input.onchange({target: input})
   })
 
@@ -498,6 +515,13 @@ describe('dpicker', function() {
     let buttons = document.querySelectorAll('button')
     let button = buttons[0]
     expect(button.textContent.trim()).to.equal('10')
+  })
+
+  it('should not set model if date is invalid', function() {
+    const dpicker = createDatePicker()
+    dpicker.model = 'foo'
+
+    expect(dpicker.model).not.to.equal('foo')
   })
 })
 
