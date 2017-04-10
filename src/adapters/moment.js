@@ -16,7 +16,11 @@ const HOURS_TOKEN = 'h'
  * @private
  * @return {Moment}
  */
-function _getMoment (date, immutable = true) {
+function _getMoment (date, immutable) {
+  if (immutable === undefined) {
+    immutable = true
+  }
+
   if (moment.isMoment(date)) {
     return immutable === true ? date.clone() : date
   }
