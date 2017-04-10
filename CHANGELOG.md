@@ -1,5 +1,56 @@
 # Changelog
 
+## 5.0.0
+
+- Use browserify instead of gulp
+- Use real dom, real dates ([nanomorph](https://github.com/yoshuawuyts/nanomorph) for diffing and [bel](https://github.com/shama/bel)
+- Use [standard](https://github.com/feross/standard)
+- Get rid of momentjs hard dependency (still required for now)
+- Implement a Date Adapter for future libraries support
+- Simplify plugins api
+
+No more `_modules` stuff. Just simple objects creation:
+
+```javascript
+DPicker.renders.closeButton = function renderCloseButton(events, data) {
+  const button = document.createElement('button')
+  button.innerText = 'Confirm'
+  button.type = 'button'
+  button.classList.add('dpicker-close-button')
+  button.addEventListener('click', events.hidePicker)
+  return button
+}
+
+DPicker.events.hidePicker = function hidePicker() {
+  this.display = false
+}
+```
+
+- Incremental builds
+
+You can use `dpicker.datetime.js` directly. Coming soon builds with `date-fns`. Available builds:
+
+```
+dist/dpicker.all.min.js.gz:  7.698 kb
+dist/dpicker.arrow-navigation.min.js.gz:  0.9410000000000001 kb
+dist/dpicker.core.min.js.gz:  4.892 kb
+dist/dpicker.datetime.min.js.gz:  6.947 kb
+dist/dpicker.min.js.gz:  5.699 kb
+dist/dpicker.modifiers.min.js.gz:  0.58 kb
+dist/dpicker.navigation.min.js.gz:  0.6900000000000001 kb
+dist/dpicker.time.min.js.gz:  2.08 kb
+dist/polyfills.min.js.gz:  4.5200000000000005 kb
+```
+
+- Improve docs (A LOT) https://soyuka.github.io/dpicker thanks to [jsdoc2md](https://github.com/jsdoc2md/jsdoc-to-markdown) and [docsify](https://github.com/QingWei-Li/docsify/)
+- Build a decent demo using cycle.js
+- naming public stuff #33
+
+`_events` => `events`
+`_data` => `data`
+
+- new getter for `empty`
+
 ## 4.2.0
 
 `onChange` now has a second argument giving informations about the recent change, for example:

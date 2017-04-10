@@ -16,7 +16,7 @@ A framework-agnostic minimal date picker.
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/dpicker@latest/dist/dpicker.all.min.js"></script>
 <script>
-[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e){new DPicker(e);});
+  [].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e){new DPicker(e);});
 </script>
 ```
 

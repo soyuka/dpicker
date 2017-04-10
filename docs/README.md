@@ -604,6 +604,21 @@ console.log(dpicker.model) //the Date instance
 console.log(dpicker.input) //the input value, a formatted date
 ```
 
+## Thanks
+
+DPicker refactor (<4 => 5) motivation:
+
+- [date-fns](https://github.com/date-fns/date-fns) - because I think this is a good alternative to momentjs, especially since it's immutable
+- [nanomorph](https://github.com/yoshuawuyts/nanomorph), in fact [@yoshuawuyts](https://github.com/yoshuawuyts) writings in general
+- [bel](https://github.com/shama/bel), why did I discover this in 2017?
+- [babel-plugin-yo-yoify](https://github.com/goto-bus-stop/babel-plugin-yo-yoify) for the reactivity and because this works great
+- [@florianpircher](https://github.com/florianpircher), [@stereonom](https://github.com/stereonom), [@thcolin](https://github.com/thcolin) for the motivation, the really good bug reports, and the design ideas/talks
+
+DPicker docs:
+
+- [jsdoc2md](https://github.com/jsdoc2md/jsdoc-to-markdown)
+- [docsify](https://github.com/QingWei-Li/docsify/)
+
 ## License
 
 ```
