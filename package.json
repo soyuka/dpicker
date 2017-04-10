@@ -2,10 +2,10 @@
   "name": "dpicker",
   "version": "5.0.0-6",
   "description": "A framework-agnostic minimal date picker.",
-  "main": "dist/dpicker.js",
+  "main": "dist/dpicker.core.js",
   "scripts": {
     "test": "standard --global DPicker src/*.js && mocha -b",
-    "build": "bash build.sh",
+    "build": "bash .scripts/build.sh",
     "coverage": "istanbul cover -x test.js -x src _mocha"
   },
   "repository": {
@@ -56,6 +56,6 @@
   },
   "browserify-shim": {
     "moment": "global:moment",
-    "../dpicker.js": "global:DPicker"
+    "../dpicker.moment.js": "global:DPicker"
   }
 }
