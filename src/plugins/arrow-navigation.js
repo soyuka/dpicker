@@ -1,19 +1,28 @@
 const DPicker = require('../dpicker.js')
 
+/**
+ * Get element position in parent
+ * @param {Element} children
+ * @return {Number}
+ * @private
+ */
 function positionInParent (children) {
   return [].indexOf.call(children.parentNode.children, children)
 }
 
 /**
- * @class ArrowNavigation
+ * Move left
+ * @param {Element} td
+ * @param {Element} table
+ * @private
  */
-
 function left (td, table) {
   // previous td
   let previous = td.previousElementSibling
 
   if (previous && previous.querySelector('button')) {
-    return previous.querySelector('button').focus()
+    previous.querySelector('button').focus()
+    return
   }
 
   // previous row, last button
@@ -26,14 +35,21 @@ function left (td, table) {
 
   // last tr first td
   let last = table.querySelector('tr:last-child').querySelectorAll('td.dpicker-active')
-  return last[last.length - 1].querySelector('button').focus()
+  last[last.length - 1].querySelector('button').focus()
 }
 
+/**
+ * Move right
+ * @param {Element} td
+ * @param {Element} table
+ * @private
+ */
 function right (td, table) {
   let next = td.nextElementSibling
 
   if (next && next.querySelector('button')) {
-    return next.querySelector('button').focus()
+    next.querySelector('button').focus()
+    return
   }
 
   next = td.parentNode.nextElementSibling
@@ -43,9 +59,16 @@ function right (td, table) {
     return next.focus()
   }
 
-  return table.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
+  table.querySelector('tr:first-child').nextElementSibling.querySelectorAll('td.dpicker-active')[0].querySelector('button').focus()
 }
 
+/**
+ * Go up or down
+ * @param {Element} td
+ * @param {Element} table
+ * @param {String} direction up or down
+ * @private
+ */
 function upOrDown (td, table, direction) {
   let position = positionInParent(td)
   let sibling = (direction === 'up' ? 'previous' : 'next') + 'ElementSibling'
@@ -54,7 +77,8 @@ function upOrDown (td, table, direction) {
   previousOrNext = previousOrNext ? previousOrNext.children[position] : null
 
   if (previousOrNext && previousOrNext.classList.contains('dpicker-active')) {
-    return previousOrNext.querySelector('button').focus()
+    previousOrNext.querySelector('button').focus()
+    return
   }
 
   // last or first line
@@ -63,27 +87,39 @@ function upOrDown (td, table, direction) {
   // find the last available position with a button beggining by the bottom
   while (lastOrFirst) {
     if (lastOrFirst.children[position].classList.contains('dpicker-active')) {
-      return lastOrFirst.children[position].querySelector('button').focus()
+      lastOrFirst.children[position].querySelector('button').focus()
+      return
     }
 
     lastOrFirst = lastOrFirst[sibling]
   }
 }
 
+/**
+ * Go up
+ * @param {Element} td
+ * @param {Element} table
+ * @private
+ */
 function up (td, table) {
   return upOrDown(td, table, 'up')
 }
 
+/**
+ * Go down
+ * @param {Element} td
+ * @param {Element} table
+ * @private
+ */
 function down (td, table) {
   return upOrDown(td, table, 'down')
 }
 
 /**
  * Enables arrow navigation inside days
- * @param {Event} DOMEvent
- * @listens DPicker#dayKeyDown
+ * @event DPicker#dayKeyDown
  */
-function DayKeyDown (evt) {
+DPicker._events.dayKeyDown = DPicker.decorate(DPicker._events.dayKeyDown, function DayKeyDown (evt) {
   let key = evt.which || evt.keyCode
   if (key > 40 || key < 37) {
     return
@@ -112,6 +148,4 @@ function DayKeyDown (evt) {
       return down(td, table)
     }
   }
-}
-
-DPicker._events.dayKeyDown = DPicker.decorate(DPicker._events.dayKeyDown, DayKeyDown)
+})

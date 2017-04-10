@@ -3,51 +3,41 @@ const html = require('bel')
 const MomentDateAdapter = require('./adapters/moment.js')
 
 /**
- * uuid generator
- * https://gist.github.com/jed/982883
- */
-function uuid () {
-  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, a => (a ^ Math.random() * 16 >> a / 4).toString(16))
-}
-
-/**
- * isElementInContainer tests if an element is inside a given id
- * @param {Element} parent a DOM node
- * @param {String} containerId the container id
- */
-function isElementInContainer (parent, containerId) {
-  while (parent && parent !== document) {
-    if (parent.getAttribute('id') === containerId) {
-      return true
-    }
-
-    parent = parent.parentNode
-  }
-
-  return false
-}
-
-/**
- * DPicker a simple date picker
- * @class
+ * DPicker
+ *
  * @param {Element} element DOM element where you want the date picker or an input
  * @param {Object} [options={}]
- * @param {Moment} [options.model=moment()] Your own model instance, defaults to moment() (can be set by the `value` attribute on an input, transformed to moment according to the given format)
- * @param {Moment} [options.min=1986-01-01] The minimum date (can be set by the `min` attribute on an input)
- * @param {Moment} [options.max=today+1 year] The maximum date (can be set by the `max` attribute on an input)
- * @param {string} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input)
- * @param {string} [options.months=moment.months()] Months array, see also moment.monthsShort()
- * @param {string} [options.days=moment.weekdaysShort()] Days array, see also moment.weekdaysMin()
- * @param {boolean} [options.display=true]
- * @param {boolean} [options.hideOnDayClick=true] Hides the date picker on day click
- * @param {boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
- * @param {boolean} [options.siblingMonthDayClick=false] Enable sibling months day click
+ * @param {Date} [options.model=new Date()] Your own model instance, defaults to `new Date()` (can be set by the `value` attribute on an input, transformed to moment according to the given format)
+ * @param {Date} [options.min=1986-01-01] The minimum date (can be set by the `min` attribute on an input)
+ * @param {Date} [options.max=today+1 year] The maximum date (can be set by the `max` attribute on an input)
+ * @param {String} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input)
+ * @param {String} [options.months=adapter.months()] Months array, see also [adapter.months()](todo)
+ * @param {String} [options.days=adapter.weekdaysShort()] Days array, see also [adapter.weekdays()](todo)
+ * @param {Boolean} [options.display=true]
+ * @param {Boolean} [options.hideOnDayClick=true] Hides the date picker on day click
+ * @param {Boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
+ * @param {Boolean} [options.siblingMonthDayClick=false] Enable sibling months day click
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
- * @param {string} [options.inputId=uuid|element.getAttribute('id')] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
- * @param {string} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
- * @param {Array} [options.order=['months', 'years', 'time', 'days']] The dom elements appending order.
- * @param {boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
- * @listens DPicker#hide
+ * @param {String} [options.inputId=uuid()] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
+ * @param {String} [options.inputName='dpicker-input'] The input name. If element is an inputand it has a `name` attribute it'll be overriden by it
+ * @param {Array} [options.order] The dom elements appending order.
+ * @param {Boolean} [options.time=false] Enable time (must include the time module)
+ * @param {Boolean} [options.meridiem=false] 12/24 hour format, default 24
+ * @param {Number} [options.step=1] Minutes step
+ * @param {Boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
+ *
+ * @property {String} container Get container id
+ * @property {String} inputId Get input id
+ * @property {String} input Get current input value (formatted date)
+ * @property {Function} onChange Set onChange method
+ * @property {Boolean} valid Is the current input valid
+ * @property {Date} model Get/Set model, a Date instance
+ * @property {String} format Get/Set format, a Date format string
+ * @property {Boolean} display Get/Set display, hides or shows the date picker
+ * @property {Date} min  Get/Set min date
+ * @property {Date} max Get/Set max date
+
+ * @fires DPicker#hide
  */
 function DPicker (element, options = {}) {
   if (!(this instanceof DPicker)) {
@@ -139,6 +129,8 @@ function DPicker (element, options = {}) {
  * @link https://github.com/yoshuawuyts/nanomorph/pull/54
  * @param {Element} element
  * @param {boolean} test set selected when true
+ * @private
+ * @return {Element}
  */
 DPicker.prototype._setSelected = function (element, test) {
   if (test === true) {
@@ -152,7 +144,8 @@ DPicker.prototype._setSelected = function (element, test) {
  * _setData is a helper to set this._data values
  * @param {String} key
  * @param {Array} values the first value that is not undefined will be set in this._data[key]
- * @param {Boolean} isMoment whether this value should be a moment instance
+ * @param {Boolean} isDate whether this value should be a date instance
+ * @private
  */
 DPicker.prototype._setData = function (key, values, isDate = false) {
   for (let i = 0; i < values.length; i++) {
@@ -185,6 +178,7 @@ DPicker.prototype._setData = function (key, values, isDate = false) {
  * Creates getters and setters for a given key
  * When the setter is called we will redraw
  * @param {String} key
+ * @private
  */
 DPicker.prototype._createGetSet = function (key) {
   if (DPicker.prototype.hasOwnProperty(key)) {
@@ -207,6 +201,8 @@ DPicker.prototype._createGetSet = function (key) {
  * Gives the dpicker container and it's attributes
  * If the container is an input, the parentNode is the container but the attributes are the input's ones
  * @param {Element} container
+ * @private
+ * @return {Object} { container, attributes }
  */
 DPicker.prototype._getContainer = function (container) {
   if (typeof container === 'undefined') {
@@ -239,6 +235,7 @@ DPicker.prototype._getContainer = function (container) {
 
 /**
  * Allows to render more child elements with modules
+ * @private
  * @return Array<VNode>
  */
 DPicker.prototype._getRenderChild = function () {
@@ -259,12 +256,17 @@ DPicker.prototype._getRenderChild = function () {
 
 /**
  * Mount rendered element to the DOM
+ * @private
  */
 DPicker.prototype._mount = function (element) {
   this._tree = this.getTree()
   element.appendChild(this._tree)
 }
 
+/**
+ * Return the whole nodes tree
+ * @return {Element}
+ */
 DPicker.prototype.getTree = function () {
   return this.renderContainer(this._events, this._data, [
     this.renderInput(this._events, this._data),
@@ -276,7 +278,7 @@ DPicker.prototype.getTree = function () {
  * Checks whether the given model is a valid moment instance
  * This method does set the `.valid` flag by checking min/max allowed inputs
  * Note that it will return `true` if the model is valid even if it's not in the allowed range
- * @param {Moment} date
+ * @param {Date} date
  * @return {boolean}
  * @TODO rename _checkValidity
  */
@@ -295,11 +297,10 @@ DPicker.prototype.isValid = function checkValidity (date) {
 
 /**
  * Render input
- * @method
- * @listens DPicker#inputChange
- * @listens DPicker#inputBlur
- * @listens DPicker#inputFocus
- * @return {H} the rendered virtual dom hierarchy
+ * @fires DPicker#inputChange
+ * @fires DPicker#inputBlur
+ * @fires DPicker#inputFocus
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderInput = function (events, data, toRender) {
   return html`<input
@@ -323,8 +324,8 @@ DPicker.prototype.renderInput = function (events, data, toRender) {
  * ```
  * div.dpicker
  * ```
- * @method
- * @return {H} the rendered virtual dom hierarchy
+ *
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderContainer = function (events, data, toRender) {
   return html`<div class="dpicker">${toRender}</div>`
@@ -338,11 +339,11 @@ DPicker.prototype.renderContainer = function (events, data, toRender) {
  *   input[type=text]
  *   div.dpicker-container.dpicker-[visible|invisible]
  * ```
- * @method
- * @see DPicker#renderYears
- * @see DPicker#renderMonths
- * @see DPicker#renderDays
- * @return {H} the rendered virtual dom hierarchy
+ *
+ * @see {@link DPicker#renderYears}
+ * @see {@link DPicker#renderMonths}
+ * @see {@link DPicker#renderDays}
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.render = function (events, data, toRender) {
   return html`<div
@@ -357,9 +358,8 @@ DPicker.prototype.render = function (events, data, toRender) {
  * ```
  * select[name='dpicker-year']
  * ```
- * @method
- * @listens DPicker#yearChange
- * @return {H} the rendered virtual dom hierarchy
+ * @fires DPicker#yearChange
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderYears = function (events, data, toRender) {
   let modelYear = DPicker._dateAdapter.getYear(data.model)
@@ -379,9 +379,8 @@ DPicker.prototype.renderYears = function (events, data, toRender) {
  * ```
  * select[name='dpicker-month']
  * ```
- * @method
- * @listens DPicker#monthChange
- * @return {H} the rendered virtual dom hierarchy
+ * @fires DPicker#monthChange
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderMonths = function (events, data, toRender) {
   let modelMonth = DPicker._dateAdapter.getMonth(data.model)
@@ -413,9 +412,9 @@ DPicker.prototype.renderMonths = function (events, data, toRender) {
  *      button|span
  * ```
  * @method
- * @listens DPicker#dayClick
- * @listens DPicker#dayKeyDown
- * @return {H} the rendered virtual dom hierarchy
+ * @fires DPicker#dayClick
+ * @fires DPicker#dayKeyDown
+ * @return {Element} the rendered virtual dom hierarchy
  */
 DPicker.prototype.renderDays = function (events, data, toRender) {
   let daysInMonth = DPicker._dateAdapter.daysInMonth(data.model)
@@ -501,15 +500,15 @@ DPicker.prototype.renderDays = function (events, data, toRender) {
 
 /**
  * Called after parseInputAttributes but before render
- * Use it with modules to change things on initialization
+ * Decorate it with modules to do things on initialization
  */
 DPicker.prototype.initialize = function () {
   this.isValid(this._data.model)
 }
 
 /**
- * The model setter, feel free to override through modules
- * @param {Moment} newValue
+ * The model setter, feel free to decorate through modules
+ * @param {Date} newValue
  */
 DPicker.prototype.modelSetter = function (newValue) {
   this._data.empty = !newValue
@@ -521,34 +520,26 @@ DPicker.prototype.modelSetter = function (newValue) {
   this.redraw()
 }
 
+/**
+ * Redraws the date picker
+ * Decorate it with modules to do things before redraw
+ */
 DPicker.prototype.redraw = function () {
   const newTree = this.getTree()
   this._tree = nanomorph(this._tree, newTree)
 }
 
 Object.defineProperties(DPicker.prototype, {
-  /**
-   * @var {String} DPicker#container
-   * @description Get container id
-   */
   'container': {
     get: function () {
       return this._container
     }
   },
-  /**
-   * @var {String} DPicker#inputId
-   * @description Get input id
-   */
   'inputId': {
     get: function () {
       return this._data.inputId
     }
   },
-  /**
-   * @var {String} DPicker#input
-   * @description Get current input value (not the model)
-   */
   'input': {
     get: function () {
       if (this._data.empty) {
@@ -558,10 +549,6 @@ Object.defineProperties(DPicker.prototype, {
       return DPicker._dateAdapter.format(this._data.model, this._data.format)
     }
   },
-  /**
-   * @var {Function} DPicker#onChange
-   * @description Set onChange method
-   */
   'onChange': {
     set: function (onChange) {
       this._onChange = (dpickerEvent) => {
@@ -573,20 +560,12 @@ Object.defineProperties(DPicker.prototype, {
     }
   },
 
-  /**
-   * @var {Boolean} DPicker#valid
-   * @description Is the current input valid
-   */
   'valid': {
     get: function () {
       return this._data.valid
     }
   },
 
-  /**
-   * @var {Moment} DPicker#model
-   * @description Get/Set model, a Moment instance
-   */
   'model': {
     set: function (newValue) {
       this.modelSetter(newValue)
@@ -598,11 +577,20 @@ Object.defineProperties(DPicker.prototype, {
 })
 
 /**
- * Creates a decorator
- * @internal
+ * Creates a decorator, use it to decorate public methods.
+ *
+ * For example:
+ * ```
+ * DPicker._events.inputChange = DPicker.decorate(DPicker._events.inputChange, function DoSomethingOnInputChange (evt) {
+ *   // do something
+ * })
+ *
+ * ```
+ *
+ * The decoration will be stopped if the method returns `false`! It's like an internal `preventDefault` to avoid altering the original event.
+ *
  * @param {String} which    one of events, calls
  * @param {Function} origin the origin function that will be decorated
- * @param {String} key      the key of the "which" we need to decorate
  */
 DPicker.decorate = function (origin, decoration) {
   return function decorator () {
@@ -618,7 +606,6 @@ DPicker._events = {
   /**
     * Hides the date picker if user does not click inside the container
     * @event DPicker#hide
-    * @param {Event} DOMEvent
     */
   hide: function hide (evt) {
     if (this._data.hideOnOutsideClick === false || this.display === false) {
@@ -638,7 +625,6 @@ DPicker._events = {
   /**
     * Change model on input change
     * @event DPicker#inputChange
-    * @param {Event} DOMEvent
     */
   inputChange: function inputChange (evt) {
     if (!evt.target.value) {
@@ -662,7 +648,6 @@ DPicker._events = {
   /**
     * Hide on input blur
     * @event DPicker#inputBlur
-    * @param {Event} DOMEvent
     */
   inputBlur: function inputBlur (evt) {
     if (this.display === false) {
@@ -682,7 +667,6 @@ DPicker._events = {
   /**
     * Show the container on input focus
     * @event DPicker#inputFocus
-    * @param {Event} DOMEvent
     */
   inputFocus: function inputFocus (evt) {
     this.display = true
@@ -696,7 +680,6 @@ DPicker._events = {
   /**
     * On year change, update the model value
     * @event DPicker#yearChange
-    * @param {Event} DOMEvent
     */
   yearChange: function yearChange (evt) {
     this._data.empty = false
@@ -709,7 +692,6 @@ DPicker._events = {
   /**
     * On month change, update the model value
     * @event DPicker#monthChange
-    * @param {Event} DOMEvent
     */
   monthChange: function monthChange (evt) {
     this._data.empty = false
@@ -721,8 +703,7 @@ DPicker._events = {
 
   /**
     * On day click, update the model value
-    * @Event DPicker#dayClick
-    * @param {Event} DOMEvent
+    * @event DPicker#dayClick
     */
   dayClick: function dayClick (evt) {
     evt.preventDefault()
@@ -738,6 +719,10 @@ DPicker._events = {
     this.onChange({modelChanged: true, name: 'dayClick', event: evt})
   },
 
+  /**
+    * On previous month day click (only if `siblingMonthDayClick` is enabled)
+    * @event DPicker#previousMonthDayClick
+    */
   previousMonthDayClick: function previousMonthDayClick (evt) {
     if (!this._data.siblingMonthDayClick) {
       return
@@ -758,6 +743,10 @@ DPicker._events = {
     this.onChange({modelChanged: true, name: 'previousMonthDayClick', event: evt})
   },
 
+  /**
+    * On next month day click (only if `siblingMonthDayClick` is enabled)
+    * @event DPicker#nextMonthDayClick
+    */
   nextMonthDayClick: function nextMonthDayClick (evt) {
     if (!this._data.siblingMonthDayClick) {
       return
@@ -780,18 +769,16 @@ DPicker._events = {
 
   /**
     * On day key down - not implemented
-    * @Event DPicker#dayKeyDown
-    * @param {Event} DOMEvent
+    * @event DPicker#dayKeyDown
     */
   dayKeyDown: function dayKeyDown () {
   },
 
   /**
-    * On key down inside the dpicker container,
-    * intercept enter and escape keys to hide the container
-    * @Event DPicker#keyDown
-    * @param {Event} DOMEvent
-    */
+   * On key down inside the dpicker container,
+   * intercept enter and escape keys to hide the container
+   * @event DPicker#keyDown
+   */
   keyDown: function keyDown (evt) {
     if (!this._data.hideOnEnter) {
       return
@@ -809,35 +796,48 @@ DPicker._events = {
   }
 }
 
+/**
+ * @property {Object} _renders Renders dictionnary
+ */
 DPicker._renders = {}
 
+/**
+ * @property {Object} _properties Properties dictionnary (getters and setters will be set)
+ */
 DPicker._properties = {display: false}
 
+/**
+ * @property {DateAdapter} _dateAdapter The date adapter
+ * @see {@link /_api?id=module_momentadapter|MomentDateAdapter}
+ */
 DPicker._dateAdapter = MomentDateAdapter
 
 /**
- * @var {String} DPicker#format
- * @description Get/Set format, a Moment format string
+ * uuid generator
+ * https://gist.github.com/jed/982883
+ * @private
  */
+function uuid () {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, a => (a ^ Math.random() * 16 >> a / 4).toString(16))
+}
+
 /**
- * @var {Boolean} DPicker#display
- * @description Get/Set display, hides or shows the date picker
+ * isElementInContainer tests if an element is inside a given id
+ * @param {Element} parent a DOM node
+ * @param {String} containerId the container id
+ * @private
+ * @return {Boolean}
  */
-/**
- * @var {Moment} DPicker#min
- * @description Get/Set min date
- */
-/**
- * @var {Moment} DPicker#max
- * @description Get/Set max date
- */
-/**
- * @var {Array.<string>} DPicker#months
- * @description Get/Set months an array of strings representing months, defaults to moment.months()
- */
-/**
- * @var {Array.<string>} DPicker#days
- * @description Get/Set days an array of strings representing days, defaults to moment.weekdaysShort()
- */
+function isElementInContainer (parent, containerId) {
+  while (parent && parent !== document) {
+    if (parent.getAttribute('id') === containerId) {
+      return true
+    }
+
+    parent = parent.parentNode
+  }
+
+  return false
+}
 
 module.exports = DPicker

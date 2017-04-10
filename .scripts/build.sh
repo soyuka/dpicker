@@ -1,4 +1,4 @@
-#!env /bin/bash
+#!env bash
 
 browserify="$(npm bin)/browserify"
 uglifyjs="$(npm bin)/uglifyjs"

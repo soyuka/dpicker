@@ -44,6 +44,7 @@
     "docsify": "^3.6.1",
     "istanbul": "^0.4.4",
     "jsdoc": "^3.4.0",
+    "jsdoc-to-markdown": "^3.0.0",
     "jsdom": "^9.2.1",
     "jsdom-global": "^2.0.0",
     "markdox": "^0.1.10",

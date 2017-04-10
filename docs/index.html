@@ -17,7 +17,25 @@
     loadSidebar: true,
     executeScript: true,
     maxLevel: 3,
-    subMaxLevel: 2,
+    subMaxLevel: 3,
+    coverpage: true,
+		themeColor: '#FFAB40',
+    plugins: [
+      function(hook) {
+        //hook to fix jsdoc2md links
+        hook.afterEach(function(html, next) {
+          var matches
+          var reg = /<a name="([^"]*)">/gi
+
+          while((matches = reg.exec(html)) !== null)  {
+             const replacement = '<a id="/_api?id='+matches[1].toLowerCase().replace('+', ' ')+'">'
+             html = html.replace(matches[0], replacement)
+          }
+
+          next(html)
+        })
+      }
+    ]
   }
 </script>
 <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>

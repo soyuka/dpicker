@@ -1,7 +1,3 @@
-/**
- * ## MomentAdapter
- */
-
 const moment = require('moment')
 
 const DAY_TOKEN = 'd'
@@ -10,10 +6,14 @@ const MONTH_TOKEN = 'M'
 const HOURS_TOKEN = 'h'
 
 /**
+ * @module MomentAdapter
+ */
+
+/**
  * Get an immutable moment date
- * @internal
  * @param  {String} date
  * @param  {Boolean} immutable
+ * @private
  * @return {Moment}
  */
 function _getMoment (date, immutable = true) {
@@ -30,20 +30,32 @@ function _getMoment (date, immutable = true) {
 
 /**
 * Get months, an array of string
-* @return {Array.<String>} List of the available months
+* @return {Array<String>} List of the available months
 */
 function months () {
   return moment.months()
 }
 
+/**
+ * Get week days
+ * @return {Array<String>}
+ */
 function weekdays () {
   return moment.weekdaysShort()
 }
 
+/**
+ * First day of week according to locale
+ * @return {Number}
+ */
 function firstDayOfWeek () {
   return moment.localeData().firstDayOfWeek()
 }
 
+/**
+ * @param {Date} date
+ * @return {Boolean}
+ */
 function isValid (date) {
   date = _getMoment(date, false)
   return date instanceof moment && date.isValid()
@@ -332,6 +344,16 @@ function isSameHours (date, comparison) {
 }
 
 /**
+ * isSameMonth
+ * @param {Date} date
+ * @param {Date} comparison
+ * @return {Boolean}
+ */
+function isSameMonth (date, comparison) {
+  return _getMoment(date, false).isSame(comparison, MONTH_TOKEN)
+}
+
+/**
  * An uppercased meridiem (AM or PM)
  * @param {Date} date
  * @return {String}
@@ -376,5 +398,6 @@ module.exports = {
   isSameOrBefore: isSameOrBefore,
   isSameDay: isSameDay,
   isSameHours: isSameHours,
+  isSameMonth: isSameMonth,
   getMeridiem: getMeridiem,
 }

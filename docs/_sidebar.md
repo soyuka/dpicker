@@ -2,6 +2,7 @@
 
 - [Home](/)
 - [Demo](_demo.md)
+- [StyleSheets](_stylesheets.md)
 - [Api](_api.md)
-- [Changelog](changelog.md)
+- [Changelog](CHANGELOG.md)
 

@@ -1,4 +1,4 @@
-#!env /bin/bash
+#!env bash
 
 [[ '' == $1 ]] && echo "Please provide patch, minor, major argument" && exit 1
 

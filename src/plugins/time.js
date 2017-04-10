@@ -1,19 +1,5 @@
-/**
- * ## Time
- */
-
 const html = require('bel')
 const DPicker = require('../dpicker.js')
-
-/**
- * @module DPicker.modules.time
- * @description
- * Adds the following options/attributes/getters/setters:
- *
- * - `{boolean} [options.time=false]` Wether to add time or not, defaults to `true` if input type is `datetime`
- * - `{boolean} [options.meridiem=false]` 12 vs 24 time format where 24 is the default, this can be set through the `meridiem` attribute
- * - `{Number} [options.step=1]` Minutes step
- **/
 
 const MINUTES = new Array(60).fill(0).map((e, i) => i)
 const HOURS24 = new Array(24).fill(0).map((e, i) => i)
@@ -24,6 +10,7 @@ const MERIDIEM_TOKENS = ['AM', 'PM']
 /**
  * Get hours and minutes according to the given _data (meridiem, min/max consideration)
  * @param {Object} data
+ * @private
  * @return {Object} `{hours, minutes}` both arrays of numbers
  */
 function getHoursMinutes (data) {
@@ -57,6 +44,8 @@ function getHoursMinutes (data) {
 /**
  * Pad left for minutes \o/
  * @param {Number} v
+ * @private
+ * @return {String}
  */
 function padLeftZero (v) {
   return v < 10 ? '0' + v : '' + v
@@ -64,6 +53,7 @@ function padLeftZero (v) {
 
 /**
  * Handles minutes steps to focus on the correct input and set the model minutes/hours
+ * @private
  */
 function minutesStep () {
   if (!this._data.time) {
@@ -110,12 +100,14 @@ function minutesStep () {
  * select[name='dpicker-hour']
  * select[name='dpicker-minutes']
  * ```
- * @method
- * @listens DPicker#hoursChange
- * @listens DPicker#minutesChange
- * @return {H} the rendered virtual dom hierarchy
+ *
+ * @fires DPicker#hoursChange
+ * @fires DPicker#minutesChange
+ * @fires DPicker#minuteHoursChange
+ * @fires DPicker#meridiemChange
+ * @return {Element} the rendered virtual dom hierarchy
  */
-const renderTime = function renderTime (events, data, toRender) {
+DPicker._renders.time = function renderTime (events, data) {
   if (!data.time) { return html`<span style="display: none;" class="dpicker-time"` }
 
   let modelHours = DPicker._dateAdapter.getHours(data.model)
@@ -195,8 +187,7 @@ const renderTime = function renderTime (events, data, toRender) {
 
 /**
   * On hours change
-  * @Event DPicker#hoursChange
-  * @param {Event} DOMEvent
+  * @event DPicker#hoursChange
   */
 DPicker._events.hoursChange = function hoursChange (evt) {
   this._data.empty = false
@@ -220,8 +211,7 @@ DPicker._events.hoursChange = function hoursChange (evt) {
 
 /**
   * On minutes change
-  * @Event DPicker#minutesChange
-  * @param {Event} DOMEvent
+  * @event DPicker#minutesChange
   */
 DPicker._events.minutesChange = function minutesChange (evt) {
   this._data.empty = false
@@ -234,8 +224,7 @@ DPicker._events.minutesChange = function minutesChange (evt) {
 
 /**
   * On minutes hours change when concatHoursAndMinutes is `true`
-  * @Event DPicker#minuteHoursChange
-  * @param {Event} DOMEvent
+  * @event DPicker#minuteHoursChange
   */
 DPicker._events.minuteHoursChange = function minuteHoursChange (evt) {
   let val = evt.target.options[evt.target.selectedIndex].value.split(':')
@@ -248,8 +237,7 @@ DPicker._events.minuteHoursChange = function minuteHoursChange (evt) {
 
 /**
   * On meridiem change
-  * @Event DPicker#meridiemChange
-  * @param {Event} DOMEvent
+  * @event DPicker#meridiemChange
   */
 DPicker._events.meridiemChange = function meridiemChange (evt) {
   this._data.empty = false
@@ -268,31 +256,59 @@ DPicker._events.meridiemChange = function meridiemChange (evt) {
 }
 
 /**
- * @inheritdoc
+ * @ignore
  */
 DPicker._events.inputChange = DPicker.decorate(DPicker._events.inputChange, function timeInputChange () {
   minutesStep.apply(this)
 })
 
-DPicker._renders.time = renderTime
-
+/**
+ * @ignore
+ */
 DPicker.prototype.initialize = DPicker.decorate(DPicker.prototype.initialize, function timeInitialize () {
   minutesStep.apply(this)
 })
 
+/**
+ * @ignore
+ */
 DPicker.prototype.redraw = DPicker.decorate(DPicker.prototype.redraw, function timeRedraw () {
   minutesStep.apply(this)
 })
 
+/**
+ * @property {Boolean} [time=false] If `type="datetime"` attribute is defined, evaluates to `true`
+ */
 DPicker._properties.time = function getTimeAttribute (attributes) {
   return attributes.type === 'datetime'
 }
 
+/**
+ * @property {Boolean} [step=1] Takes the value of the attribute `step` or `1`
+ */
 DPicker._properties.step = function getStepAttribute (attributes) {
   return attributes.step ? parseInt(attributes.step, 10) : 1
 }
 
+/**
+ * @property {Boolean} [meridiem=false]
+ */
 DPicker._properties.meridiem = false
+
+/**
+ * @property {Boolean} [concatHoursAndMinutes=false]
+ */
 DPicker._properties.concatHoursAndMinutes = false
 
+
+/**
+ * ## Time
+ *
+ * Adds the following options/attributes/getters/setters:
+ *
+ * - `{boolean} [options.time=false]` Wether to add time or not, defaults to `true` if input type is `datetime`
+ * - `{boolean} [options.meridiem=false]` 12 vs 24 time format where 24 is the default, this can be set through the `meridiem` attribute
+ * - `{Number} [options.step=1]` Minutes step
+ *
+ **/
 module.exports = DPicker

@@ -1,12 +1,4 @@
-/**
- * ## Modifiers
- */
-
 const DPicker = require('../dpicker.js')
-
-/**
- * @module DPicker.modules.modifiers
- */
 
 /**
  * Enables modifiers on `+[num]` and `-[num]` where:
@@ -17,7 +9,7 @@ const DPicker = require('../dpicker.js')
  * @param {Event} DOMEvent
  * @listens DPicker#inputChange
  */
-function ModifierInputChange (evt) {
+DPicker._events.inputChange = DPicker.decorate(DPicker._events.inputChange, function ModifierInputChange (evt) {
   let first = evt.target.value.charAt(0)
   let x = evt.target.value.slice(1) || 0
 
@@ -37,9 +29,4 @@ function ModifierInputChange (evt) {
   }
 
   this.onChange({modelChanged: true, name: 'inputChange', event: evt})
-}
-
-/**
- * @inheritdoc
- */
-DPicker._events.inputChange = DPicker.decorate(DPicker._events.inputChange, ModifierInputChange)
+})

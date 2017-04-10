@@ -1,32 +1,108 @@
-// Core variables and mixins
-@import "bootstrap/variables";
-$input-border-radius: 0px;
-$input-border-focus: lighten(#ffab40, 20%);
-$alert-border-radius:         0px;
-$alert-warning-bg:            lighten(#ffab40, 25%);
-$alert-warning-text:          darken(#ffab40, 50%);
-$alert-warning-border:        darken(#ffab40, 20%);
+# Stylesheets
 
-@import "bootstrap/mixins";
+## Minimal
 
-// Reset and dependencies
-@import "bootstrap/normalize";
-@import "bootstrap/print";
+```css
+td.dpicker-inactive {
+  color: grey;
+}
 
-// Core CSS
-@import "bootstrap/scaffolding";
-@import "bootstrap/type";
-@import "bootstrap/code";
-@import "bootstrap/grid";
-@import "bootstrap/tables";
-@import "bootstrap/forms";
-@import "bootstrap/buttons";
+button.dpicker-active {
+  background: coral;
+}
 
- @import "bootstrap/alerts";
+.dpicker-invisible {
+  display: none;
+}
 
-// Utility classes
-@import "bootstrap/utilities";
-@import "bootstrap/responsive-utilities";
+.dpicker-visible {
+  display: block;
+}
+```
+
+## Foundation
+
+```css
+@import 'foundation';
+
+$black: #2f3439 !default;
+$white: #fefefe !default;
+$alt-white: #f0f0f0 !default;
+
+label.dpicker .dpicker-container { top: inherit; }
+
+.dpicker {
+  position: relative;
+
+  .dpicker-container {
+    background: $white;
+    border: $black;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    left: 0;
+    padding: 15px;
+    position: absolute;
+    top: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+    width: 300px;
+    z-index: 2;
+
+    &.dpicker-invisible { display: none; }
+    &.dpicker-visible { display: flex; }
+
+    select {
+      flex: 0 0 49%;
+    }
+
+    .dpicker-time {
+      display: flex;
+
+      select {
+        flex: 0 0 30%;
+      }
+    }
+
+    table {
+      color: $black;
+      text-align: center;
+      $dpicker-hover: scale-color($alt-white, $lightness: -20%);
+
+      td {
+        border: 1px solid $black;
+        border-collapse: collapse;
+        height: 40px;
+        width: 40px;
+      }
+
+      .dpicker-inactive {
+        color: scale-color($black, $lightness: 50%);
+        font-size: $small-font-size;
+      }
+
+      .dpicker-active button {
+
+        @include button($expand: true, $background: $alt-white, $background-hover: $dpicker-hover)
+
+        border: 0;
+        color: inherit;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        &.dpicker-active {
+          background-color: $dpicker-hover;
+        }
+      }
+    }
+  }
+}
+```
+
+## Bootstrap
+
+From the [demo](_demo) (scss)
+
+```css
+@import 'bootstrap';
 
 @mixin form-control {
   display: block;
@@ -103,33 +179,6 @@ $alert-warning-border:        darken(#ffab40, 20%);
   &.focus {
     color: $btn-default-color;
     text-decoration: none;
-  }
-
-}
-
-body {
-  background-color: #aed581;
-}
-
-#heading {
-  padding: 50px 0;
-  text-align: center;
-  background-color: #ffab40;
-}
-
-#main {
-  background-color: #aed581;
-}
-
-.main-container, #demo {
-  margin-top: 30px;
-}
-
-.dpicker-main {
-  .dpicker-container {
-    position: relative !important;
-    border: 0 !important;
-    min-width: auto !important;
   }
 }
 
@@ -227,3 +276,41 @@ body {
     }
   }
 }
+
+```
+
+## Contributed
+
+By [jonwilkinson](https://github.com/soyuka/dpicker/issues/4)
+
+```css
+.dpicker-container table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 3px;
+    -webkit-box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+    box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.5);
+}
+
+.dpicker-container button,
+.dpicker-container td,
+.dpicker-container th {
+    font-size: 1em;  /* overall calendar size */
+    height: 2em; /* tweak to add vertical spacing to calendar */
+    min-width: 1em; /* tweak to add horizontal spacing to calendar */
+    text-align: center;
+}
+
+.dpicker-inactive { color: rgba(0,0,0,.2); }
+select[name="dpicker-year"], select[name="dpicker-month"] { margin: 1em 2em 1em 0em; }
+.dpicker-active button.dpicker-active { background-color: #FFFBCC; font-weight:bold; }
+.dpicker-container, .dpicker-container button {  font-size: 100%; font: inherit; vertical-align: baseline; }
+.dpicker-container { margin:.5em; }
+.dpicker-active, .dpicker-inactive {border: 1px solid rgba(0,0,0,.05); }
+.dpicker-active button { border:none; width: 100%; background: none; }
+.dpicker-active button:hover { background: rgba(0,0,0,.05); cursor: pointer; }
+.dpicker-invisible { display: none; }
+.dpicker-visible { display: block; }
+```

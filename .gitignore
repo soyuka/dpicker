@@ -1,6 +1,5 @@
 node_modules
 dist
 coverage
-docs/api/*
-!docs/api/.gitkeep
 docs/_api.md
+docs/CHANGELOG.md

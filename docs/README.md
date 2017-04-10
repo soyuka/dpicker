@@ -17,11 +17,37 @@ npm install dpicker --save
 bower install dpicker --save
 ```
 
-Package managers are only referencing `dpicker.js`!
+!> Package managers are only referencing `dpicker.js`! To keep `dpicker` small, every new feature is added through a module.
+You can either use those separatly, or use one of the pre-built package.
+
+We've built-in the following for an easy installation (suffix with `.min.js` for the minified version):
+
+- `dpicker.all` contains every module (~7.6kb)
+- `dpicker.datetime` contains only core and time (~6.9kb)
+- `dpicker` contains only core (~5.6kb)
+
+Modules alone (needs the core to be included first):
+
+- `dpicker.arrow-navigation` enable keyboard arrows to navigate between days (~0.1kb)
+- `dpicker.modifiers` enable modifiers, for example `+` to get current day, `+100` to get the date in 100 days. (~0.5kb)
+- `dpicker.time` enable time (~2kb)
+
+For example with the [unpkg cdn](https://unpkg.com):
+
+```
+<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.datetime.min.js"></script>
+```
+
+Is the same as:
+
+```
+<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.time.min.js"></script>
+```
 
 ## Usage
 
-DPicker depends on moment. It can be included with your favorite module loader or through a CDN, for example:
+DPicker relies on [momentjs](momentjs.com) (soon [date-fns](https://github.com/date-fns/date-fns) as an alternative!). It can be included with your favorite module loader or through a CDN, for example:
 
 ```html
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
@@ -131,7 +157,7 @@ var dp = new DPicker(container, {
 })
 ```
 
-More options are available, for a complete list [check the documentation](https://soyuka.github.io/dpicker/DPicker.html#demo).
+More options are available, for a complete list [check the api documentation](_api#dpickerelement-options).
 
 Change values during the date picker life cycle:
 
@@ -146,7 +172,7 @@ dp.max = moment('01/01/2020')
 dp.time = true
 ```
 
-Available properties are listed in the [documentation](https://soyuka.github.io/dpicker/DPicker.html)
+Available properties are listed in the [api documentation](_api#dpickerelement-options), where [some properties](_api#dpicker_properties) belong to modules.
 
 ## CSS
 
@@ -169,17 +195,326 @@ button.dpicker-active {
 }
 ```
 
-[You can find alternatives stylesheets here.](https://soyuka.github.io/dpicker/demo/styles.html)
+[You can find alternatives stylesheets here.](_stylesheets)
 
 ## Modules
 
-To keep DPicker small, external modules are available.
+### Concept
 
-For example to add time to your date picker you need to add `dpicker.time.js`.
+As stated above, DPicker has a *built-in module system*. Actually, as DPicker is built with two core concepts, it's nothing more than:
 
-### Framework agnostic
+1. render methods
+2. event listeners
 
-examples
+A render method is a context-less function, which must return one DOM element.
+It always has two parameters:
+
+- `events` an Object with every event listener available in DPicker
+- `data` an Object with the DPicker data
+
+Example:
+
+```javascript
+DPicker._renders.myRenderFn = function (data, events) {
+  var el = document.createElement('div')
+  el.onclick = events.doSomeStuff
+
+  return el
+}
+```
+
+An event listener is a function that will be executed in DPicker context. This means that `this._data` will be the `_data` object of our date picker.
+
+Example:
+
+```javascript
+DPicker._events.doSomeStuff = function (evt) {
+  evt.preventDefault()
+  this._data.foo = 'foobar'
+  this.redraw() // Call the public redraw method, those are documented in the API docs
+}
+```
+
+### Example
+
+Let's build a module that will add two arrows to navigate between previous and next months.
+
+ To make this easy, we will use the [`bel`](https://github.com/shama/bel) module. This module can then be [`yo-yoified`](https://github.com/shama/yo-yoify) or [`babel-yo-yoified`](https://github.com/goto-bus-stop/babel-plugin-yo-yoify) to transform our html text to real DOM elements.
+
+First, let's add two rendering methods for our buttons:
+
+```javascript
+const html = require('bel')
+
+DPicker._renders.previousMonth = function renderPreviousMonth(events, data) {
+  return html`<button onclick="${events.previousMonth}" class="dpicker-previous-month"></button>`
+}
+
+DPicker._renders.nextMonth = function renderNextMonth(events, data) {
+  return html`<button onclick="${events.nextMonth}" class="dpicker-next-month"></button>`
+}
+```
+
+Now let's add two events to make this work. Note that to play with dates you should use the [`DateAdapter`](_api#momentadapter):
+
+```javascript
+DPicker._events.previousMonth = function previousMonth(evt) {
+  // go one month back
+  this.model = DPicker._dateAdapter.subMonths(this._data.model, 1)
+  // redraw the DPicker
+  this.redraw()
+  // This is not mandatory but is good if you want your changes to reach DPicker.onChange
+  this.onChange({modelChanged: true, name: 'previousMonth', event: evt})
+}
+
+DPicker._events.nextMonth = function nextMonth(evt) {
+  this.model = DPicker._dateAdapter.addMonths(this._data.model, 1)
+  this.redraw()
+  this.onChange({modelChanged: true, name: 'nextMonth', event: evt})
+}
+```
+
+We're done. To enable your render functions, you have to specify their keys in the `order` option:
+
+```javascript
+new DPicker(element, {order: ['previousMonth', 'months', 'years', 'nextMonth', 'days', 'time']})
+```
+
+This module is actually available [here](https://github.com/soyuka/dpicker/blob/development/src/plugins/navigation.js).
+
+### Go further
+
+Sometimes, you just want to do more work when one of the [available events or methods](_api) from DPicker are called. For this to work we can `decorate` public methods or events.
+
+For example, let's add a call when `dpicker#initialize` is called:
+
+```javascript
+DPicker.prototype.initialize = DPicker.decorate(DPicker.prototype.initialize, function myPluginInit () {
+  //do some stuff
+})
+```
+
+Or with an event:
+
+```javascript
+DPicker._events.dayKeyDown = DPicker.decorate(DPicker._events.dayKeyDown, function DayKeyDown (evt) {
+  // a keydown event was called on a day
+})
+```
+
+!> Note that if a decoration returns `false`, it'll stop the call chain.
+
+Last but not least, you can add options to your plugin. DPicker will automatically try to instantiate the given properties via:
+
+1. attributes (the DOM attributes of the given `input`)
+2. options (the options given to `DPicker` constructor)
+3. a default value
+
+Properties should be added like this:
+
+```javascript
+DPicker._properties.myOption = false
+```
+
+This sets up `this._data.myOption`, and has a default `false` value.
+
+If you want to customize the behavior on the `attributes` parsing, you can use a `function`:
+
+```javascript
+DPicker._properties.step = function getStepAttribute (attributes) {
+  return attributes.step ? parseInt(attributes.step, 10) : 1
+}
+```
+
+## Framework agnostic
+
+!> Those are only base examples, please adapt them to your needs!
+
+### Angular 1
+
+?> Simple Angular 1 example that leverages ngModelCtrl. Some more bits are needed for validation.
+
+```javascript
+angular.module('DPicker', [])
+
+angular.module('DPicker')
+.directive('dpDpicker', function() {
+	return {
+		restrict: 'A',
+		scope: {
+			ngModel: '='
+		},
+		require: 'ngModel',
+		link: function(scope, element, attrs, ngModelCtrl) {
+			scope.dpicker = new DPicker(element[0])
+			scope.dpicker.onChange = function() {
+				ngModelCtrl.$setViewValue(scope.dpicker.model)
+			}
+
+			if (scope.ngModel && scope.ngModel instanceof Date) {
+				scope.dpicker.model = scope.ngModel
+			}
+
+			ngModelCtrl.$setViewValue(scope.dpicker.empty ? null : scope.dpicker.model)
+
+			attrs.$observe('ngModel', function(value) {
+				if (value instanceof Date) {
+					scope.dpicker.model = value
+				}
+			})
+		}
+	}
+})
+```
+
+### Angular 2
+
+?> This Angular 2 example assumes that the ngModel is a Date. This example also attach an angular 2 validator.
+
+```javascript
+import { forwardRef, ElementRef, Directive, Input, OnInit } from '@angular/core'
+import { NG_VALUE_ACCESSOR, ControlValueAccessor, NG_VALIDATORS, AbstractControl } from '@angular/forms'
+
+import * as DPicker from 'dpicker'
+
+@Directive({
+  selector: '[prefixDpicker]',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => PrefixDpickerDirective),
+    multi: true
+  },
+  {
+    provide: NG_VALIDATORS,
+    useExisting: forwardRef(() => PrefixDpickerDirective),
+    multi: true
+  }
+  ],
+})
+export class PrefixDpickerDirective implements ControlValueAccessor, OnInit {
+  dpicker: any
+  @Input() max: string
+  @Input() min: string
+
+  private onChangeCallback: (_: any) => void = () => {}
+  private onTouchedCallback: () => void = () => {}
+
+  constructor(public elementRef: ElementRef) {}
+
+  ngOnInit() {
+    try {
+      this.dpicker = new DPicker(this.elementRef.nativeElement, {min: this.min, max: this.max})
+    } catch (e) {
+      console.error(e.message)
+    }
+
+    this.dpicker.onChange = () => {
+      this.onChangeCallback(this.dpicker.model)
+      this.onTouchedCallback()
+    }
+  }
+
+  registerOnChange(fn: any) {
+    this.onChangeCallback = fn
+  }
+
+  registerOnTouched(fn: any) {
+    this.onTouchedCallback = fn
+  }
+
+  writeValue(value: any) {
+    this.dpicker.model = value
+  }
+
+  validate(c: AbstractControl): { [key: string]: any } {
+    this.dpicker.isValid(c.value)
+
+    if (this.dpicker.valid === true) {
+      return null
+    }
+
+    return {validDate: false}
+  }
+}
+```
+
+Html:
+
+```html
+<form #f='ngForm'>
+  valid: {{f.valid}} {{foo}}
+   <div>
+     <input type='text' prefixDpicker max='12/12/2016' [(ngModel)]='foo' name: 'bar' />
+   </div>
+</form>
+```
+
+### Cycle.js
+
+?> This example uses a `timeout` hack to initialize the DPicker. This might not be the best way of doing this. Note that this exact code is used in the demo.
+
+```javascript
+import {div, input, h2, label, pre, code, makeDOMDriver} from '@cycle/dom'
+import xs from 'xstream'
+
+export function CycleDPicker (sources) {
+  let init = false
+  let dpicker
+
+  function deferCreate(element, listener) {
+      if (init === false) {
+        sources.time = true
+        dpicker = new DPicker(element.elm, sources)
+      }
+
+      dpicker.onChange = function(data, modelChanged) {
+        if (modelChanged === false) {
+          return
+        }
+
+        element.data = { value: data.model }
+
+        listener.next(element)
+      }
+
+      init = true
+  }
+
+  const d = input('.dp')
+
+  const Dpicker$ = xs.create({
+    start: (listener) => {
+      if (init === false) {
+        setTimeout(() => deferCreate(d, listener), 100)
+      }
+
+      listener.next(d)
+    },
+    stop: () => {
+
+    },
+    id: 0
+  })
+
+  return {
+    DOM: Dpicker$
+  }
+}
+```
+
+?> **TODO** add more examples
+
+## Date Adapter
+
+Because framework agnostic also means that we don't want to force you to use one or another Date library, DPicker uses a `DateAdapter`. It's a simple bridge module that exposes needed functions. If you want to implement your own date adapter, implement the [DateAdapter as documented in the API](_api#momentadapter).
+
+?> **TODO** Release a package with no default date adapters
+
+Referencing the `dateAdapter` of your choice is done through the static property:
+
+```javascript
+DPicker._dateAdapter = MyDateAdapter
+```
 
 ## Why?
 
@@ -188,21 +523,45 @@ If you know one that does have less than 1000 SLOC, please let me know.
 
 This date picker:
 
-- is light and easy to use, especially easy to maintain (core has ~500 SLOC + a 150 SLOC simplified hyperscript library)
-- is compliant and can be extended for your needs, and no default css so that it fits well with foundation/bootstrap or angular/react
+- is light and easy to use, especially easy to maintain (core has ~500 SLOC), uses `Date` and `DOM` objects.
+- is compliant and can be extended to suit your needs
+- no default css so that it fits well with foundation/bootstrap
+- is framework agnostic
 - has HTML attributes compatibility with `input[type="date"]` (adds a `format` attribute) and `input[type="datetime"]` (adds a `meridiem` attribute on top of the `format` one if you need 12 hours time range). Define minutes step through the `step` attribute.
-- works with momentjs so that locale changes are a breeze
-- extensible through modules, use the core and implement yourself your specific needs easily
+- has in mind to work with any Date module (momentjs, date-fns)
+- extensible through modules, use the core and implement your specific needs easily
 
 What I think is good, and isn't straightforward in other date pickers is that your input's `Date` instance is separated from the input real value:
 
 ```javascript
 const dpicker = new DPicker(input)
 
-console.log(dpicker.model) //the Moment.js instance
+console.log(dpicker.model) //the Date instance
 console.log(dpicker.input) //the input value, a formatted date
 ```
 
 ## License
 
-MIT
+```
+The MIT License (MIT)
+
+Copyright (c) 2016 Antoine Bluchet
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
