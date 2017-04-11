@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/soyuka/dpicker.svg?branch=master)](https://travis-ci.org/soyuka/dpicker)
-[![codecov](https://codecov.io/gh/soyuka/dpicker/branch/master/graph/badge.svg)](https://codecov.io/gh/soyuka/dpicker)
+[![Build Status](https://img.shields.io/travis/soyuka/dpicker.svg)](https://travis-ci.org/soyuka/dpicker)
+[![codecov](https://img.shields.io/codecov/c/github/soyuka/dpicker.svg)](https://codecov.io/gh/soyuka/dpicker)
 
 A framework-agnostic minimal date picker.
 
