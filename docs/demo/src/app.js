@@ -14,10 +14,21 @@ export function App (sources) {
   let valid = dpicker.valid
   let empty = dpicker.empty
 
-  const min = CycleDPicker({name: 'min', model: dpicker.min, format: DEFAULT_FORMAT, order: DEFAULT_ORDER})
+  const min = CycleDPicker('.cycle-dpicker-min', {
+    DOM: sources.DOM,
+    props: xs.of({name: 'min', model: dpicker.min, format: DEFAULT_FORMAT, order: DEFAULT_ORDER})
+  })
+
   const minVDom$ = min.DOM
-  const max = CycleDPicker({name: 'max', model: dpicker.max, max: DPicker.dateAdapter.addYears(dpicker.max, 1), format: DEFAULT_FORMAT, order: DEFAULT_ORDER})
+  const minState$ = min.state.map((e) => e.model)
+
+  const max = CycleDPicker('.cycle-dpicker-max', {
+    DOM: sources.DOM,
+    props: xs.of({name: 'max', model: dpicker.max, max: DPicker.dateAdapter.addYears(dpicker.max, 1), format: DEFAULT_FORMAT, order: DEFAULT_ORDER})
+  })
+
   const maxVDom$ = max.DOM
+  const maxState$ = max.state.map((e) => e.model)
 
   const validDpicker$ = xs.create({
     start: (listener) => {
@@ -103,7 +114,7 @@ export function App (sources) {
     .startWith(e)
   })
 
-  form$.push(validDpicker$.startWith(dpicker.data), minVDom$, maxVDom$)
+  form$.push(validDpicker$.startWith(dpicker.data), minVDom$, minState$, maxVDom$, maxState$)
 
   const vdom$ = xs.combine.apply(null, form$)
   .map((configArray) => {
@@ -127,14 +138,17 @@ export function App (sources) {
     }
 
     const minVDom = configArray[formLength + 1]
-    const maxVDom = configArray[formLength + 2]
+    const minValue = configArray[formLength + 2]
 
-    if (minVDom.data.value && minVDom.data.value !== dpicker.min) {
-      dpicker.min = minVDom.data.value
+    const maxVDom = configArray[formLength + 3]
+    const maxValue = configArray[formLength + 4]
+
+    if (minValue && dpicker.min !== minValue) {
+      dpicker.min = minValue
     }
 
-    if (maxVDom.data.value && maxVDom.data.value !== dpicker.min) {
-      dpicker.max = maxVDom.data.value
+    if (maxValue && dpicker.max !== maxValue) {
+      dpicker.max = maxValue
     }
 
     return {config: dpicker.data, minVDom: minVDom, maxVDom: maxVDom}

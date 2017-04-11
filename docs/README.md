@@ -503,48 +503,67 @@ Html:
 
 ### Cycle.js
 
-To bundle `DPicker` in the cyclejs DOM, we are setting a [`snabbdom` hook](https://github.com/snabbdom/snabbdom#hooks) on `insert`. This allows us to use the real `Element`, once appended to the DOM.
+To bundle `DPicker` in the cyclejs DOM, let's create a [Component](https://cycle.js.org/components.html#components).
+
+?> We are setting a [`snabbdom` hook](https://github.com/snabbdom/snabbdom#hooks) on `insert`. This allows us to set up DPicker on the real `Element`, once appended to the DOM.
 
 ```javascript
 import {div} from '@cycle/dom'
 import xs from 'xstream'
 
-export function CycleDPicker (sources) {
-  const Dpicker$ = xs.create({
-    start: (listener) => {
-      let dpicker
+export function CycleDPicker (selector, sources) {
 
-      const d = div('.dp', {
-        hook: {
-          insert: (vnode) => {
-            console.log('vnode', vnode)
-            dpicker = new DPicker(vnode.elm, sources)
-            vnode.data.value = dpicker.model
+  const value$ = sources.DOM.select(selector)
+    .events('dpicker:change')
+    .map((ev) => {
+      return ev.detail
+    })
 
-            dpicker.onChange = function(data, modelChanged) {
-              if (modelChanged === false) {
-                return
-              }
+  const state$ = sources.props
+    .map((props) => {
+      return value$
+      .startWith(props)
+    })
+    .flatten()
+    .remember()
 
-              vnode.data.value = data.model
-              listener.next(vnode)
+  const vdom$ = state$.map((state) => {
+    return div(selector, {
+      hook: {
+        insert: (vnode) => {
+          const dpicker = new DPicker(vnode.elm, state)
+          dpicker.onChange = function(data, modelChanged) {
+            if (modelChanged === false) {
+              return
             }
 
-            listener.next(vnode)
+            const evt = new CustomEvent('dpicker:change', {bubbles: true, detail: dpicker.data})
+            vnode.elm.dispatchEvent(evt)
           }
         }
-      })
-
-      listener.next(d)
-    },
-    stop: () => {},
-    id: 0
+      }
+    })
   })
 
   return {
-    DOM: Dpicker$
+    DOM: vdom$,
+    state: state$
   }
 }
+```
+
+Usage:
+
+```
+const myDpicker = CycleDPicker('.cycle-dpicker-max', {
+  DOM: sources.DOM,
+  props: xs.of({name: 'max', model: new Date()}) //dpicker options
+})
+
+// Streams:
+
+const vdom$ = myDpicker.DOM
+const state$ = myDpicker.state
 ```
 
 ?> **TODO** add more examples

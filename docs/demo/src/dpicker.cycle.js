@@ -1,38 +1,42 @@
 import {div} from '@cycle/dom'
 import xs from 'xstream'
 
-export function CycleDPicker (sources) {
-  const Dpicker$ = xs.create({
-    start: (listener) => {
-      let dpicker
+export function CycleDPicker (selector, sources) {
 
-      const d = div('.dp', {
-        hook: {
-          insert: (vnode) => {
-            dpicker = new DPicker(vnode.elm, sources)
-            vnode.data.value = dpicker.model
+  const value$ = sources.DOM.select(selector)
+    .events('dpicker:change')
+    .map((ev) => {
+      return ev.detail
+    })
 
-            dpicker.onChange = function(data, modelChanged) {
-              if (modelChanged === false) {
-                return
-              }
+  const state$ = sources.props
+    .map((props) => {
+      return value$
+      .startWith(props)
+    })
+    .flatten()
+    .remember()
 
-              vnode.data.value = data.model
-              listener.next(vnode)
+  const vdom$ = state$.map((state) => {
+    return div(selector, {
+      hook: {
+        insert: (vnode) => {
+          const dpicker = new DPicker(vnode.elm, state)
+          dpicker.onChange = function(data, modelChanged) {
+            if (modelChanged === false) {
+              return
             }
 
-            listener.next(vnode)
+            const evt = new CustomEvent('dpicker:change', {bubbles: true, detail: dpicker.data})
+            vnode.elm.dispatchEvent(evt)
           }
         }
-      })
-
-      listener.next(d)
-    },
-    stop: () => {},
-    id: 0
+      }
+    })
   })
 
   return {
-    DOM: Dpicker$
+    DOM: vdom$,
+    state: state$
   }
 }
