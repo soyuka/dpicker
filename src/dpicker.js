@@ -325,6 +325,7 @@ DPicker.prototype.renderInput = function (events, data, toRender) {
     onchange="${events.inputChange}"
     onfocus="${events.inputFocus}"
     name="${data.inputName}"
+    autocomplete="off"
     aria-invalid="${data.valid}" aria-haspopup
     class="${data.valid === false ? 'dpicker-invalid' : ''}">`
 }
