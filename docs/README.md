@@ -442,8 +442,8 @@ import * as DPicker from 'dpicker'
 })
 export class PrefixDpickerDirective implements ControlValueAccessor, OnInit {
   dpicker: any
-  @Input() max: string
-  @Input() min: string
+  @Input() max: Date
+  @Input() min: Date
 
   private onChangeCallback: (_: any) => void = () => {}
   private onTouchedCallback: () => void = () => {}
