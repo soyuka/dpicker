@@ -1,10 +1,10 @@
 'use strict'
 const moment = require('moment')
 const expect = require('chai').expect
+const DPicker = require('../../dist/dpicker.js')
 
 describe('dpicker.arrow-navigation', function() {
-  let DPicker = window.DPicker
-  require('../../dist/dpicker.arrow-navigation')
+  require('../../dist/dpicker.arrow-navigation')(DPicker)
 
   before(() => {
     document.body.innerHTML = ''

@@ -15,7 +15,7 @@ function keyDown(keyCode, element) {
 require('./adapters/moment.spec.js')
 
 describe('dpicker', function() {
-  const DPicker = require('../dist/dpicker')
+  const DPicker = require('../dist/dpicker.js')
 
   beforeEach(() => {
     document.body.innerHTML = ''

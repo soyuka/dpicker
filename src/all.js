@@ -1,7 +1,7 @@
 const DPicker = require('./dpicker.moment.js')
-require('./plugins/time.js')
-require('./plugins/modifiers.js')
-require('./plugins/arrow-navigation.js')
-require('./plugins/navigation.js')
+require('./plugins/time.js')(DPicker)
+require('./plugins/modifiers.js')(DPicker)
+require('./plugins/arrow-navigation.js')(DPicker)
+require('./plugins/navigation.js')(DPicker)
 
 module.exports = DPicker

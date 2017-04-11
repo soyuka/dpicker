@@ -586,8 +586,10 @@ const MyDateAdapter = require('./my.date.adapter')
 
 DPicker.dateAdapter = MyDateAdapter
 
-// Require some extensions here
-require('node_modules/dpicker/dist/dpicker.time.js')
+// Require some modules here
+require('dpicker/src/plugins/time')(DPicker)
+
+module.exports = DPicker
 ```
 
 Use our 100% coverage test case instead of building your own tests!

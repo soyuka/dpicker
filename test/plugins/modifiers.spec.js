@@ -1,9 +1,10 @@
 'use strict'
 const moment = require('moment')
 const expect = require('chai').expect
+const DPicker = require('../../dist/dpicker.js')
 
 describe('dpicker.modifiers', function() {
-  require('../../dist/dpicker.modifiers.js')
+  require('../../dist/dpicker.modifiers.js')(DPicker)
 
   before(() => {
     document.body.innerHTML = ''

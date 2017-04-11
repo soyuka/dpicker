@@ -3,11 +3,7 @@ require('jsdom-global')()
 
 global.screen = {}
 
-window.moment = require('moment')
-
 const DPicker = require('../dist/dpicker.js')
-window.DPicker = DPicker
-
 let container
 
 global.createDatePicker = function createDatePicker(opts) {

@@ -1,10 +1,10 @@
 'use strict'
 const moment = require('moment')
 const expect = require('chai').expect
+const DPicker = require('../../dist/dpicker.js')
 
 describe('dpicker.time', function() {
-  const DPicker = window.DPicker
-  require('../../dist/dpicker.time.js')
+  require('../../dist/dpicker.time.js')(DPicker)
 
   beforeEach(() => {
     document.body.innerHTML = ''

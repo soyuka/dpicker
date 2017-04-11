@@ -3,7 +3,7 @@
 browserify="$(npm bin)/browserify"
 uglifyjs="$(npm bin)/uglifyjs"
 
-GLOBAL_ARGS="-g unassertify -t babelify -t browserify-shim -x moment"
+GLOBAL_ARGS="-g unassertify -t babelify -x moment"
 MIN_ARGS="$GLOBAL_ARGS -g uglifyify"
 
 RELEASE_BUILD=0
@@ -15,9 +15,9 @@ build() {
   args=$GLOBAL_ARGS
 
   if [[ $3 == 1 ]]; then
-        args="-s DPicker $args"
+        args="-s dpicker $args"
   else
-        args="-x ./src/dpicker.moment.js $args"
+        args="-s ${2/./_} $args"
   fi
 
   echo  "Browserifying src/$1 => $2"
@@ -48,22 +48,14 @@ if [[ $RELEASE_BUILD == 1 ]]; then
   echo
   echo  "Build release files"
 
-  # Patching package.json
-  patch package.json .scripts/shim.patch
-
   # Build date + time
   echo  "Browerifying datetime"
-  sh -c "$browserify $GLOBAL_ARGS -s DPicker src/plugins/time.js -o dist/dpicker.datetime.js"
-  sh -c "$browserify $MIN_ARGS -s DPicker src/plugins/time.js -o dist/dpicker.datetime.min.js"
+  sh -c "$browserify $GLOBAL_ARGS -s dpicker src/datetime.js -o dist/dpicker.datetime.js"
+  sh -c "$browserify $MIN_ARGS -s dpicker src/datetime.js -o dist/dpicker.datetime.min.js"
   # Build all
   echo  "Browerifying all"
-  sh -c "$browserify $GLOBAL_ARGS -s DPicker src/all.js -o dist/dpicker.all.js"
-  sh -c "$browserify $MIN_ARGS -s DPicker src/all -o dist/dpicker.all.min.js"
-
-  # undo changes
-  patch -R package.json .scripts/shim.patch
-
-  rm package.json.orig
+  sh -c "$browserify $GLOBAL_ARGS -s dpicker src/all.js -o dist/dpicker.all.js"
+  sh -c "$browserify $MIN_ARGS -s dpicker src/all -o dist/dpicker.all.min.js"
 
   echo  "Browserifying polyfills"
   $browserify -g uglifyify src/polyfills.js -o dist/polyfills.min.js
