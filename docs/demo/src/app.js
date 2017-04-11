@@ -87,7 +87,7 @@ export function App (sources) {
     e.value = e.default
 
     return sources.DOM.select(`input[name="${e.key}"]`)
-    .events('input')
+    .events('change')
     .map(event => {
       switch(typeof e.default) {
         case 'boolean':
