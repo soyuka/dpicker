@@ -589,7 +589,7 @@ export function CycleDPicker (selector, sources) {
 
 Usage:
 
-```
+```javascript
 const myDpicker = CycleDPicker('.cycle-dpicker-max', {
   DOM: sources.DOM,
   props: xs.of({name: 'max', model: new Date()}) //dpicker options
