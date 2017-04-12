@@ -1,4 +1,8 @@
-const moment = require('moment')
+try {
+  const moment = require('moment')
+} catch (e) {
+  const moment = window.moment
+}
 
 const DAY_TOKEN = 'd'
 const YEAR_TOKEN = 'y'
