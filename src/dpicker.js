@@ -205,7 +205,7 @@ DPicker.prototype._createGetSet = function (key) {
  * @return {Object} { container, attributes }
  */
 DPicker.prototype._getContainer = function (container) {
-  if (typeof container === 'undefined') {
+  if (!container) {
     throw new ReferenceError('Can not initialize DPicker without a container')
   }
 
