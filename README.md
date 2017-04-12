@@ -1,6 +1,6 @@
 # DPicker
 
-<img src="https://cdn.rawgit.com/soyuka/dpicker/master/logo.svg" width="140px">
+<img src="https://soyuka.github.io/dpicker/logo.svg" width="140px">
 
 [![Build Status](https://img.shields.io/travis/soyuka/dpicker.svg)](https://travis-ci.org/soyuka/dpicker)
 [![codecov](https://img.shields.io/codecov/c/github/soyuka/dpicker.svg)](https://codecov.io/gh/soyuka/dpicker)
