@@ -49,11 +49,11 @@ if [[ $RELEASE_BUILD == 1 ]]; then
   echo  "Build release files"
 
   # Build date + time
-  echo  "Browerifying datetime"
+  echo  "Browserifying datetime"
   sh -c "$browserify $GLOBAL_ARGS -s dpicker src/datetime.js -o dist/dpicker.datetime.js"
   sh -c "$browserify $MIN_ARGS -s dpicker src/datetime.js -o dist/dpicker.datetime.min.js"
   # Build all
-  echo  "Browerifying all"
+  echo  "Browserifying all"
   sh -c "$browserify $GLOBAL_ARGS -s dpicker src/all.js -o dist/dpicker.all.js"
   sh -c "$browserify $MIN_ARGS -s dpicker src/all -o dist/dpicker.all.min.js"
 
