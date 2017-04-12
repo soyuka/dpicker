@@ -1,6 +1,7 @@
-import { div, input, h2, label, pre, code, p, kbd } from '@cycle/dom'
+import {div, input, h2, label, pre, code, p, kbd} from '@cycle/dom'
 import xs from 'xstream'
-import { CycleDPicker } from './dpicker.cycle'
+import DPicker from '../../../dist/dpicker.all.js'
+import {CycleDPicker} from './dpicker.cycle'
 import './style.scss'
 
 const inputText = document.getElementById('input')

@@ -1,5 +1,29 @@
 # Changelog
 
+## 5.0.1
+
+- Globals are evil. By trying to make things easy to use, we declared a global `window.DPicker` variable. Since `5.0.1` it's not the case anymore and it will be declared as `window.dpicker`.
+It's recommended that you use a bundle system though (webpack, rollup, browserify...).
+
+- Plugins are exporting a `function`. Makes things easier to pre-build packages. This means that this won't work anymore:
+
+```javascript
+<script type="text/javascript" src="https://unpkg.com/dpicker@5.0.0/dist/dpicker.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/dpicker@5.0.0/dist/dpicker.time.min.js"></script>
+```
+
+To get date + time, you should use:
+
+```javascript
+<script type="text/javascript" src="https://unpkg.com/dpicker@5.0.0/dist/dpicker.datetime.min.js"></script>
+```
+
+Or the package with every module:
+
+```javascript
+<script type="text/javascript" src="https://unpkg.com/dpicker@5.0.0/dist/dpicker.datetime.all.js"></script>
+```
+
 ## 5.0.0
 
 - Use browserify instead of gulp

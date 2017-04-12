@@ -1,7 +1,5 @@
 #!env bash
 bash .scripts/build.sh docs
-mkdir -p docs/demo/public/dist
-cp dist/dpicker.all.min.js docs/demo/public/dist/
 cp CHANGELOG.md docs/CHANGELOG.md
 cd docs/demo
 npm install

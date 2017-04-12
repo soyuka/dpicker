@@ -28,23 +28,24 @@ We've built-in the following for an easy installation (suffix with `.min.js` for
 - `dpicker` contains core with momentjs adapter (~5.6kb)
 - `dpicker.core` contains only core (~4.89kb)
 
-Modules alone (needs the core to be included first):
-
-- `dpicker.arrow-navigation` enable keyboard arrows to navigate between days (~0.1kb)
-- `dpicker.modifiers` enable modifiers, for example `+` to get current day, `+100` to get the date in 100 days. (~0.5kb)
-- `dpicker.time` enable time (~2kb)
-
 For example with the [unpkg cdn](https://unpkg.com):
 
 ```html
 <script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.datetime.min.js"></script>
 ```
 
-Is the same as:
+Modules alone:
 
-```html
-<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.min.js"></script>
-<script type="text/javascript" src="https://unpkg.com/dpicker@DPICKER_VERSION/dist/dpicker.time.min.js"></script>
+- `dpicker.arrow-navigation` enable keyboard arrows to navigate between days (~0.1kb)
+- `dpicker.modifiers` enable modifiers, for example `+` to get current day, `+100` to get the date in 100 days. (~0.5kb)
+- `dpicker.time` enable time (~2kb)
+
+When using modules, the best is to bundle them with your favorite tool, for example:
+
+```javascript
+var DPicker = require('dpicker') //dpicker.core
+DPicker.dateAdapter = require('dpicker/src/adapters/moment')
+require('dpicker/dist/dpicker.time')(DPicker)
 ```
 
 For old browser support, you will need the `polyfill` file:
@@ -65,12 +66,14 @@ The default library to handle dates is `momentjs`, just add it to your script:
 
 ## Usage
 
+!> Global variables are not safe, but if you're not using a bundle system (wepback, rollup, browserify), you may use the global `window.dpicker` variable.
+
 To create a date picker, just init the DPicker module within a container:
 
 ```html
 <div id="my-datepicker"></div>
 <script>
-var dp = new DPicker(document.getElementById('my-datepicker'))
+var dp = new dpicker(document.getElementById('my-datepicker'))
 </script>
 ```
 
@@ -82,7 +85,7 @@ If you have an input already, you can init the datepicker with it, the date pick
   <input type="date" id="my-dpicker" />
 </label>
 <script>
-var dp = new DPicker(document.querySelector('input[type="date"]'))
+var dp = new dpicker(document.querySelector('input[type="date"]'))
 </script>
 ```
 
@@ -93,7 +96,7 @@ var dp = new DPicker(document.querySelector('input[type="date"]'))
 Let's initialize every `date` and `datetime` inputs with DPicker by using this ugly one-liner:
 
 ```javascript
-[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e){new DPicker(e);});
+[].slice.call(document.querySelectorAll('input[type="date"],input[type="datetime"]')).forEach(function(e){new dpicker(e);});
 ```
 
 HTML can now take multiple formats, the simplest would be:
@@ -149,15 +152,15 @@ Let's do the oposite by declaring a simple html container:
 Basic initalization:
 
 ```javascript
-var container = document.getElementById('dpicker')
-var dp = new DPicker(container)
+var container = document.getElementById('my-dpicker')
+var dp = new dpicker(container)
 ```
 
 Setup almost every option:
 
 ```javascript
-var container = document.getElementById('dpicker')
-var dp = new DPicker(container, {
+var container = document.getElementById('my-dpicker')
+var dp = new dpicker(container, {
   model: moment(), //today
   min: moment('1986-01-01'),
   max: moment().add(1, 'year').month(11), //today + 1 year
@@ -174,8 +177,8 @@ More options are available, for a complete list [check the api documentation](_a
 Change values during the date picker life cycle:
 
 ```javascript
-var container = document.getElementById('dpicker')
-var dp = new DPicker(container)
+var container = document.getElementById('my-dpicker')
+var dp = new dpicker(container)
 // do things
 
 dp.format = 'DD/MM/YYYY'
@@ -189,8 +192,8 @@ Available properties are listed in the [api documentation](_api#dpickerelement-o
 Let's get further with Javascript with the [`onChange` method](_api#onchangedata-dpickerevent). This is a hook to listen to any change that comes from DPicker. It helps integrating the date picker in any framework.
 
 ```javascript
-var container = document.getElementById('dpicker')
-var dp = new DPicker(container)
+var container = document.getElementById('my-dpicker')
+var dp = new dpicker(container)
 
 dp.onChange = function(data, DPickerEvent) {
   // has the model changed?
@@ -266,9 +269,33 @@ DPicker.events.doSomeStuff = function (evt) {
 
 ### Example
 
-Let's build a module that will add two arrows to navigate between previous and next months.
+#### Confirm button
 
- To make this easy, we will use the [`bel`](https://github.com/shama/bel) module. This module can then be [`yo-yoified`](https://github.com/shama/yo-yoify) or [`babel-yo-yoified`](https://github.com/goto-bus-stop/babel-plugin-yo-yoify) to transform our html text to real DOM elements.
+Straightforward, plain javascript module that adds a close button:
+
+```javascript
+//add 'closeButton' to the `order` array
+DPicker.renders.closeButton = function renderCloseButton(events, data) {
+  const button = document.createElement('button')
+  button.innerText = 'Confirm'
+  button.type = 'button'
+  button.classList.add('dpicker-close-button')
+  button.addEventListener('click', events.hidePicker)
+  return button
+}
+
+DPicker.events.hidePicker = function hidePicker() {
+  this.display = false
+}
+```
+
+Then, initialize your DPicker with `new DPicker(container, {order: ['months', 'years', 'time', 'days', 'closeButton']})`.
+
+#### Previous/Next month buttons
+
+Let's build an other module that will add two arrows to navigate between previous and next months.
+
+ To make this more readable, we will use the [`bel`](https://github.com/shama/bel) module. This module can then be [`yo-yoified`](https://github.com/shama/yo-yoify) or [`babel-yo-yoified`](https://github.com/goto-bus-stop/babel-plugin-yo-yoify) to transform our html text to real DOM elements.
 
 First, let's add two rendering methods for our buttons:
 
@@ -306,28 +333,10 @@ DPicker.events.nextMonth = function nextMonth(evt) {
 We're done. To enable your render functions, you have to specify their keys in the `order` option:
 
 ```javascript
-new DPicker(element, {order: ['previousMonth', 'months', 'years', 'nextMonth', 'days', 'time']})
+new dpicker(element, {order: ['previousMonth', 'months', 'years', 'nextMonth', 'days', 'time']})
 ```
 
 This module is actually available [here](https://github.com/soyuka/dpicker/blob/development/src/plugins/navigation.js).
-
-If you don't want to use `bel`, just use native DOM elements. For example, this adds a confirm button:
-
-```javascript
-//add 'closeButton' to the `order` array
-DPicker.renders.closeButton = function renderCloseButton(events, data) {
-  const button = document.createElement('button')
-  button.innerText = 'Confirm'
-  button.type = 'button'
-  button.classList.add('dpicker-close-button')
-  button.addEventListener('click', events.hidePicker)
-  return button
-}
-
-DPicker.events.hidePicker = function hidePicker() {
-  this.display = false
-}
-```
 
 ### Go further
 
@@ -373,6 +382,31 @@ DPicker.properties.step = function getStepAttribute (attributes) {
 }
 ```
 
+### Share the module
+
+The best to share a module is to embed it in a function:
+
+```javascript
+module.exports = function(DPicker) {
+
+}
+```
+
+Then you can bundle your own DPicker:
+
+```javascript
+const DPicker = require('dpicker')
+const MomentDateAdapter = require('dpicker/src/adapters/moment')
+
+DPicker.dateAdapter = MomentDateAdapter
+
+// Require some modules here
+require('dpicker/src/plugins/time')(DPicker)
+require('./my-awesome-dpicker-module')(DPicker)
+
+module.exports = DPicker
+```
+
 ## Framework agnostic
 
 !> Those are only base examples, please adapt them to your needs!
@@ -393,7 +427,7 @@ angular.module('DPicker')
 		},
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModelCtrl) {
-			scope.dpicker = new DPicker(element[0])
+			scope.dpicker = new dpicker(element[0])
 			scope.dpicker.onChange = function(data, DPickerEvent) {
         if (DPickerEvent.modelChanged === true) {
           ngModelCtrl.$setViewValue(scope.dpicker.model)
@@ -452,7 +486,7 @@ export class PrefixDpickerDirective implements ControlValueAccessor, OnInit {
 
   ngOnInit() {
     try {
-      this.dpicker = new DPicker(this.elementRef.nativeElement, {min: this.min, max: this.max})
+      this.dpicker = new dpicker(this.elementRef.nativeElement, {min: this.min, max: this.max})
     } catch (e) {
       console.error(e.message)
     }
@@ -510,6 +544,7 @@ To bundle `DPicker` in the cyclejs DOM, let's create a [Component](https://cycle
 ```javascript
 import {div} from '@cycle/dom'
 import xs from 'xstream'
+import DPicker from 'dpicker/dist/dpicker.all'
 
 export function CycleDPicker (selector, sources) {
 
@@ -612,7 +647,7 @@ This date picker:
 What I think is good, and isn't straightforward in other date pickers is that your input's `Date` instance is separated from the input real value:
 
 ```javascript
-const dpicker = new DPicker(input)
+const dpicker = new dpicker(input)
 
 console.log(dpicker.model) //the Date instance
 console.log(dpicker.input) //the input value, a formatted date

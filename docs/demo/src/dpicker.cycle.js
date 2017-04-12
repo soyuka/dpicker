@@ -1,5 +1,6 @@
 import {div} from '@cycle/dom'
 import xs from 'xstream'
+import DPicker from '../../../dist/dpicker.all.js'
 
 export function CycleDPicker (selector, sources) {
 
