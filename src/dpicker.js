@@ -24,6 +24,7 @@ const html = require('bel')
  * @param {Boolean} [options.meridiem=false] 12/24 hour format, default 24
  * @param {Number} [options.step=1] Minutes step
  * @param {Boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
+ * @param {Boolean} [options.empty=false] Use this so force DPicker with an empty input instead of setting it to the formatted current date
  *
  * @property {String} container Get container id
  * @property {String} inputId Get input id
