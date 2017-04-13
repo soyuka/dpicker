@@ -420,33 +420,33 @@ angular.module('DPicker', [])
 
 angular.module('DPicker')
 .directive('dpDpicker', function() {
-	return {
-		restrict: 'A',
-		scope: {
-			ngModel: '='
-		},
-		require: 'ngModel',
-		link: function(scope, element, attrs, ngModelCtrl) {
-			scope.dpicker = new dpicker(element[0])
-			scope.dpicker.onChange = function(data, DPickerEvent) {
+  return {
+    restrict: 'A',
+    scope: {
+      ngModel: '='
+    },
+    require: 'ngModel',
+    link: function(scope, element, attrs, ngModelCtrl) {
+      scope.dpicker = new dpicker(element[0])
+      scope.dpicker.onChange = function(data, DPickerEvent) {
         if (DPickerEvent.modelChanged === true) {
           ngModelCtrl.$setViewValue(scope.dpicker.model)
         }
-			}
+      }
 
-			if (scope.ngModel && scope.ngModel instanceof Date) {
-				scope.dpicker.model = scope.ngModel
-			}
+      if (scope.ngModel && scope.ngModel instanceof Date) {
+        scope.dpicker.model = scope.ngModel
+      }
 
-			ngModelCtrl.$setViewValue(scope.dpicker.empty ? null : scope.dpicker.model)
+      ngModelCtrl.$setViewValue(scope.dpicker.empty ? null : scope.dpicker.model)
 
-			attrs.$observe('ngModel', function(value) {
-				if (value instanceof Date) {
-					scope.dpicker.model = value
-				}
-			})
-		}
-	}
+      attrs.$observe('ngModel', function(value) {
+        if (value instanceof Date) {
+          scope.dpicker.model = value
+        }
+      })
+    }
+  }
 })
 ```
 
