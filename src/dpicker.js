@@ -775,7 +775,7 @@ DPicker.events = {
     evt.preventDefault()
     evt.stopPropagation()
 
-    this.model = DPicker.dateAdapter.subMonths(DPicker.dateAdapter.setDate(this.data.model, evt.target.value), 1)
+    this.model = DPicker.dateAdapter.setDate(DPicker.dateAdapter.subMonths(this.data.model, 1), evt.target.value)
 
     this.data.empty = false
 
@@ -799,7 +799,7 @@ DPicker.events = {
     evt.preventDefault()
     evt.stopPropagation()
 
-    this.model = DPicker.dateAdapter.addMonths(DPicker.dateAdapter.setDate(this.data.model, evt.target.value), 1)
+    this.model = DPicker.dateAdapter.setDate(DPicker.dateAdapter.addMonths(this.data.model, 1), evt.target.value)
 
     this.data.empty = false
 

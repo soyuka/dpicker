@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2
+
+- Fix sibling months day click gave incorrect date
+
 ## 5.0.1
 
 - Globals are evil. By trying to make things easy to use, we declared a global `window.DPicker` variable. Since `5.0.1` it's not the case anymore and it will be declared as `window.dpicker`.

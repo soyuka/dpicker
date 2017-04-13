@@ -453,13 +453,23 @@ describe('dpicker', function() {
 
     document.body.appendChild(label)
 
-    let input = label.querySelector('input[type="text"]')
-
     let buttons = document.querySelectorAll('button')
+
     let button = buttons[0]
     button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
     expect(dpicker.valid).to.be.true
     expect(moment(dpicker.model).month()).to.equal(4)
+    expect(moment(dpicker.model).date()).to.equal(26)
+
+    button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
+    expect(dpicker.valid).to.be.true
+    expect(moment(dpicker.model).month()).to.equal(3)
+    expect(moment(dpicker.model).date()).to.equal(28)
+
+    button.onclick({target: button, preventDefault: chai.spy(), stopPropagation: chai.spy()})
+    expect(dpicker.valid).to.be.true
+    expect(moment(dpicker.model).month()).to.equal(2)
+    expect(moment(dpicker.model).date()).to.equal(31)
   })
 
   it('should enable click on next month days', function() {
@@ -471,8 +481,6 @@ describe('dpicker', function() {
     })
 
     document.body.appendChild(label)
-
-    let input = label.querySelector('input[type="text"]')
 
     let buttons = document.querySelectorAll('button')
     let button = buttons[buttons.length - 1]
