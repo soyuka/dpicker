@@ -27,7 +27,7 @@
     "bel": "^5.0.0",
     "dom4": "^1.8.3",
     "moment": "^2.18.1",
-    "nanomorph": "soyuka/nanomorph#master",
+    "nanomorph": "^5.0.0",
     "on-load": "^3.2.0",
     "yo-yoify": "^3.7.3"
   },

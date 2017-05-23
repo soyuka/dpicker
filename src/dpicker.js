@@ -126,22 +126,6 @@ function DPicker (element, options = {}) {
 }
 
 /**
- * Helper to set the `selected` attribute on `<option>` tags
- * @link https://github.com/yoshuawuyts/nanomorph/pull/54
- * @param {Element} element
- * @param {boolean} test set selected when true
- * @private
- * @return {Element}
- */
-DPicker.prototype.setSelected = function (element, test) {
-  if (test === true) {
-    element.setAttribute('selected', 'selected')
-  }
-
-  return element
-}
-
-/**
  * _setData is a helper to set this.data values
  * @param {String} key
  * @param {Array} values the first value that is not undefined will be set in this.data[key]
@@ -382,7 +366,7 @@ DPicker.prototype.renderYears = function (events, data, toRender) {
   let options = []
 
   while (--futureYear >= pastYear) {
-    options.push(this.setSelected(html`<option value="${futureYear}">${futureYear}</option>`, futureYear === modelYear))
+    options.push(html`<option value="${futureYear}" ${futureYear === modelYear ? 'selected' : ''}>${futureYear}</option>`)
   }
 
   return html`<select onchange="${events.yearChange}" name="dpicker-year" aria-label="Year">${options}</select>`
@@ -413,7 +397,7 @@ DPicker.prototype.renderMonths = function (events, data, toRender) {
   }
 
   return html`<select onchange="${events.monthChange}" name="dpicker-month" aria-label="Month">
-      ${showMonths.map((e, i) => this.setSelected(html`<option value="${e}">${months[e]}</option>`, e === modelMonth))}
+      ${showMonths.map((e, i) => html`<option ${e === modelMonth ? 'selected' : ''} value="${e}">${months[e]}</option>`)}
     </select>`
 }
 

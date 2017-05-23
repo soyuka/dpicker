@@ -153,7 +153,7 @@ module.exports = function(DPicker) {
             })
             .map((value) => {
               const text = value.split(':').map(padLeftZero).join(':')
-              return this.setSelected(html`<option value="${value}">${text}</option>`, value === modelStringValue)
+              return html`<option ${value === modelStringValue ? 'selected' : ''} value="${value}">${text}</option>`
             })
           }
         </select>`
@@ -162,12 +162,12 @@ module.exports = function(DPicker) {
       selects.push(
         html`<select onchange="${events.hoursChange}" name="dpicker-hours" aria-label="Hours">${
           hours.map((e, i) => {
-            return this.setSelected(html`<option value="${e}">${padLeftZero(e)}</option>`, e === modelHours)
+            return html`<option ${e === modelHours ? 'selected' : ''} value="${e}">${padLeftZero(e)}</option>`
           })
         }</select>`,
         html`<select onchange="${events.minutesChange}" name="dpicker-minutes" aria-label="Minutes">${
           minutes.map((e, i) => {
-            return this.setSelected(html`<option value="${e}">${padLeftZero(e)}</option>`, e === modelMinutes)
+            return html`<option ${e === modelMinutes ? 'selected' : ''} value="${e}">${padLeftZero(e)}</option>`
           })
         }</select>`
       )
@@ -177,7 +177,7 @@ module.exports = function(DPicker) {
       let modelMeridiem = DPicker.dateAdapter.getMeridiem(data.model)
       selects.push(html`<select onchange="${events.meridiemChange}" name="dpicker-meridiem">
         ${MERIDIEM_TOKENS.map(e => {
-          return this.setSelected(html`<option value="${e}">${e}</option>`, modelMeridiem === e)
+          return html`<option ${modelMeridiem === e ? 'selected' : ''} value="${e}">${e}</option>`
         })}
       </select>`)
     }
