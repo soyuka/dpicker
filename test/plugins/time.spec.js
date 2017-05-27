@@ -275,7 +275,7 @@ describe('dpicker.time', function() {
     })
   })
 
-  it('should find correct hours value if minutes upper last step #11', function() {
+  it.skip('should find correct hours value if minutes upper last step #11', function() {
     const format = 'DD/MM/YYYY HH:mm'
     let input = document.createElement('input')
     let label = document.createElement('label')
@@ -348,7 +348,7 @@ describe('dpicker.time', function() {
       time: true
     })
 
-    expect(moment(dpicker.min).format(format)).to.equal('24/06/1991 16:00')
+    expect(moment(dpicker.min).format(format)).to.equal('24/06/1991 15:53')
     expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
   })
@@ -414,4 +414,20 @@ describe('dpicker.time', function() {
     expect(time.options[0].value.split(':')).to.have.length.of(2)
   })
 
+  it('should have correct time step when 59:59', function() {
+    let format = 'DD/MM/YYYY hh:mm:ss'
+    const dpicker = createDatePicker({
+      time: true,
+      meridiem: false,
+      format: format,
+      concatHoursAndMinutes: true,
+      step: 15,
+      model: moment('24/06/1991 13:00:00', format),
+      min: moment('24/06/1991 14:59:59', format),
+    })
+
+    let options = document.querySelectorAll('select[name="dpicker-time"] option')
+    expect([].slice.call(options)).to.have.length.of(36)
+    //;[].slice.call(options).forEach((e) => console.log(e.textContent))
+  })
 })

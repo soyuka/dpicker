@@ -16,25 +16,33 @@ module.exports = function(DPicker) {
   function getHoursMinutes (data) {
     let hours = data.meridiem ? HOURS12 : HOURS24
     let minutes = MINUTES.filter(e => e % data.step === 0)
+    const modelHours = DPicker.dateAdapter.getHours(data.model)
 
     ;[data.min, data.max].map((e, i) => {
-      if (DPicker.dateAdapter.isSameDay(data.model, e)) {
-        let xHours = DPicker.dateAdapter.getHours(e)
+      if (!DPicker.dateAdapter.isSameDay(data.model, e)) {
+        return
+      }
 
-        if (data.meridiem === true) {
-          if (xHours > 12) {
-            xHours = xHours - 12
-          } else if (xHours === 0) {
-            xHours = 12
-          }
+      let xHours = DPicker.dateAdapter.getHours(e)
+      let xMinutes = DPicker.dateAdapter.getMinutes(e)
+      let x = e
+
+      if (xMinutes + data.step > 60) {
+        x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, ++xHours), 0)
+      }
+
+      if (data.meridiem === true) {
+        if (xHours > 12) {
+          xHours = xHours - 12
+        } else if (xHours === 0) {
+          xHours = 12
         }
+      }
 
-        hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
+      hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
 
-        if (DPicker.dateAdapter.isSameHours(data.model, e)) {
-          let xMinutes = DPicker.dateAdapter.getMinutes(e)
-          minutes = minutes.filter(e => i === 0 ? e >= xMinutes : e <= xHours)
-        }
+      if (DPicker.dateAdapter.isSameHours(data.model, x)) {
+        minutes = minutes.filter(e => i === 0 ? e >= xMinutes : e <= xHours)
       }
     })
 
@@ -63,6 +71,7 @@ module.exports = function(DPicker) {
     let {minutes} = getHoursMinutes(this.data)
 
     let modelMinutes = DPicker.dateAdapter.getMinutes(this.data.model)
+    const minutesAndStep = modelMinutes + this.data.step
 
     // should fix min hour if minutes exceed the last step available (see test)
     if (minutes.length === 0) {
