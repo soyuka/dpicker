@@ -36,6 +36,7 @@ Or the package with every module:
 - Get rid of momentjs hard dependency (still required for now)
 - Implement a Date Adapter for future libraries support
 - Simplify plugins api
+- uses immutable `Date` instances internally! [BC]
 
 No more `_modules` stuff. Just simple objects creation:
 
