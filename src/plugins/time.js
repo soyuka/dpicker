@@ -29,6 +29,7 @@ module.exports = function(DPicker) {
 
       if (xMinutes + data.step > 60) {
         x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, ++xHours), 0)
+        xMinutes = 0
       }
 
       if (data.meridiem === true) {
@@ -72,12 +73,6 @@ module.exports = function(DPicker) {
 
     let modelMinutes = DPicker.dateAdapter.getMinutes(this.data.model)
     const minutesAndStep = modelMinutes + this.data.step
-
-    // should fix min hour if minutes exceed the last step available (see test)
-    if (minutes.length === 0) {
-      this.data.min = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.addHours(this.data.min, 1), 0)
-      minutes = getHoursMinutes(this.data).minutes
-    }
 
     if (DPicker.dateAdapter.getMinutes(this.data.model) < minutes[0]) {
       this.data.model = DPicker.dateAdapter.setMinutes(this.data.model, minutes[0])

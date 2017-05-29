@@ -275,7 +275,7 @@ describe('dpicker.time', function() {
     })
   })
 
-  it.skip('should find correct hours value if minutes upper last step #11', function() {
+  it('should find correct hours value if minutes upper last step #11', function() {
     const format = 'DD/MM/YYYY HH:mm'
     let input = document.createElement('input')
     let label = document.createElement('label')
@@ -296,8 +296,13 @@ describe('dpicker.time', function() {
 
     expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
-    let options = document.querySelector('select[name="dpicker-minutes"]').options
-    expect(options).to.have.length.of(4)
+    let s = [].slice.call(document.querySelectorAll('select'))
+    let options = [].slice.call(document.querySelector('select[name="dpicker-hours"]').options).map((e) => parseInt(e.textContent))
+    expect(options).to.have.length.of(8)
+    expect(options).to.deep.equal([16, 17, 18, 19, 20, 21, 22, 23])
+
+    options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
+    expect(options).to.deep.equal([0, 15, 30, 45])
   })
 
   it('should have correct time AM/PM midnight', function(cb) {
@@ -428,6 +433,5 @@ describe('dpicker.time', function() {
 
     let options = document.querySelectorAll('select[name="dpicker-time"] option')
     expect([].slice.call(options)).to.have.length.of(36)
-    //;[].slice.call(options).forEach((e) => console.log(e.textContent))
   })
 })
