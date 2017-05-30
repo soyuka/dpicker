@@ -15,7 +15,8 @@ module.exports = function(DPicker) {
   */
   function getHoursMinutes (data) {
     let hours = data.meridiem ? HOURS12 : HOURS24
-    let minutes = MINUTES.filter(e => e % data.step === 0)
+    const step = parseInt(data.step)
+    let minutes = MINUTES.filter(e => e % step === 0)
     const modelHours = DPicker.dateAdapter.getHours(data.model)
 
     ;[data.min, data.max].map((e, i) => {
@@ -27,7 +28,7 @@ module.exports = function(DPicker) {
       let xMinutes = DPicker.dateAdapter.getMinutes(e)
       let x = e
 
-      if (xMinutes + data.step > 60) {
+      if (xMinutes + step > 60) {
         x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, ++xHours), 0)
         xMinutes = 0
       }
@@ -72,7 +73,6 @@ module.exports = function(DPicker) {
     let {minutes} = getHoursMinutes(this.data)
 
     let modelMinutes = DPicker.dateAdapter.getMinutes(this.data.model)
-    const minutesAndStep = modelMinutes + this.data.step
 
     if (DPicker.dateAdapter.getMinutes(this.data.model) < minutes[0]) {
       this.data.model = DPicker.dateAdapter.setMinutes(this.data.model, minutes[0])
@@ -84,7 +84,7 @@ module.exports = function(DPicker) {
       return
     }
 
-    if (this.data.step <= 1) {
+    if (parseInt(this.data.step) <= 1) {
       return
     }
 

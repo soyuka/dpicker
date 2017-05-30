@@ -283,7 +283,7 @@ describe('dpicker.time', function() {
     input.setAttribute('min', '24/06/1991 15:53')
     input.setAttribute('value', '24/06/1991 15:46')
     input.setAttribute('format', format)
-    input.setAttribute('step', 15)
+    input.setAttribute('step', '15')
     input.setAttribute('id', 't')
 
     label.appendChild(input)
@@ -296,13 +296,46 @@ describe('dpicker.time', function() {
 
     expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
-    let s = [].slice.call(document.querySelectorAll('select'))
     let options = [].slice.call(document.querySelector('select[name="dpicker-hours"]').options).map((e) => parseInt(e.textContent))
     expect(options).to.have.length.of(8)
     expect(options).to.deep.equal([16, 17, 18, 19, 20, 21, 22, 23])
 
     options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
     expect(options).to.deep.equal([0, 15, 30, 45])
+  })
+
+  it('should have correct minutes value with step of 30', function(cb) {
+    const format = 'DD/MM/YYYY HH:mm'
+    let input = document.createElement('input')
+    let label = document.createElement('label')
+    input.setAttribute('type', 'datetime')
+    input.setAttribute('min', '24/06/1991 09:29')
+    input.setAttribute('value', '24/06/1991 09:30')
+    input.setAttribute('format', format)
+    input.setAttribute('step', '30')
+
+    label.appendChild(input)
+    document.body.appendChild(label)
+
+    const dpicker = DPicker(input)
+
+    dpicker.onChange = function() {
+      let options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
+      expect(options).to.deep.equal([0, 30])
+      cb()
+    }
+
+    expect(dpicker.time).to.equal(true)
+    expect(dpicker.step).to.equal(30)
+
+    let options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
+    expect(options).to.deep.equal([30])
+
+    let select = document.querySelector('select[name="dpicker-hours"]')
+    select.selectedIndex = select.selectedIndex + 1
+
+    select.onchange({target: select})
+
   })
 
   it('should have correct time AM/PM midnight', function(cb) {
