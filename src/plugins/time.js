@@ -28,8 +28,8 @@ module.exports = function(DPicker) {
       let xMinutes = DPicker.dateAdapter.getMinutes(e)
       let x = e
 
-      if (xMinutes + step > 60) {
-        x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, ++xHours), 0)
+      if (i === 0 && xMinutes + step > 60) {
+        x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, i === 0 ? ++xHours : --xHours), 0)
         xMinutes = 0
       }
 
@@ -127,12 +127,31 @@ module.exports = function(DPicker) {
     let modelStringValue = `${modelHours}:${modelMinutes}`
 
     if (data.concatHoursAndMinutes) {
+      const minHours = DPicker.dateAdapter.getHours(data.min)
+      const minMinutes = DPicker.dateAdapter.getMinutes(data.min)
+
+      const maxHours = DPicker.dateAdapter.getHours(data.max)
+      const maxMinutes = DPicker.dateAdapter.getMinutes(data.max)
+
       selects.push(
         html`<select onchange="${events.minuteHoursChange}" name="dpicker-time" aria-label="time">
           ${
             [].concat.apply([], minutes.map(minute => {
               return hours.map(hour => `${hour}:${minute}`)
             }))
+            .filter((e) => {
+              let hm = e.split(':').map(parseFloat)
+
+              if (hm[0] === minHours && hm[1] < minMinutes) {
+                return false
+              }
+
+              if (hm[0] === maxHours && hm[1] > maxMinutes) {
+                return false
+              }
+
+              return true
+            })
             .sort((a, b) => {
               a = a.split(':').map(parseFloat)
               b = b.split(':').map(parseFloat)
