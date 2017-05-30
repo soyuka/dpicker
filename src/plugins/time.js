@@ -42,10 +42,6 @@ module.exports = function(DPicker) {
       }
 
       hours = hours.filter(e => i === 0 ? e >= xHours : e <= xHours)
-
-      if (DPicker.dateAdapter.isSameHours(data.model, x)) {
-        minutes = minutes.filter(e => i === 0 ? e >= xMinutes : e <= xHours)
-      }
     })
 
     return {hours, minutes}
@@ -66,7 +62,7 @@ module.exports = function(DPicker) {
   * @private
   */
   function minutesStep () {
-    if (!this.data.time) {
+    if (!this.data.time || parseInt(this.data.step, 10) <= 1) {
       return
     }
 
@@ -74,17 +70,13 @@ module.exports = function(DPicker) {
 
     let modelMinutes = DPicker.dateAdapter.getMinutes(this.data.model)
 
-    if (DPicker.dateAdapter.getMinutes(this.data.model) < minutes[0]) {
+    if (modelMinutes < minutes[0]) {
       this.data.model = DPicker.dateAdapter.setMinutes(this.data.model, minutes[0])
       modelMinutes = minutes[0]
     }
 
     if (modelMinutes > minutes[minutes.length - 1]) {
       this.data.model = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.addHours(this.data.model, 1), 0)
-      return
-    }
-
-    if (parseInt(this.data.step) <= 1) {
       return
     }
 
@@ -122,17 +114,16 @@ module.exports = function(DPicker) {
     }
 
     let {hours, minutes} = getHoursMinutes(data)
-    let modelMinutes = DPicker.dateAdapter.getMinutes(data.model)
+    const modelMinutes = DPicker.dateAdapter.getMinutes(data.model)
     let selects = []
     let modelStringValue = `${modelHours}:${modelMinutes}`
 
+    const minHours = DPicker.dateAdapter.getHours(data.min)
+    const minMinutes = DPicker.dateAdapter.getMinutes(data.min)
+    const maxHours = DPicker.dateAdapter.getHours(data.max)
+    const maxMinutes = DPicker.dateAdapter.getMinutes(data.max)
+
     if (data.concatHoursAndMinutes) {
-      const minHours = DPicker.dateAdapter.getHours(data.min)
-      const minMinutes = DPicker.dateAdapter.getMinutes(data.min)
-
-      const maxHours = DPicker.dateAdapter.getHours(data.max)
-      const maxMinutes = DPicker.dateAdapter.getMinutes(data.max)
-
       selects.push(
         html`<select onchange="${events.minuteHoursChange}" name="dpicker-time" aria-label="time">
           ${
@@ -189,7 +180,17 @@ module.exports = function(DPicker) {
           })
         }</select>`,
         html`<select onchange="${events.minutesChange}" name="dpicker-minutes" aria-label="Minutes">${
-          minutes.map((e, i) => {
+          minutes.filter((e) => {
+            if (DPicker.dateAdapter.isSameDay(data.model, data.min) && modelHours === minHours && e < minMinutes) {
+              return false
+            }
+
+            if (DPicker.dateAdapter.isSameDay(data.model, data.max) && modelHours === maxHours && e > maxMinutes) {
+              return false
+            }
+
+            return true
+          }).map((e, i) => {
             return html`<option ${e === modelMinutes ? 'selected' : ''} value="${e}">${padLeftZero(e)}</option>`
           })
         }</select>`
