@@ -501,4 +501,35 @@ describe('dpicker.time', function() {
     let options = [].slice.call(document.querySelectorAll('select[name="dpicker-time"] option')).map((e) => e.textContent)
     expect(options).to.deep.equal(['09:30', '10:00', '10:30', '11:00', '11:30'])
   })
+
+  it('should have correct values when concatHoursAndMinutes and step (change min)', function() {
+    let format = 'DD/MM/YYYY hh:mm:ss'
+    const dpicker = createDatePicker({
+      time: true,
+      meridiem: false,
+      format: format,
+      concatHoursAndMinutes: true,
+      step: 30,
+      model: moment('15/05/2017 11:00:00', format),
+      min: moment('15/05/2017 11:00:00', format),
+      max: moment('11/07/2017 11:30:00', format),
+    })
+
+    let options = [].slice.call(document.querySelectorAll('select[name="dpicker-time"] option')).map((e) => e.textContent)
+    expect(options[0]).to.equal('11:00')
+    expect(options[1]).to.equal('11:30')
+    expect(options[options.length - 1]).to.equal('23:30')
+
+    dpicker.min = moment('15/05/2017 11:30:00', format).toDate()
+    dpicker.redraw()
+
+    options = [].slice.call(document.querySelectorAll('select[name="dpicker-time"] option')).map((e) => e.textContent)
+    expect(options[0]).to.equal('11:30')
+
+    dpicker.model = moment('16/05/2017 11:30:00', format).toDate()
+
+    options = [].slice.call(document.querySelectorAll('select[name="dpicker-time"] option')).map((e) => e.textContent)
+
+    expect(!!~options.indexOf('11:00')).to.be.true
+  })
 })

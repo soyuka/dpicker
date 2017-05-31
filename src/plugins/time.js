@@ -133,11 +133,11 @@ module.exports = function(DPicker) {
             .filter((e) => {
               let hm = e.split(':').map(parseFloat)
 
-              if (hm[0] === minHours && hm[1] < minMinutes) {
+              if (DPicker.dateAdapter.isSameDay(data.model, data.min) && hm[0] === minHours && hm[1] < minMinutes) {
                 return false
               }
 
-              if (hm[0] === maxHours && hm[1] > maxMinutes) {
+              if (DPicker.dateAdapter.isSameDay(data.model, data.max) && hm[0] === maxHours && hm[1] > maxMinutes) {
                 return false
               }
 
