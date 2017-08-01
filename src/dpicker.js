@@ -713,6 +713,12 @@ DPicker.events = {
     this.data.empty = false
     this.model = DPicker.dateAdapter.setYear(this.data.model, evt.target.options[evt.target.selectedIndex].value)
 
+    if (DPicker.dateAdapter.isAfter(this.model, this.data.max)) {
+      this.model = DPicker.dateAdapter.setMonth(this.data.model, DPicker.dateAdapter.getMonth(this.data.max))
+    } else if (DPicker.dateAdapter.isBefore(this.model, this.data.min)) {
+      this.model = DPicker.dateAdapter.setMonth(this.data.model, DPicker.dateAdapter.getMonth(this.data.min))
+    }
+
     this.redraw()
     this.onChange({modelChanged: true, name: 'yearChange', event: evt})
   },

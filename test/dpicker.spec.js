@@ -531,6 +531,55 @@ describe('dpicker', function() {
 
     expect(dpicker.model).not.to.equal('foo')
   })
+
+  // Cause of this bug is that only year was changed, added a change on month if not in the min/max interval
+  it('should handle max interval of 1 year +', function(cb) {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('01/08/2017', 'DD/MM/YYYY'),
+      min: moment('01/08/2017', 'DD/MM/YYYY'),
+      max: moment('01/02/2018', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      onChange: (data) => {
+        expect(document.querySelectorAll('td.dpicker-active').length).to.be.above(0)
+        cb()
+      }
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let select = document.querySelector('select[name=dpicker-year]')
+    let index = [].slice.call(select.options).findIndex((e) => e.innerHTML === '2018')
+
+    select.selectedIndex = index
+    select.onchange({target: select})
+  })
+
+  it('should handle min interval of 1 year +', function(cb) {
+    let label = document.createElement('label')
+    let dpicker = DPicker(label, {
+      model: moment('01/08/2018', 'DD/MM/YYYY'),
+      min: moment('01/09/2017', 'DD/MM/YYYY'),
+      max: moment('01/08/2018', 'DD/MM/YYYY'),
+      format: 'DD/MM/YYYY',
+      onChange: (data) => {
+        expect(document.querySelectorAll('td.dpicker-active').length).to.be.above(0)
+        cb()
+      }
+    })
+
+    document.body.appendChild(label)
+
+    let input = label.querySelector('input[type="text"]')
+
+    let select = document.querySelector('select[name=dpicker-year]')
+    let index = [].slice.call(select.options).findIndex((e) => e.innerHTML === '2017')
+
+    select.selectedIndex = index
+    select.onchange({target: select})
+  })
 })
 
 require('./plugins/arrow-navigation.spec.js')
