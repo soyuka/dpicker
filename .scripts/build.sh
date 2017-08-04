@@ -41,6 +41,7 @@ build "plugins/time" "dpicker.time" &
 build "plugins/modifiers" "dpicker.modifiers" &
 build "plugins/arrow-navigation" "dpicker.arrow-navigation" &
 build "plugins/navigation" "dpicker.navigation" &
+build "plugins/monthAndYear" "dpicker.monthAndYear" &
 
 wait
 
