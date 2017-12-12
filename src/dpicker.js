@@ -45,7 +45,7 @@ function DPicker (element, options = {}) {
     return new DPicker(element, options)
   }
 
-  const {container, attributes} = this._getContainer(element)
+  const {container, attributes, reference} = this._getContainer(element)
 
   this._container = uuid()
   this.data = {}
@@ -121,6 +121,23 @@ function DPicker (element, options = {}) {
 
   let input = container.querySelector('input')
   input.addEventListener('blur', this.events.inputBlur)
+
+  if (reference) {
+    const refAttributes = reference.attributes
+    for (let i = 0; i < refAttributes.length; i++) {
+      if (!input.hasAttribute(refAttributes[i].name)) {
+        input.setAttribute(refAttributes[i].name, refAttributes[i].value)
+      }
+    }
+
+    if (reference.classList && reference.classList.length) {
+      [].slice.call(reference.classList).forEach((val) => {
+        if (!input.classList.contains(val)) {
+          input.classList.add(val)
+        }
+      })
+    }
+  }
 
   return this
 }
@@ -204,18 +221,21 @@ DPicker.prototype._getContainer = function (container) {
     container = container[0]
   }
 
+  let reference = null
+
   if (container.tagName === 'INPUT') {
     if (!container.parentNode) {
       throw new ReferenceError('Can not initialize DPicker on an input without parent node')
     }
 
-    let parentNode = container.parentNode
-    container.parentNode.removeChild(container)
+    const parentNode = container.parentNode
+    reference = container
+    container.parentNode.removeChild(reference)
     container = parentNode
     container.classList.add('dpicker')
   }
 
-  return { container, attributes }
+  return { container, attributes, reference }
 }
 
 /**

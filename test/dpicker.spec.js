@@ -580,6 +580,21 @@ describe('dpicker', function() {
     select.selectedIndex = index
     select.onchange({target: select})
   })
+
+  it('should keep data attributes / classes from original input', function() {
+    const label = document.createElement('label')
+    const input = document.createElement('input')
+    input.setAttribute('data-foo', 'bar')
+    input.classList.add('my-class')
+    label.appendChild(input)
+    document.body.appendChild(label)
+    const dpicker = new DPicker(input)
+
+    const newInput = document.getElementById(dpicker.container).querySelector('input')
+
+    expect(newInput.getAttribute('data-foo')).to.equal('bar')
+    expect(newInput.classList.contains('my-class')).to.be.true
+  })
 })
 
 require('./plugins/arrow-navigation.spec.js')
