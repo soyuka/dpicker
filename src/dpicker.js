@@ -543,8 +543,9 @@ DPicker.prototype.modelSetter = function (newValue) {
  * Decorate it with modules to do things before redraw
  */
 DPicker.prototype.redraw = function () {
-  const newTree = this.getTree()
-  this._tree = nanomorph(this._tree, newTree)
+  window.requestAnimationFrame(() => {
+    this._tree = nanomorph(this._tree, this.getTree())
+  })
 }
 
 Object.defineProperties(DPicker.prototype, {
