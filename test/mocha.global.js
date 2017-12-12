@@ -18,3 +18,5 @@ global.createDatePicker = function createDatePicker(opts) {
   document.body.appendChild(container)
   return new DPicker(container, opts || undefined)
 }
+
+global.window.requestAnimationFrame = (cb) => cb()

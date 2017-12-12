@@ -11,13 +11,13 @@ fi
 bash .scripts/build.sh forpublish
 npm test
 newver=$(npm --no-git-tag-version version $1)
-git add -f dist package.json
+git add -f dist package.json package-lock.json
 git commit -m $newver
 git tag $newver
 npm publish --tag $tag
 git reset --hard HEAD~1
 newver=$(npm --no-git-tag-version version $1)
-git add package.json
+git add package.json package-lock.json
 git commit -m $newver
 git push --tags
 git push
