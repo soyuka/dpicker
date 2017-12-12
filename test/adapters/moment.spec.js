@@ -7,17 +7,17 @@ function doTest (Adapter) {
   let adapter = Adapter
 
   it('should get months', () => {
-    expect(adapter.months()).to.be.an.array
-    expect(adapter.months()).to.have.length.of(12)
+    expect(adapter.months()).to.be.an('array')
+    expect(adapter.months()).to.have.lengthOf(12)
   })
 
   it('should get weekdays', () => {
-    expect(adapter.weekdays()).to.be.an.array
-    expect(adapter.weekdays()).to.have.length.of(7)
+    expect(adapter.weekdays()).to.be.an('array')
+    expect(adapter.weekdays()).to.have.lengthOf(7)
   })
 
   it('should get firstDayOfWeek', () => {
-    expect(adapter.firstDayOfWeek()).to.be.a.number
+    expect(adapter.firstDayOfWeek()).to.be.a('number')
   })
 
   it('should check isValid', () => {

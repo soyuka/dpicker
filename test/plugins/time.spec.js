@@ -135,7 +135,7 @@ describe('dpicker.time', function() {
     expect(input.getAttribute('type')).to.equal('text')
 
     let options = document.querySelector('select[name="dpicker-hours"]').options
-    expect(options).to.have.length.of(24)
+    expect(options).to.have.lengthOf(24)
   })
 
   it('should bind to an input[type="datetime"] with meridiem', function() {
@@ -156,7 +156,7 @@ describe('dpicker.time', function() {
     expect(input.getAttribute('type')).to.equal('text')
 
     let options = document.querySelector('select[name="dpicker-hours"]').options
-    expect(options).to.have.length.of(12)
+    expect(options).to.have.lengthOf(12)
   })
 
   it('should have minutes step of 5', function() {
@@ -167,7 +167,7 @@ describe('dpicker.time', function() {
 
     let options = document.querySelector('select[name="dpicker-minutes"]').options
 
-    expect(options).to.have.length.of(12)
+    expect(options).to.have.lengthOf(12)
   })
 
   it('should not allow lower hour/min than minDate ones (24)', function() {
@@ -181,11 +181,11 @@ describe('dpicker.time', function() {
 
     let minutes = document.querySelector('select[name="dpicker-minutes"]').options
 
-    expect(minutes).to.have.length.of(50)
+    expect(minutes).to.have.lengthOf(50)
 
     let hours = document.querySelector('select[name="dpicker-hours"]').options
 
-    expect(hours).to.have.length.of(9)
+    expect(hours).to.have.lengthOf(9)
   })
 
   it('should not allow lower hour/min than minDate ones (12)', function() {
@@ -200,11 +200,11 @@ describe('dpicker.time', function() {
 
     let minutes = document.querySelector('select[name="dpicker-minutes"]').options
 
-    expect(minutes).to.have.length.of(50)
+    expect(minutes).to.have.lengthOf(50)
 
     let hours = document.querySelector('select[name="dpicker-hours"]').options
 
-    expect(hours).to.have.length.of(3)
+    expect(hours).to.have.lengthOf(3)
   })
 
   it('should keep available hours - min (#11)', function() {
@@ -217,7 +217,7 @@ describe('dpicker.time', function() {
     })
 
     let hours = document.querySelector('select[name="dpicker-hours"]').options
-    expect(hours).to.have.length.of(14)
+    expect(hours).to.have.lengthOf(14)
 
     dpicker.model = moment('1991/06/24 09:10', format)
     expect(dpicker.valid).to.be.false
@@ -225,7 +225,7 @@ describe('dpicker.time', function() {
     expect(dpicker.valid).to.be.true
 
     hours = document.querySelector('select[name="dpicker-hours"]').options
-    expect(hours).to.have.length.of(14)
+    expect(hours).to.have.lengthOf(14)
   })
 
   it('should keep available hours/minutes - max', function() {
@@ -238,16 +238,16 @@ describe('dpicker.time', function() {
     })
 
     let hours = document.querySelector('select[name="dpicker-hours"]').options
-    expect(hours).to.have.length.of(11)
+    expect(hours).to.have.lengthOf(11)
     let minutes = document.querySelector('select[name="dpicker-minutes"]').options
-    expect(minutes).to.have.length.of(11)
+    expect(minutes).to.have.lengthOf(11)
 
     dpicker.model = moment('1991/06/24 11:10', format)
     expect(dpicker.valid).to.be.false
     dpicker.model = moment('1991/06/24 09:10', format)
 
     hours = document.querySelector('select[name="dpicker-hours"]').options
-    expect(hours).to.have.length.of(11)
+    expect(hours).to.have.lengthOf(11)
     expect(dpicker.valid).to.be.true
   })
 
@@ -297,7 +297,7 @@ describe('dpicker.time', function() {
     expect(moment(dpicker.model).format(format)).to.equal('24/06/1991 16:00')
 
     let options = [].slice.call(document.querySelector('select[name="dpicker-hours"]').options).map((e) => parseInt(e.textContent))
-    expect(options).to.have.length.of(8)
+    expect(options).to.have.lengthOf(8)
     expect(options).to.deep.equal([16, 17, 18, 19, 20, 21, 22, 23])
 
     options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
@@ -404,7 +404,7 @@ describe('dpicker.time', function() {
 
     dpicker.onChange = function(data, event) {
       let minutes = document.querySelector('select[name=dpicker-minutes]')
-      expect(minutes.children).to.have.length.of(60)
+      expect(minutes.children).to.have.lengthOf(60)
 
       dpicker.onChange = function() {
         expect(moment(dpicker.model).minutes()).to.equal(7)
@@ -444,12 +444,12 @@ describe('dpicker.time', function() {
 
     let selects = document.querySelectorAll('select')
 
-    expect(selects).to.have.length.of(3)
+    expect(selects).to.have.lengthOf(3)
 
     let time = selects[2]
 
     expect(time.name).to.equal('dpicker-time')
-    expect(time.options[0].value.split(':')).to.have.length.of(2)
+    expect(time.options[0].value.split(':')).to.have.lengthOf(2)
   })
 
   it('should have correct time step when 59:59', function() {
@@ -465,7 +465,7 @@ describe('dpicker.time', function() {
     })
 
     let options = document.querySelectorAll('select[name="dpicker-time"] option')
-    expect([].slice.call(options)).to.have.length.of(36)
+    expect([].slice.call(options)).to.have.lengthOf(36)
   })
 
   it('should have correct values when concatHoursAndMinutes and step', function() {

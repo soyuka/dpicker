@@ -116,14 +116,14 @@ describe('dpicker', function() {
     const dpicker = createDatePicker({min: moment('1991-06-24'), model: moment('1991-06-24'), format: 'YYYY-MM-DD'})
 
     let days = document.querySelectorAll('button')
-    expect(days).to.have.length.of(7)
+    expect(days).to.have.lengthOf(7)
   })
 
   it('should change days active on max date', function() {
     const dpicker = createDatePicker({max: moment('1991-06-24'), model: moment('1991-06-24'), format: 'YYYY-MM-DD'})
 
     let days = document.querySelectorAll('button')
-    expect(days).to.have.length.of(24)
+    expect(days).to.have.lengthOf(24)
   })
 
   it('should bind to an input[type="date"]', function() {
