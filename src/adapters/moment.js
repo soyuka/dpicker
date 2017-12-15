@@ -68,7 +68,7 @@ function firstDayOfWeek () {
  */
 function isValid (date) {
   date = _getMoment(date, false)
-  return date instanceof moment && date.isValid()
+  return moment.isMoment(date) && date.isValid()
 }
 
 /**
