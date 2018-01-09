@@ -12,12 +12,14 @@ function keyDown(keyCode, element) {
   element.dispatchEvent(event);
 }
 
+function noop() {}
+
 require('./adapters/moment.spec.js')
 
 describe('dpicker', function() {
   const DPicker = require('../dist/dpicker.js')
 
-  beforeEach(() => {
+  afterEach(() => {
     document.body.innerHTML = ''
   })
 
@@ -53,6 +55,7 @@ describe('dpicker', function() {
         expect(''+moment(dpicker.model).year()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
+        dpicker.onChange = noop
       }
     })
 
@@ -71,6 +74,7 @@ describe('dpicker', function() {
         expect(''+moment(dpicker.model).month()).to.equal(select.options[selectedIndex].value)
         expect(input.value).to.equal(dpicker.input)
         cb()
+        dpicker.onChange = noop
       }
     })
 
@@ -140,7 +144,7 @@ describe('dpicker', function() {
     label.setAttribute('for', 't')
     document.body.appendChild(label)
 
-    const dpicker = DPicker(input)
+    const dpicker = DPicker(input, {display: true})
 
     expect(dpicker.inputId).to.equal('t')
     expect(dpicker.format).to.equal('YYYY-MM-DD')
@@ -208,10 +212,11 @@ describe('dpicker', function() {
 
   it('should change dpicker according to input change', function(cb) {
     const dpicker = createDatePicker({
-      onChange: (data) => {
+      onChange: (data, ev) => {
         expect(dpicker.input).to.equal('24/06/1991')
         cb()
-      }
+      },
+      display: false
     })
 
     let input = document.querySelector('input[name=dpicker-input]')
@@ -226,7 +231,8 @@ describe('dpicker', function() {
       onChange: (data) => {
         expect(dpicker.input).to.equal('')
         cb()
-      }
+      },
+      display: false
     })
 
     let input = document.querySelector('input[name=dpicker-input]')
@@ -249,21 +255,20 @@ describe('dpicker', function() {
   })
 
   it('should display dpicker on input focus', function() {
-    const dpicker = createDatePicker()
+    const dpicker = createDatePicker({display: false})
     let input = document.querySelector('input[name=dpicker-input]')
     input.focus()
     expect(dpicker.display).to.be.true
   })
 
   it('should hide container on outside click', function() {
-    const dpicker = createDatePicker()
-    dpicker.display = true
+    const dpicker = createDatePicker({display: true})
     document.body.click()
     expect(dpicker.display).to.be.false
   })
 
   it('should not hide container on inside click', function() {
-    const dpicker = createDatePicker()
+    const dpicker = createDatePicker({display: false})
     let input = document.querySelector('input[name=dpicker-input]')
 
     input.focus()
@@ -428,7 +433,8 @@ describe('dpicker', function() {
     let dpicker = DPicker(label, {
       max: moment('24/06/1991', 'DD/MM/YYYY'),
       model: moment('26/06/1991', 'DD/MM/YYYY'),
-      format: 'DD/MM/YYYY'
+      format: 'DD/MM/YYYY',
+      display: true
     })
 
     document.body.appendChild(label)
@@ -448,7 +454,9 @@ describe('dpicker', function() {
     let dpicker = DPicker(label, {
       model: moment('26/06/1991', 'DD/MM/YYYY'),
       format: 'DD/MM/YYYY',
-      siblingMonthDayClick: true
+      siblingMonthDayClick: true,
+      display: true,
+      hideOnDayClick: false
     })
 
     document.body.appendChild(label)
@@ -477,7 +485,9 @@ describe('dpicker', function() {
     let dpicker = DPicker(label, {
       model: moment('26/06/1991', 'DD/MM/YYYY'),
       format: 'DD/MM/YYYY',
-      siblingMonthDayClick: true
+      siblingMonthDayClick: true,
+      display: true,
+      hideOnDayClick: false
     })
 
     document.body.appendChild(label)
@@ -495,7 +505,9 @@ describe('dpicker', function() {
       model: moment('26/06/1991', 'DD/MM/YYYY'),
       max: moment('30/06/1991', 'DD/MM/YYYY'),
       format: 'DD/MM/YYYY',
-      siblingMonthDayClick: true
+      siblingMonthDayClick: true,
+      display: true,
+      hideOnDayClick: false
     })
 
     document.body.appendChild(label)
@@ -513,7 +525,9 @@ describe('dpicker', function() {
       model: moment('26/06/1991', 'DD/MM/YYYY'),
       min: moment('10/06/1991', 'DD/MM/YYYY'),
       format: 'DD/MM/YYYY',
-      siblingMonthDayClick: true
+      siblingMonthDayClick: true,
+      display: true,
+      hideOnDayClick: false
     })
 
     document.body.appendChild(label)
@@ -543,7 +557,8 @@ describe('dpicker', function() {
       onChange: (data) => {
         expect(document.querySelectorAll('td.dpicker-active').length).to.be.above(0)
         cb()
-      }
+      },
+      display: true
     })
 
     document.body.appendChild(label)
@@ -567,7 +582,8 @@ describe('dpicker', function() {
       onChange: (data) => {
         expect(document.querySelectorAll('td.dpicker-active').length).to.be.above(0)
         cb()
-      }
+      },
+      display: true
     })
 
     document.body.appendChild(label)

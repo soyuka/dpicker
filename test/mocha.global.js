@@ -6,7 +6,7 @@ global.screen = {}
 const DPicker = require('../dist/dpicker.js')
 let container
 
-global.createDatePicker = function createDatePicker(opts) {
+global.createDatePicker = function createDatePicker(opts = {}) {
   if (container) {
     try {
       document.body.removeChild(container)
@@ -16,7 +16,8 @@ global.createDatePicker = function createDatePicker(opts) {
   container = document.createElement('div')
   container.setAttribute('id', 'dpicker')
   document.body.appendChild(container)
-  return new DPicker(container, opts || undefined)
+  opts.display = opts.display !== undefined ? opts.display : true
+  return new DPicker(container, opts)
 }
 
 global.window.requestAnimationFrame = (cb) => cb()

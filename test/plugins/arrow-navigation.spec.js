@@ -12,7 +12,7 @@ describe('dpicker.arrow-navigation', function() {
 
   it('should enable arrows navigation on days', function() {
     let label = document.createElement('label')
-    let dpicker = DPicker(label, {model: moment('24/06/1991', 'DD/MM/YYYY')})
+    let dpicker = DPicker(label, {model: moment('24/06/1991', 'DD/MM/YYYY'), display: true})
     document.body.appendChild(label)
 
     let dateFocusIs = function(x) {

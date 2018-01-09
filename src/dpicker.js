@@ -244,6 +244,10 @@ DPicker.prototype._getContainer = function (container) {
  * @return Array<VNode>
  */
 DPicker.prototype._getRenderChild = function () {
+  if (!this.data.display) {
+    return ''
+  }
+
   let children = {
     years: this.renderYears(this.events, this.data),
     months: this.renderMonths(this.events, this.data)

@@ -128,7 +128,7 @@ describe('dpicker.time', function() {
     label.setAttribute('for', 't')
     document.body.appendChild(label)
 
-    const dpicker = DPicker(input)
+    const dpicker = DPicker(input, {display: true})
     expect(dpicker.time).to.equal(true)
 
     input = document.getElementById('t')
@@ -149,7 +149,7 @@ describe('dpicker.time', function() {
     label.setAttribute('for', 't')
     document.body.appendChild(label)
 
-    const dpicker = DPicker(input)
+    const dpicker = DPicker(input, {display: true})
     expect(dpicker.time).to.equal(true)
 
     input = document.getElementById('t')
@@ -290,7 +290,7 @@ describe('dpicker.time', function() {
     label.setAttribute('for', 't')
     document.body.appendChild(label)
 
-    const dpicker = DPicker(input)
+    const dpicker = DPicker(input, {display: true})
     expect(dpicker.time).to.equal(true)
     expect(dpicker.step).to.equal(15)
 
@@ -317,7 +317,7 @@ describe('dpicker.time', function() {
     label.appendChild(input)
     document.body.appendChild(label)
 
-    const dpicker = DPicker(input)
+    const dpicker = DPicker(input, {display: true})
 
     dpicker.onChange = function() {
       let options = [].slice.call(document.querySelector('select[name="dpicker-minutes"]').options).map((e) => parseInt(e.textContent))
@@ -358,6 +358,7 @@ describe('dpicker.time', function() {
       meridiem: true,
       format: format,
       model: moment('1991/06/24 12:00 PM', format),
+      display: true
     })
 
     let moptions = document.querySelector('select[name="dpicker-meridiem"]').options
@@ -437,7 +438,8 @@ describe('dpicker.time', function() {
     let label = document.createElement('label')
     let dpicker = DPicker(label, {
       time: true,
-      concatHoursAndMinutes: true
+      concatHoursAndMinutes: true,
+      display: true
     })
 
     document.body.appendChild(label)
