@@ -611,6 +611,16 @@ describe('dpicker', function() {
     expect(newInput.getAttribute('data-foo')).to.equal('bar')
     expect(newInput.classList.contains('my-class')).to.be.true
   })
+
+  it('should enable/disable input on disabled option toggle', function() {
+    const dpicker = createDatePicker({disabled: true})
+    let input = document.querySelector('input[name=dpicker-input]')
+    dpicker.disabled = true
+    expect(input.getAttribute('disabled')).to.equal('disabled')
+    dpicker.disabled = false
+    expect(input.getAttribute('disabled')).to.be.null
+  })
+
 })
 
 require('./plugins/arrow-navigation.spec.js')
