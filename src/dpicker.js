@@ -866,7 +866,7 @@ DPicker.renders = {}
 /**
  * @property {Object} properties Properties dictionnary (getters and setters will be set)
  */
-DPicker.properties = {display: false}
+DPicker.properties = { display: false, disabled: false }
 
 /**
  * @property {DateAdapter} dateAdapter The date adapter
