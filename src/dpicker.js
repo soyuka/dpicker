@@ -22,6 +22,7 @@ const html = require('bel')
  * @param {Array} [options.order] The dom elements appending order.
  * @param {Boolean} [options.time=false] Enable time (must include the time module)
  * @param {Boolean} [options.meridiem=false] 12/24 hour format, default 24
+ * @param {Boolean} [options.disabled=false] Disable the input box
  * @param {Number} [options.step=1] Minutes step
  * @param {Boolean} [options.concatHoursAndMinutes=false] Use only one select box for both hours and minutes
  * @param {Boolean} [options.empty=false] Use this so force DPicker with an empty input instead of setting it to the formatted current date
@@ -59,6 +60,7 @@ function DPicker (element, options = {}) {
     hideOnDayClick: true,
     hideOnEnter: true,
     hideOnOutsideClick: true,
+    disabled: false,
     siblingMonthDayClick: false,
     firstDayOfWeek: DPicker.dateAdapter.firstDayOfWeek()
   }
@@ -336,6 +338,7 @@ DPicker.prototype.renderInput = function (events, data, toRender) {
     name="${data.inputName}"
     autocomplete="off"
     aria-invalid="${data.valid}" aria-haspopup
+    disabled="${data.disabled}"
     class="${data.valid === false ? 'dpicker-invalid' : ''}">`
 }
 
