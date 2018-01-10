@@ -111,6 +111,14 @@ function DPicker (element, options = {}) {
   document.addEventListener('click', this.events.hide)
 
   document.addEventListener('touchend', (e) => {
+    if (!this.data.hideOnOutsideClick) {
+      return
+    }
+
+    if (isElementInContainer(e.target, this._container)) {
+      return
+    }
+
     this.events.inputBlur(e)
   })
 
