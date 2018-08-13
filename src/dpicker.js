@@ -1,5 +1,5 @@
 const nanomorph = require('nanomorph')
-const html = require('bel')
+const html = require('nanohtml')
 
 /**
  * DPicker
@@ -9,13 +9,15 @@ const html = require('bel')
  * @param {Date} [options.model=new Date()] Your own model instance, defaults to `new Date()` (can be set by the `value` attribute on an input, transformed to moment according to the given format)
  * @param {Date} [options.min=1986-01-01] The minimum date (can be set by the `min` attribute on an input)
  * @param {Date} [options.max=today+1 year] The maximum date (can be set by the `max` attribute on an input)
- * @param {String} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input)
+ * @param {String|Array} [options.format='DD/MM/YYYY'] The input format, a moment format (can be set by the `format` attribute on an input). If the aformat is an array, it'll enable multiple input formats. The first one will be the output format.
  * @param {String} [options.months=adapter.months()] Months array, see also [adapter.months()](todo)
  * @param {String} [options.days=adapter.weekdaysShort()] Days array, see also [adapter.weekdays()](todo)
  * @param {Boolean} [options.display=false] Initial calendar display state (not that when false it won't render the calendar)
  * @param {Boolean} [options.hideOnOutsideClick=true] On click outside of the date picker, hide the calendar
  * @param {Boolean} [options.hideOnDayClick=true] Hides the date picker on day click
  * @param {Boolean} [options.hideOnDayEnter=true] Hides the date picker when Enter or Escape is hit
+ * @param {Boolean} [options.showCalendarOnInputFocus=true] Shows the calendar on input focus
+ * @param {Boolean} [options.showCalendarButton=false] Adds a calendar button
  * @param {Boolean} [options.siblingMonthDayClick=false] Enable sibling months day click
  * @param {Function} [options.onChange] A function to call whenever the data gets updated
  * @param {String} [options.inputId=uuid()] The input id, useful to add you own label (can only be set in the initiation phase) If element is an inputand it has an `id` attribute it'll be overriden by it
@@ -61,6 +63,8 @@ function DPicker (element, options = {}) {
     hideOnDayClick: true,
     hideOnEnter: true,
     hideOnOutsideClick: true,
+    showCalendarOnInputFocus: true,
+    showCalendarButton: false,
     disabled: false,
     siblingMonthDayClick: false,
     firstDayOfWeek: DPicker.dateAdapter.firstDayOfWeek()
@@ -109,7 +113,6 @@ function DPicker (element, options = {}) {
   this.onChange = options.onChange
 
   document.addEventListener('click', this.events.hide)
-
   document.addEventListener('touchend', (e) => {
     if (!this.data.hideOnOutsideClick) {
       return
@@ -290,6 +293,7 @@ DPicker.prototype._mount = function (element) {
 DPicker.prototype.getTree = function () {
   return this.renderContainer(this.events, this.data, [
     this.renderInput(this.events, this.data),
+    this.renderCalendar(this.events, this.data),
     this.render(this.events, this.data, this._getRenderChild())
   ])
 }
@@ -476,60 +480,70 @@ DPicker.prototype.renderDays = function (events, data, toRender) {
   return html`<table>
     <tr>${days.map(e => html`<th>${e}</th>`)}</tr>
     ${rows.map((e, row) => {
-      return html`<tr>${new Array(7).fill(0).map((e, col) => {
-        dayActive = loopend
-        classActive = ''
+    return html`<tr>${new Array(7).fill(0).map((e, col) => {
+      dayActive = loopend
+      classActive = ''
 
-        if (col <= firstDay && row === 0) {
-          day = daysInPreviousMonth - (firstDay - col)
+      if (col <= firstDay && row === 0) {
+        day = daysInPreviousMonth - (firstDay - col)
+        dayActive = false
+        previousMonth = true
+      } else if (col === firstDay + 1 && row === 0) {
+        previousMonth = false
+        day = 1
+        dayActive = true
+      } else {
+        if (day === daysInMonth) {
+          day = 0
           dayActive = false
-          previousMonth = true
-        } else if (col === firstDay + 1 && row === 0) {
-          previousMonth = false
-          day = 1
-          dayActive = true
-        } else {
-          if (day === daysInMonth) {
-            day = 0
-            dayActive = false
-            loopend = false
-            nextMonth = true
-          }
-
-          day++
+          loopend = false
+          nextMonth = true
         }
 
-        let dayMonth = previousMonth ? currentMonth : (nextMonth ? currentMonth + 2 : currentMonth + 1)
-        let currentDayModel = new Date(currentYear, dayMonth - 1, day)
+        day++
+      }
 
-        if (dayActive === false && data.siblingMonthDayClick === true) {
-          dayActive = true
-        }
+      let dayMonth = previousMonth ? currentMonth : (nextMonth ? currentMonth + 2 : currentMonth + 1)
+      let currentDayModel = new Date(currentYear, dayMonth - 1, day)
 
-        if (data.min && dayActive) {
-          dayActive = DPicker.dateAdapter.isSameOrAfter(currentDayModel, data.min)
-        }
+      if (dayActive === false && data.siblingMonthDayClick === true) {
+        dayActive = true
+      }
 
-        if (data.max && dayActive) {
-          dayActive = DPicker.dateAdapter.isSameOrBefore(currentDayModel, data.max)
-        }
+      if (data.min && dayActive) {
+        dayActive = DPicker.dateAdapter.isSameOrAfter(currentDayModel, data.min)
+      }
 
-        if (dayActive === true && previousMonth === false && nextMonth === false && currentDay === day) {
-          classActive = 'dpicker-active'
-        }
+      if (data.max && dayActive) {
+        dayActive = DPicker.dateAdapter.isSameOrBefore(currentDayModel, data.max)
+      }
 
-        return html`<td class="${dayActive === true ? 'dpicker-active' : 'dpicker-inactive'}">
-          ${
-            dayActive === true
-              ? html`<button value="${day}" aria-label="Day ${day}" aria-disabled="${dayActive}" onclick="${previousMonth === false && nextMonth === false ? events.dayClick : (previousMonth === true ? events.previousMonthDayClick : events.nextMonthDayClick)}" type="button" onkeydown="${events.dayKeyDown}" class="${classActive}">
-                ${day}
-              </button>`
-            : html`<span class="${classActive}">${day}</span>`
-          }
-          </td>`
-      })}</tr>`
-    })}
+      if (dayActive === true && previousMonth === false && nextMonth === false && currentDay === day) {
+        classActive = 'dpicker-active'
+      }
+
+      const button = html`<button value="${day}" aria-label="Day ${day}" aria-disabled="${dayActive}" onclick="${previousMonth === false && nextMonth === false ? events.dayClick : (previousMonth === true ? events.previousMonthDayClick : events.nextMonthDayClick)}" type="button" onkeydown="${events.dayKeyDown}" class="${classActive}">${day}</button>`
+
+      return html`<td class="${dayActive === true ? 'dpicker-active' : 'dpicker-inactive'}">
+        ${dayActive === true ? button : html`<span class="${classActive}">${day}</span>`}
+      </td>`
+    })}</tr>`
+  })}
   </table>`
+}
+
+/**
+* Outputs a calendar button
+* @param {DPicker.events} events
+* @param {DPicker.data} data
+* @param {Array} toRender
+* @fires DPicker#toggleCalendar
+*
+* @return {Element}
+*/
+DPicker.prototype.renderCalendar = function renderCalendar (events, data) {
+  if (!data.showCalendarButton) return ''
+  return html`<button tabindex="-1" onclick="${events.toggleCalendar}" name="dpicker-button-calendar" class="dpicker-button-calendar"></button>`
 }
 
 /**
@@ -734,6 +748,10 @@ DPicker.events = {
     * @event DPicker#inputFocus
     */
   inputFocus: function inputFocus (evt) {
+    if (this.data.showCalendarOnInputFocus === false) {
+      return
+    }
+
     this.display = true
     if (evt.target && evt.target.select) {
       evt.target.select()
@@ -864,7 +882,17 @@ DPicker.events = {
     document.getElementById(this.inputId).blur()
     this.display = false
     this.onChange({modelChanged: false, name: 'keyDown', event: evt})
+  },
+
+  /**
+  * Show calendar
+  * @event Dpicker#showCalendar
+  */
+  toggleCalendar: function showCalendar (evt) {
+    this.display = !this.display
+    this.onChange({modelChanged: false, name: 'toggleCalendar', event: evt})
   }
+
 }
 
 /**

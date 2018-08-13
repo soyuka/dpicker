@@ -1,3 +1,5 @@
+/* global it, describe */
+/* eslint-disable no-unused-expressions */
 'use strict'
 const MomentDateAdapter = require('../../src/adapters/moment.js')
 const moment = require('moment')

@@ -1,6 +1,6 @@
-const html = require('bel')
+const html = require('nanohtml')
 
-module.exports = function(DPicker) {
+module.exports = function (DPicker) {
   const MINUTES = new Array(60).fill(0).map((e, i) => i)
   const HOURS24 = new Array(24).fill(0).map((e, i) => i)
   const HOURS12 = new Array(12).fill(0).map((e, i) => i === 0 ? 12 : i)
@@ -17,7 +17,6 @@ module.exports = function(DPicker) {
     let hours = data.meridiem ? HOURS12 : HOURS24
     const step = parseInt(data.step)
     let minutes = MINUTES.filter(e => e % step === 0)
-    const modelHours = DPicker.dateAdapter.getHours(data.model)
 
     ;[data.min, data.max].map((e, i) => {
       if (!DPicker.dateAdapter.isSameDay(data.model, e)) {
@@ -26,10 +25,8 @@ module.exports = function(DPicker) {
 
       let xHours = DPicker.dateAdapter.getHours(e)
       let xMinutes = DPicker.dateAdapter.getMinutes(e)
-      let x = e
-
       if (i === 0 && xMinutes + step > 60) {
-        x = DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(x, i === 0 ? ++xHours : --xHours), 0)
+        DPicker.dateAdapter.setMinutes(DPicker.dateAdapter.setHours(e, i === 0 ? ++xHours : --xHours), 0)
         xMinutes = 0
       }
 
@@ -124,53 +121,39 @@ module.exports = function(DPicker) {
     const maxMinutes = DPicker.dateAdapter.getMinutes(data.max)
 
     if (data.concatHoursAndMinutes) {
-      selects.push(
-        html`<select onchange="${events.minuteHoursChange}" name="dpicker-time" aria-label="time">
-          ${
-            [].concat.apply([], minutes.map(minute => {
-              return hours.map(hour => `${hour}:${minute}`)
-            }))
-            .filter((e) => {
-              let hm = e.split(':').map(parseFloat)
+      const options = [].concat.apply([], minutes.map(minute => {
+        return hours.map(hour => `${hour}:${minute}`)
+      }))
+        .filter((e) => {
+          let hm = e.split(':').map(parseFloat)
 
-              if (DPicker.dateAdapter.isSameDay(data.model, data.min) && hm[0] === minHours && hm[1] < minMinutes) {
-                return false
-              }
-
-              if (DPicker.dateAdapter.isSameDay(data.model, data.max) && hm[0] === maxHours && hm[1] > maxMinutes) {
-                return false
-              }
-
-              return true
-            })
-            .sort((a, b) => {
-              a = a.split(':').map(parseFloat)
-              b = b.split(':').map(parseFloat)
-
-              if (a[0] < b[0]) {
-                return -1
-              }
-
-              if (a[0] > b[0]) {
-                return 1
-              }
-
-              if (a[1] < b[1]) {
-                return -1
-              }
-
-              if (a[1] > b[1]) {
-                return 1
-              }
-
-              return 0
-            })
-            .map((value) => {
-              const text = value.split(':').map(padLeftZero).join(':')
-              return html`<option ${value === modelStringValue ? 'selected' : ''} value="${value}">${text}</option>`
-            })
+          if (DPicker.dateAdapter.isSameDay(data.model, data.min) && hm[0] === minHours && hm[1] < minMinutes) {
+            return false
           }
-        </select>`
+
+          if (DPicker.dateAdapter.isSameDay(data.model, data.max) && hm[0] === maxHours && hm[1] > maxMinutes) {
+            return false
+          }
+
+          return true
+        })
+        .sort((a, b) => {
+          a = a.split(':').map(parseFloat)
+          b = b.split(':').map(parseFloat)
+
+          if (a[0] < b[0]) return -1
+          if (a[0] > b[0]) return 1
+          if (a[1] < b[1]) return -1
+          if (a[1] > b[1]) return 1
+          return 0
+        })
+        .map((value) => {
+          const text = value.split(':').map(padLeftZero).join(':')
+          return html`<option ${value === modelStringValue ? 'selected' : ''} value="${value}">${text}</option>`
+        })
+
+      selects.push(
+        html`<select onchange="${events.minuteHoursChange}" name="dpicker-time" aria-label="time">${options}</select>`
       )
     } else {
       selects.push(

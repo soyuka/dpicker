@@ -77,6 +77,20 @@ function isValid (date) {
  * @return {Date|Boolean} false if invalid or the parsed date, parsing is heaving let's do this only once
  */
 function isValidWithFormat (dateString, format) {
+  if (Array.isArray(format)) {
+    let date = false
+
+    for (let i = 0; i < format.length; i++) {
+      const testDate = moment(dateString, format[i], true)
+      if (this.isValid(testDate) === true) {
+        date = testDate.toDate()
+        break
+      }
+    }
+
+    return date
+  }
+
   const testDate = moment(dateString, format, true)
   if (this.isValid(testDate) === true) {
     return testDate.toDate()
@@ -265,6 +279,7 @@ function subMonths (date, num) {
  * @return {String}
  */
 function format (date, format) {
+  if (Array.isArray(format)) { format = format[0] }
   return _getMoment(date, false).format(format)
 }
 

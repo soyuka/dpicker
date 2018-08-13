@@ -1,4 +1,4 @@
-module.exports = function(DPicker) {
+module.exports = function (DPicker) {
   /**
   * Enables modifiers on `+[num]` and `-[num]` where:
   * - `+` gives the current date

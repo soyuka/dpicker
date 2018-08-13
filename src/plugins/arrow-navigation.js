@@ -1,4 +1,4 @@
-module.exports = function(DPicker) {
+module.exports = function (DPicker) {
   /**
   * Get element position in parent
   * @param {Element} children

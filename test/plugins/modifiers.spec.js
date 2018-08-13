@@ -1,16 +1,17 @@
+/* global it, describe, before, createDatePicker */
 'use strict'
 const moment = require('moment')
 const expect = require('chai').expect
 const DPicker = require('../../dist/dpicker.js')
 
-describe('dpicker.modifiers', function() {
+describe('dpicker.modifiers', function () {
   require('../../dist/dpicker.modifiers.js')(DPicker)
 
   before(() => {
     document.body.innerHTML = ''
   })
 
-  it('should replace modifiers', function() {
+  it('should replace modifiers', function () {
     const now = moment()
     const dpicker = createDatePicker()
 
@@ -37,9 +38,9 @@ describe('dpicker.modifiers', function() {
     expect(moment(dpicker.model).format('YYYYMMDD')).to.equal(now.clone().subtract(10, 'days').format('YYYYMMDD'))
   })
 
-  it('should call onChange twice', function(cb) {
+  it('should call onChange twice', function (cb) {
     let i = 0
-    const dpicker = createDatePicker({onChange: function() {
+    createDatePicker({onChange: function () {
       if (++i === 2) {
         cb()
       }

@@ -1,6 +1,6 @@
-const html = require('bel')
+const html = require('nanohtml')
 
-module.exports = function(DPicker) {
+module.exports = function (DPicker) {
 /**
   * Renders concated months and Years
   * @param {DPicker.events} events
@@ -10,7 +10,7 @@ module.exports = function(DPicker) {
   *
   * @return {Element}
   */
-  DPicker.renders.monthsAndYears = function rendermonthsAndYears(events, data) {
+  DPicker.renders.monthsAndYears = function rendermonthsAndYears (events, data) {
     const minMonth = DPicker.dateAdapter.getMonth(data.min)
     const minYear = DPicker.dateAdapter.getYear(data.min)
 
@@ -21,16 +21,20 @@ module.exports = function(DPicker) {
     const maxYear = DPicker.dateAdapter.getYear(data.max)
 
     // start with min month in year of min
-    let showMonths = data.months.map(function(e, i){return {month: i, year: minYear}}).filter(obj => obj.month >= minMonth)
+    let showMonths = data.months.map(function (e, i) {
+      return {month: i, year: minYear}
+    }).filter(obj => obj.month >= minMonth)
 
     // fill months of all years
-    let yearsToShow = maxYear - minYear;
+    let yearsToShow = maxYear - minYear
     for (var index = 1; index <= yearsToShow; index++) {
-      showMonths = showMonths.concat(data.months.map(function(e, i){return {month: i, year: minYear + index}}))
+      showMonths = showMonths.concat(data.months.map(function (e, i) {
+        return {month: i, year: minYear + index}
+      }))
     }
 
     // remove unnecessary months of max year
-    showMonths = showMonths.filter(function(obj){
+    showMonths = showMonths.filter(function (obj) {
       if (obj.year < maxYear) {
         return true
       }
@@ -46,7 +50,7 @@ module.exports = function(DPicker) {
   * MonthYear
   * @event Dpicker#monthYearChange
   */
-  DPicker.events.monthYearChange = function monthYearChange(evt) {
+  DPicker.events.monthYearChange = function monthYearChange (evt) {
     let selectedMonthYear = evt.target.value.split('-')
     this.model = DPicker.dateAdapter.setMonth(this.data.model, selectedMonthYear[0])
     this.model = DPicker.dateAdapter.setYear(this.data.model, selectedMonthYear[1])
