@@ -1,0 +1,225 @@
+// Core variables and mixins
+@import "bootstrap/variables";
+$input-border-radius: 0px;
+$input-border-focus: lighten(#ffab40, 20%);
+$alert-border-radius:         0px;
+$alert-warning-bg:            lighten(#ffab40, 25%);
+$alert-warning-text:          darken(#ffab40, 50%);
+$alert-warning-border:        darken(#ffab40, 20%);
+
+@import "bootstrap/mixins";
+
+// Reset and dependencies
+@import "bootstrap/normalize";
+@import "bootstrap/print";
+
+// Core CSS
+@import "bootstrap/scaffolding";
+@import "bootstrap/type";
+@import "bootstrap/code";
+@import "bootstrap/grid";
+@import "bootstrap/tables";
+@import "bootstrap/forms";
+@import "bootstrap/buttons";
+
+ @import "bootstrap/alerts";
+
+// Utility classes
+@import "bootstrap/utilities";
+@import "bootstrap/responsive-utilities";
+
+@mixin form-control {
+  display: block;
+  width: 100%;
+  height: $input-height-base; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  padding: $padding-base-vertical $padding-base-horizontal;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $input-color;
+  background-color: $input-bg;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: 1px solid $input-border;
+  border-radius: $input-border-radius; // Note: This has no effect on <select>s in some browsers, due to the limited stylability of <select>s in CSS.
+  @include box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+  @include transition(border-color ease-in-out .15s, box-shadow ease-in-out .15s);
+
+  // Customize the `:focus` state to imitate native WebKit styles.
+  @include form-control-focus;
+
+  // Placeholder
+  @include placeholder;
+
+  // Unstyle the caret on `<select>`s in IE10+.
+  &::-ms-expand {
+    border: 0;
+    background-color: transparent;
+  }
+
+  // Disabled and read-only inputs
+  //
+  // HTML5 says that controls under a fieldset > legend:first-child won't be
+  // disabled if the fieldset is disabled. Due to implementation difficulty, we
+  // don't honor that edge case; we style them as disabled anyway.
+  &[disabled],
+  &[readonly],
+  fieldset[disabled] & {
+    background-color: $input-bg-disabled;
+    opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
+  }
+
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: $cursor-disabled;
+  }
+}
+
+@mixin button {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 0; // For input.btn
+  font-weight: $btn-font-weight;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: 1px solid transparent;
+  white-space: nowrap;
+  @include button-size($padding-base-vertical, $padding-base-horizontal, $font-size-base, $line-height-base, 0);
+  @include user-select(none);
+  @include button-variant($btn-default-color, $btn-default-bg, transparent);
+
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      @include tab-focus;
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &.focus {
+    color: $btn-default-color;
+    text-decoration: none;
+  }
+
+}
+
+#heading {
+  padding: 50px 0;
+  text-align: center;
+  background-color: #F1F8E9;
+}
+
+#main {
+  background-color: #fff;
+}
+
+.main-container, #demo {
+  margin-top: 30px;
+}
+
+.dpicker-main {
+  .dpicker-container {
+    position: relative !important;
+    border: 0 !important;
+    min-width: auto !important;
+  }
+}
+
+.dpicker {
+  .dpicker-invalid {
+    border: 1px solid #e65100;
+  }
+
+  @include form-inline;
+
+  input, select {
+    @include form-control;
+  }
+
+  .dpicker-inactive {
+    color: lighten(#111, 50%);
+  }
+
+  .dpicker-next-month::before {
+    content: '\2771';
+  }
+
+  .dpicker-previous-month::before {
+    content: '\2770';
+  }
+
+  .dpicker-previous-month.dpicker-invisible, .dpicker-next-month.dpicker-invisible{
+    visibility: hidden;
+  }
+
+  .dpicker-container {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 0;
+    z-index: 2;
+    background: #fff;
+    border: 1px solid darken(#fff, 20%);
+    padding: 15px;
+    min-width: 500px;
+    text-align: center;
+    justify-content: space-between;
+
+    &.dpicker-invisible {
+      display: none;
+    }
+
+    .dpicker-time {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+      flex: 0 0 100%;
+
+      select {
+        display: inline-block;
+        width: auto;
+        margin: 0 10px;
+      }
+    }
+
+    .dpicker-previous-month, .dpicker-next-month {
+      background: transparent;
+      border: 0;
+      flex: 0 0 10%;
+    }
+
+    select {
+      flex: 0 0 30%;
+    }
+
+    table {
+      text-align: center;
+      border-collapse: 'collapse';
+      margin: 10px auto 0;
+      width: 90%;
+
+      td.dpicker-inactive {
+        padding: 7px 8px;
+      }
+
+      th {
+        text-align: center;
+      }
+
+      button {
+        @include button();
+        @include button-size(6px, 8px, $font-size-base, $line-height-base, 3px);
+
+        &.dpicker-active {
+          @include button-variant(#111, #ffab40, darken(#ffab40, 20%));
+        }
+      }
+    }
+  }
+}
