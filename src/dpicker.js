@@ -504,7 +504,7 @@ DPicker.prototype.renderDays = function (events, data, toRender) {
       }
 
       let dayMonth = previousMonth ? currentMonth : (nextMonth ? currentMonth + 2 : currentMonth + 1)
-      let currentDayModel = new Date(currentYear, dayMonth - 1, day)
+      let currentDayModel = new Date(Date.UTC(currentYear, dayMonth - 1, day))
 
       if (dayActive === false && data.siblingMonthDayClick === true) {
         dayActive = true
